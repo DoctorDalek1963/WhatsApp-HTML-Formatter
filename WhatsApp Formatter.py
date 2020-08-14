@@ -9,12 +9,6 @@ import shutil
 
 # Debug bit
 print()
-# print(os.getcwd())
-if "".join(list(os.getcwd())[-4:]) != "venv":  # If not in /venv
-    os.chdir(os.getcwd() + "/venv")  # Set working dir to /venv
-# print(os.getcwd())
-# print()
-
 print("Welcome to the WhatsApp Formatter!")
 print()
 print("Please move the selected zip to /venv/")
