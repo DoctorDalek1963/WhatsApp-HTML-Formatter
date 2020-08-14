@@ -43,9 +43,8 @@ except OSError:
 print("Reformatting...")
 
 # Creates chat_txt as list of _chat.txt
-file = open("Work Folder/_chat.txt", encoding="utf-8")
-chat_txt_list = file.read().splitlines()
-file.close()
+with open("Work Folder/_chat.txt", encoding="utf-8") as f:
+    chat_txt_list = f.read().splitlines()
 
 extension_tuple = (".opus", ".m4a")  # List of accepted non-mp3 audio files
 
@@ -243,9 +242,8 @@ def create_message_block(string):
 
 html_file = open("{output}/{name}.html".format(output=outputDir, name=recipName), "w+", encoding="utf-8")
 
-file = open("start_template.txt", encoding="utf-8")
-start_template = file.readlines()
-file.close()
+with open("start_template.txt", encoding="utf-8") as f:
+    start_template = f.readlines()
 
 # Replace recipName in start_template
 for i, line in enumerate(start_template):
@@ -280,9 +278,8 @@ for i in chat_txt_list:
     # Writes reformatted & complete message to recipName.html
     # USE THAT WHEN DONE
 
-file = open("end_template.txt", encoding="utf-8")
-end_template = file.readlines()
-file.close()
+with open("end_template.txt", encoding="utf-8") as f:
+    end_template = f.readlines()
 
 # Add end template
 for i in end_template:
