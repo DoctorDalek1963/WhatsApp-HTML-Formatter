@@ -20,10 +20,10 @@ print()
 outputDir = input("Please enter a full output directory: ")
 print()
 
-# Extracts selected zip file to /Work Folder/
+# Extracts selected zip file to /temp/
 zip_ref = zf.ZipFile(input_file)
 print("Unzipping...")
-zip_ref.extractall("Work Folder")
+zip_ref.extractall("temp")
 zip_ref.close()
 print("Unzipped!")
 print()
@@ -37,7 +37,7 @@ except OSError:
 print("Reformatting...")
 
 # Creates chat_txt as list of _chat.txt
-with open("Work Folder/_chat.txt", encoding="utf-8") as f:
+with open("temp/_chat.txt", encoding="utf-8") as f:
     chat_txt_list = f.read().splitlines()
 
 extension_tuple = (".opus", ".m4a")  # List of accepted non-mp3 audio files
@@ -129,7 +129,7 @@ def reformat(string):
 def convert_audio(filename):
     """Convert all audio files to .mp3 to be used in HTML."""
     # Convert audio file to mp3
-    pd.AudioSegment.from_file(f"Work Folder/{filename}").export(
+    pd.AudioSegment.from_file(f"temp/{filename}").export(
         f"{outputDir}/{recipName}/{filename}", format="mp3")
     return filename
 
@@ -157,7 +157,7 @@ def add_attachments(string):
         return string
 
     # Copy file & metadata to attachment dir
-    shutil.copy2(f"Work Folder/{filename}", f"{outputDir}/{recipName}/{filename}")
+    shutil.copy2(f"temp/{filename}", f"{outputDir}/{recipName}/{filename}")
 
     if extension == ".mp3":
         string = string_start + f"<audio src=\"{recipName}/{filename}\" controls></audio>"
@@ -274,12 +274,14 @@ with open("end_template.txt", encoding="utf-8") as f:
 for i in end_template:
     html_file.write(i)
 
-# ===== Clear up Work Folder
+# ===== Clear up /temp/
 
-# Deletes all files in /Work Folder
-files = g.glob("Work Folder/*")
+# Deletes all files in /temp/
+files = g.glob("temp/*")
 for f in files:
     os.remove(f)
+
+os.rmdir("temp")
 
 print()
 print("Process complete!")
