@@ -47,6 +47,7 @@ extension_tuple = (".opus", ".m4a")  # List of accepted non-mp3 audio files
 
 
 def html_cleaner(string):  # Get rid of <> in non-attachment messages
+    """Remove HTML tags."""
     string = string.replace("<", "&lt;")
     string = string.replace(">", "&gt;")
 
@@ -54,6 +55,7 @@ def html_cleaner(string):  # Get rid of <> in non-attachment messages
 
 
 def tag_replace(string, char, tag):  # Replace char with tags in string
+    """Replace selected format character with selected HTML tag."""
     count = 0
     list_message = list(string)
 
@@ -73,6 +75,7 @@ def tag_replace(string, char, tag):  # Replace char with tags in string
 
 
 def reformat(string):
+    """Replace format characters (by calling tag_replace()) and add formatted links."""
     # ===== Format italics, bold, and strikethrough if there's an even number of format chars
     if "_" in string:
         if string.count("_") % 2 == 0:
@@ -124,6 +127,7 @@ def reformat(string):
 
 
 def convert_audio(filename):
+    """Convert all audio files to .mp3 to be used in HTML."""
     # Convert audio file to mp3
     pd.AudioSegment.from_file("Work Folder/{}".format(filename)).export(
         "{output}/{name}/{file}".format(output=outputDir, name=recipName, file=filename), format="mp3")
@@ -131,6 +135,7 @@ def convert_audio(filename):
 
 
 def add_attachments(string):
+    """Embed images, videos, and audio."""
     # Parse filename
     offset = string.find("<")
     list_string = list(string)
@@ -175,6 +180,7 @@ def add_attachments(string):
 
 
 def create_message_block(string):
+    """Format message into <div> block with appropriate class."""
     if string == "":
         return "<br>\n"
 
