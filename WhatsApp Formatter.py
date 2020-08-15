@@ -41,6 +41,7 @@ with open("temp/_chat.txt", encoding="utf-8") as f:
     chat_txt_list = f.read().splitlines()
 
 extension_tuple = (".opus", ".m4a")  # List of accepted non-mp3 audio files
+format_dict = {"_": "em", "*": "strong", "~": "del"}
 
 
 # ===== Define functions
@@ -77,15 +78,10 @@ def tag_replace(string, char, tag):  # Replace char with tags in string
 def reformat(string):
     """Replace format characters (by calling tag_replace()) and add formatted links."""
     # ===== Format italics, bold, and strikethrough if there's an even number of format chars
-    if "_" in string:
-        if string.count("_") % 2 == 0:
-            string = tag_replace(string, "_", "em")
-    if "*" in string:
-        if string.count("*") % 2 == 0:
-            string = tag_replace(string, "*", "strong")
-    if "~" in string:
-        if string.count("~") % 2 == 0:
-            string = tag_replace(string, "~", "del")
+    for x, (char, tag) in enumerate(format_dict.items()):
+        if char in string:
+            if string.count(char) % 2 == 0:
+                string = tag_replace(string, char, tag)
 
     # ===== Format links
     if "http" in string:
