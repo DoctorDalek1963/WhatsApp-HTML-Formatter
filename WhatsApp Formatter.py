@@ -264,13 +264,8 @@ for i in chat_txt_list:
                 html_file.write(i)
                 continue  # next i
 
-    # message = html_cleaner(i)
-    # message = reformat(message)  # Reformat message with tags
-    # message = create_message_block(message)  # Adds <div> tags with class="recipient" or "sender"
-    # html_file.write(message)
-
+    # Write reformatted & complete message to {recipName}.html
     html_file.write(create_message_block(reformat(html_cleaner(i))))
-    # Writes reformatted & complete message to recipName.html
 
 with open("end_template.txt", encoding="utf-8") as f:
     end_template = f.readlines()
