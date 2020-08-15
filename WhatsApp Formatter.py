@@ -30,7 +30,7 @@ print()
 
 # Make dir if it doesn't exist
 try:
-    os.mkdir("{output}/{name}".format(output=outputDir, name=recipName))
+    os.mkdir(f"{outputDir}/{recipName}")
 except OSError:
     pass
 
@@ -64,11 +64,11 @@ def tag_replace(string, char, tag):  # Replace char with tags in string
         if letter == char:
             if count == 0:
                 # Replace char 1 with <tag>
-                list_message[x] = str("<{}>".format(tag))
+                list_message[x] = str(f"<{tag}>")
                 count = 1
             elif count == 1:
                 # Replace char 2 with </tag>
-                list_message[x] = str("</{}>".format(tag))
+                list_message[x] = str(f"</{tag}>")
                 count = 0
 
     return "".join(list_message)
@@ -129,8 +129,8 @@ def reformat(string):
 def convert_audio(filename):
     """Convert all audio files to .mp3 to be used in HTML."""
     # Convert audio file to mp3
-    pd.AudioSegment.from_file("Work Folder/{}".format(filename)).export(
-        "{output}/{name}/{file}".format(output=outputDir, name=recipName, file=filename), format="mp3")
+    pd.AudioSegment.from_file(f"Work Folder/{filename}").export(
+        f"{outputDir}/{recipName}/{filename}", format="mp3")
     return filename
 
 
@@ -152,27 +152,22 @@ def add_attachments(string):
     # ===== Format attachments
     if extension in extension_tuple:
         filename = convert_audio(filename)
-        string = string_start + \
-            "<audio src=\"{name}/{file}\" controls></audio>".format(name=recipName, file=filename)
+        string = string_start + f"<audio src=\"{recipName}/{filename}\" controls></audio>"
         string = create_message_block(string)
         return string
 
     # Copy file & metadata to attachment dir
-    shutil.copy2("Work Folder/{}".format(filename),
-                 "{output}/{name}/{file}".format(output=outputDir, name=recipName, file=filename))
+    shutil.copy2(f"Work Folder/{filename}", f"{outputDir}/{recipName}/{filename}")
 
     if extension == ".mp3":
-        string = string_start + \
-                 "<audio src=\"{name}/{file}\" controls></audio>".format(name=recipName, file=filename)
+        string = string_start + f"<audio src=\"{recipName}/{filename}\" controls></audio>"
 
     elif extension == ".mp4":
-        string = string_start + \
-                 "<video controls>\n\t<source src=\"{name}/{file}\" type=\"video/mp4\"></source>\n</video>".format(
-                     name=recipName, file=filename)
+        string = string_start + f"<video controls>\n\t<source src=\"{recipName}/{filename}\"" + \
+                 " type=\"video/mp4\"></source>\n</video>"
 
     elif extension == ".jpg" or ".png" or ".webp":
-        string = string_start + "<img src=\"{name}/{file}\" alt=\"Image\" width=\"30%\" height=\"30%\">".format(
-            name=recipName, file=filename)
+        string = string_start + f"<img src=\"{recipName}/{filename}\" alt=\"Image\" width=\"30%\" height=\"30%\">"
 
     string = create_message_block(string)
 
@@ -232,15 +227,15 @@ def create_message_block(string):
     else:
         string = "<div class=\"message sender\">" + string
 
-    string = "</div>\n{string} <span class=\"message-info time\">{time}</span>".format(string=string, time=time)
-    string = string + "<span class=\"message-info date\">{}</span>".format(date)
+    string = f"</div>\n{string} <span class=\"message-info time\">{time}</span>"
+    string = string + f"<span class=\"message-info date\">{date}</span>"
 
     return string
 
 
 # ===== Reformat chat_txt into recipName.html
 
-html_file = open("{output}/{name}.html".format(output=outputDir, name=recipName), "w+", encoding="utf-8")
+html_file = open(f"{outputDir}/{recipName}.html", "w+", encoding="utf-8")
 
 with open("start_template.txt", encoding="utf-8") as f:
     start_template = f.readlines()
@@ -269,14 +264,13 @@ for i in chat_txt_list:
                 html_file.write(i)
                 continue  # next i
 
-    message = html_cleaner(i)
-    message = reformat(message)  # Reformat message with tags
-    message = create_message_block(message)  # Adds <div> tags with class="recipient" or "sender"
-    html_file.write(message)
+    # message = html_cleaner(i)
+    # message = reformat(message)  # Reformat message with tags
+    # message = create_message_block(message)  # Adds <div> tags with class="recipient" or "sender"
+    # html_file.write(message)
 
-    # html_file.write(create_message_block(reformat(html_cleaner(i))))
+    html_file.write(create_message_block(reformat(html_cleaner(i))))
     # Writes reformatted & complete message to recipName.html
-    # USE THAT WHEN DONE
 
 with open("end_template.txt", encoding="utf-8") as f:
     end_template = f.readlines()
