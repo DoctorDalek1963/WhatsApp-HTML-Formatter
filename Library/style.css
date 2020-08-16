@@ -1,0 +1,76 @@
+* { /* Styles for everything */
+	font-family: "Helvetica Neue", Helvetica, sans-serif;
+	font-size: 20px;
+	color: white;
+}
+body { /* Sets display style for background image & body*/
+	background-image: url('background_image.jpg');
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-attachment: fixed;
+	font-size: 100%;
+}
+img {
+	max-height: 100%;
+	max-width: 100%;
+	width: auto;
+}
+audio {
+	width: 400px;
+}
+.message-block { /* Positions all mesages */
+	margin-top: 110px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+h3 { /* Style for recipName */
+	text-align: center;
+	margin-top: 25px;
+	vertical-align: middle;
+	font-size: 40px;
+}
+.time { /* The timestamp in the bottom right of messages */
+	bottom: 2px;
+}
+.date {
+	top: 2px;
+}
+.message-info {
+	color: #7f7f84;
+	font-size: 50%;
+	position: absolute;
+	right: 2px;
+}
+.ui {
+	background-color: #171717;
+	position: fixed;
+	margin: -10px;
+	margin-top: -110px;
+	width: 100%;
+	height: 90px;
+	z-index: 100;
+}
+.message { /* Sets the style for all messages */
+	margin: 5px 0; /* Sets 5px margins at top & bottom */
+	max-width: 60%;
+	clear: both;
+	float: left;
+	padding: 5px;
+	padding-right: 62px;
+	padding-top: 13px;
+	border-radius: 5px;
+	font-size: 1em;
+    position: relative;
+	min-width: 60px;
+	width: auto;
+
+}
+div span { /* Sets brightness of span inside div */
+	filter: brightness(120%);
+}
+.recipient { /* Sets the style for the recipient */
+	background-color: #3c3c3e;
+}
+.sender { /* Sets the style for the sender */
+	background-color: #0f5247;
+}
