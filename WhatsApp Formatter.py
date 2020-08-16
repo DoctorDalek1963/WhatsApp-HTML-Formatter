@@ -1,8 +1,8 @@
-import zipfile as zf
+from zipfile import zipfile
 import os
-import glob as g
-import datetime as dt
-import pydub as pd
+from glob import glob
+from datetime import datetime
+from pydub import AudioSegment
 import shutil
 
 # ===== Initial Setup
@@ -21,7 +21,7 @@ outputDir = input("Please enter a full output directory: ")
 print()
 
 # Extracts selected zip file to /temp/
-zip_ref = zf.ZipFile(input_file)
+zip_ref = ZipFile(input_file)
 print("Unzipping...")
 zip_ref.extractall("temp")
 zip_ref.close()
@@ -125,7 +125,7 @@ def reformat(string):
 def convert_audio(filename):
     """Convert all audio files to .mp3 to be used in HTML."""
     # Convert audio file to mp3
-    pd.AudioSegment.from_file(f"temp/{filename}").export(
+    AudioSegment.from_file(f"temp/{filename}").export(
         f"{outputDir}/{recipName}/{filename}", format="mp3")
     return filename
 
@@ -195,8 +195,8 @@ def create_message_block(string):
     string = "".join(list_message)
 
     # Reformat date
-    date_obj = dt.datetime.strptime(date_raw, "%d/%m/%Y")
-    date = dt.datetime.strftime(date_obj, "%a %d %B %Y")
+    date_obj = datetime.strptime(date_raw, "%d/%m/%Y")
+    date = datetime.strftime(date_obj, "%a %d %B %Y")
 
     # Parse time
     offset = string.find("]")
@@ -273,7 +273,7 @@ for i in end_template:
 # ===== Clear up /temp/
 
 # Deletes all files in /temp/
-files = g.glob("temp/*")
+files = glob("temp/*")
 for f in files:
     os.remove(f)
 
