@@ -85,39 +85,12 @@ def reformat(string):
 
     # ===== Format links
     if "http" in string:
-        # Find link
-        offset = string.find("http")
-        link_list = list(string)
-
-        # Store piece of string before link and del it
-        string_start = ""
-        for x in range(offset):
-            string_start = string_start + link_list[0]
-            del link_list[0]
-        string = "".join(link_list)
-
-        # Get offset if there's text after link, else offset = len
-        if " " in string:
-            offset = string.find(" ")
-        else:
-            offset = len(string)
-
-        # Store link and del it
-        link = ""
-        for x in range(offset):
-            link = link + link_list[0]
-            del link_list[0]
-        string = "".join(link_list)
-
-        # Store piece of string after link and del it
-        string_end = ""
-        for x in range(len(string)):
-            string_end = string_end + link_list[0]
-            del link_list[0]
-
-        # Concat string back together
-        link = "<a href=\"" + link + "\" target=\"_blank\">" + link + "</a>"
-        string = string_start + link + string_end
+        # Find links
+        links = re.findall(r"https?://[\w/.-]+", message)
+        # Format links with HTML tags
+        for link in links:
+            formatted_link = f"<a href=\"{link}\" target=\"_blank\">{link}</a>"
+            string = string.replace(link, formatted_link)
 
     return string
 
