@@ -87,7 +87,7 @@ def reformat(string):
     # ===== Format links
     if "http" in string:
         # Find links
-        links = re.findall(r"https?://[^\s]+", string)
+        links = re.findall(r"https?://\S+", string)
         # Format links with HTML tags
         for link in links:
             formatted_link = f"<a href=\"{link}\" target=\"_blank\">{link}</a>"
