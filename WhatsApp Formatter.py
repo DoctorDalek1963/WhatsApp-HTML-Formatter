@@ -4,6 +4,7 @@ from glob import glob
 from datetime import datetime
 from pydub import AudioSegment
 import shutil
+import re
 
 # ===== Initial Setup
 
