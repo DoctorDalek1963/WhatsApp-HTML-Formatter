@@ -3,22 +3,23 @@ import os
 from glob import glob
 from datetime import datetime
 from pydub import AudioSegment
-import shutil
 import re
 
 # ===== Initial Setup
+
+cwd = os.getcwd()
 
 # Debug bit
 print()
 print("Welcome to the WhatsApp Formatter!")
 print()
-print("Please move the selected zip to /venv/")
+print(f"Please move the selected zip to {cwd}")
 print()
 input_file = input("Please enter the name of the input zip file: ")
 if not input_file.endswith(".zip"):
     input_file = input_file + ".zip"
 print()
-recipName = input("Please enter the name of the recipient (case sensitive): ")
+recipName = input("Please enter the name of the recipient: ")
 print()
 outputDir = input("Please enter a full output directory: ")
 print()
@@ -140,17 +141,17 @@ def add_attachments(string):
         return string
 
     # Copy file & metadata to attachment dir
-    shutil.copy2(f"temp/{filename}", f"{outputDir}/{recipName}/{filename}")
+    os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/{recipName}/{filename}")
 
     if extension == ".mp3":
-        string = string_start + f"<audio src=\"{recipName}/{filename}\" controls></audio>"
+        string = f"{string_start}<audio src=\"{recipName}/{filename}\" controls></audio>"
 
     elif extension == ".mp4":
-        string = string_start + f"<video controls>\n\t<source src=\"{recipName}/{filename}\"" + \
+        string = f"{string_start}<video controls>\n\t<source src=\"{recipName}/{filename}\"" + \
                  " type=\"video/mp4\"></source>\n</video>"
 
     elif extension in image_tuple:
-        string = string_start + f"<img src=\"{recipName}/{filename}\" alt=\"Image\" width=\"30%\" height=\"30%\">"
+        string = f"{string_start}<img src=\"{recipName}/{filename}\" alt=\"Image\" width=\"30%\" height=\"30%\">"
 
     string = create_message_block(string)
 
@@ -241,9 +242,11 @@ with open("end_template.txt", encoding="utf-8") as f:
 for i in end_template:
     html_file.write(i)
 
+print("Reformatting complete!")
+
 # ===== Clear up /temp/
 
-# Deletes all files in /temp/
+# Delete remaining files in /temp/ (should just be _chat.txt)
 files = glob("temp/*")
 for f in files:
     os.remove(f)
