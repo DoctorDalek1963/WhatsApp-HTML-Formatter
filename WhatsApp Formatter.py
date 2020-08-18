@@ -14,7 +14,9 @@ print("Welcome to the WhatsApp Formatter!")
 print()
 print("Please move the selected zip to /venv/")
 print()
-input_file = input("Please enter the name of the input zip file (including .zip extension): ")
+input_file = input("Please enter the name of the input zip file: ")
+if not input_file.endswith(".zip"):
+    input_file = input_file + ".zip"
 print()
 recipName = input("Please enter the name of the recipient (case sensitive): ")
 print()
