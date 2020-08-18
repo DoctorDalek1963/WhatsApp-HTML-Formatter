@@ -9,7 +9,6 @@ import re
 
 cwd = os.getcwd()
 
-# Debug bit
 print()
 print("Welcome to the WhatsApp Formatter!")
 print()
