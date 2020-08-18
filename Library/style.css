@@ -65,6 +65,9 @@ h3 { /* Style for recipName */
 	width: auto;
 
 }
+code {
+	font-family: "Consolas", Courier, monospace;
+}
 div span { /* Sets brightness of span inside div */
 	filter: brightness(120%);
 }

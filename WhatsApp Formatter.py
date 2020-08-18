@@ -43,7 +43,8 @@ print("Reformatting...")
 with open("temp/_chat.txt", encoding="utf-8") as f:
     chat_txt_list = f.read().splitlines()
 
-extension_tuple = (".opus", ".m4a")  # List of accepted non-mp3 audio files
+audio_extensions = (".opus", ".m4a")  # List of accepted non-mp3 audio files
+image_tuple = (".jpg", ".png", ".webp")
 format_dict = {"_": "em", "*": "strong", "~": "del"}
 
 
@@ -70,7 +71,7 @@ def tag_replace(string, char, tag):  # Replace char with tags in string
                 # Replace char 1 with <tag>
                 list_message[x] = str(f"<{tag}>")
                 count = 1
-            elif count == 1:
+            else:
                 # Replace char 2 with </tag>
                 list_message[x] = str(f"</{tag}>")
                 count = 0
@@ -81,10 +82,26 @@ def tag_replace(string, char, tag):  # Replace char with tags in string
 def reformat(string):
     """Replace format characters (by calling tag_replace()) and add formatted links."""
     # ===== Format italics, bold, and strikethrough if there's an even number of format chars
-    for x, (char, tag) in enumerate(format_dict.items()):
-        if char in string:
-            if string.count(char) % 2 == 0:
-                string = tag_replace(string, char, tag)
+
+    count = 0
+
+    # If code block, ignore other format chars
+    if "```" in string:
+        string = string.replace("```", "<code>")
+        list_string = list(string)
+        for x, letter in enumerate(list_string):
+            if letter == "<":
+                if count == 0:
+                    count = 1
+                else:
+                    list_string[x] = "</"
+                    count = 0
+        string = "".join(list_string)
+    else:
+        for x, (char, tag) in enumerate(format_dict.items()):
+            if char in string:
+                if string.count(char) % 2 == 0:
+                    string = tag_replace(string, char, tag)
 
     # ===== Format links
     if "http" in string:
@@ -103,27 +120,21 @@ def convert_audio(filename):
     # Convert audio file to mp3
     AudioSegment.from_file(f"temp/{filename}").export(
         f"{outputDir}/{recipName}/{filename}", format="mp3")
-    return filename
 
 
 def add_attachments(string):
     """Embed images, videos, and audio."""
-    # Parse filename
-    offset = string.find("<")
-    list_string = list(string)
-    string_start = "".join(list_string[0:offset])
-    del list_string[0:offset + 11]
-    del list_string[len(list_string) - 1]
-    filename = "".join(list_string)
-    list_filename = list(filename)
+    # Parse filename and extension with a RegEx
+    pattern = re.compile(r"(\d{8}-\w+-\d{4}-\d\d-\d\d-\d\d-\d\d-\d\d)(\.\w+)")
+    matches = pattern.findall(string)
+    filename = "".join(matches[0])
+    extension = matches[0][1]
 
-    # Parse extension
-    offset = filename.find(".")
-    extension = "".join(list_filename[offset:])
+    string_start = string.split("<attached: ")[0]
 
     # ===== Format attachments
-    if extension in extension_tuple:
-        filename = convert_audio(filename)
+    if extension in audio_extensions:
+        convert_audio(filename)
         string = string_start + f"<audio src=\"{recipName}/{filename}\" controls></audio>"
         string = create_message_block(string)
         return string
@@ -138,7 +149,7 @@ def add_attachments(string):
         string = string_start + f"<video controls>\n\t<source src=\"{recipName}/{filename}\"" + \
                  " type=\"video/mp4\"></source>\n</video>"
 
-    elif extension == ".jpg" or ".png" or ".webp":
+    elif extension in image_tuple:
         string = string_start + f"<img src=\"{recipName}/{filename}\" alt=\"Image\" width=\"30%\" height=\"30%\">"
 
     string = create_message_block(string)
@@ -161,46 +172,30 @@ def create_message_block(string):
 
     # ===== Parse date, time, and name
 
-    # Parse date
-    offset = string.find(",")
-    date_raw = ""
-    for x in range(offset - 1):
-        date_raw = date_raw + list_message[0]
-        del list_message[0]
-    del list_message[0:2]
-    string = "".join(list_message)
+    # Parse date and time with RegEx
+    pattern = re.compile(r"\[\d\d/\d\d/\d{4}, \d\d?:\d\d:\d\d [ap]m")
+    date_raw = pattern.findall(string)[0]
+    date_obj = datetime.strptime(date_raw, "[%d/%m/%Y, %I:%M:%S %p")
 
-    # Reformat date
-    date_obj = datetime.strptime(date_raw, "%d/%m/%Y")
     date = datetime.strftime(date_obj, "%a %d %B %Y")
+    time = datetime.strftime(date_obj, "%I:%M:%S %p")
 
-    # Parse time
-    offset = string.find("]")
-    time = ""
-    for x in range(offset):
-        time = time + list_message[0]
-        del list_message[0]
-    del list_message[0:2]
-    string = "".join(list_message)
+    # Parse name with RegEx
+    pattern = re.compile(r"\[\d\d/\d\d/\d{4}, \d\d?:\d\d:\d\d [ap]m] (\w+): ")
+    matches = pattern.findall(string)
+    name = matches[0]
 
-    # Parse name
-    offset = string.find(":")
-    name = ""
-    for x in range(0, offset):
-        name = name + list_message[0]
-        del list_message[0]
-    del list_message[0:2]
-    string = "".join(list_message)
+    string = string.split(": ")[1]
 
     # ===== Create message block
 
     if name == recipName:
-        string = "<div class=\"message recipient\">" + string
+        string = f"<div class=\"message recipient\">{string}"
     else:
-        string = "<div class=\"message sender\">" + string
+        string = f"<div class=\"message sender\">{string}"
 
     string = f"</div>\n{string} <span class=\"message-info time\">{time}</span>"
-    string = string + f"<span class=\"message-info date\">{date}</span>"
+    string = f"{string}<span class=\"message-info date\">{date}</span>"
 
     return string
 
@@ -214,9 +209,9 @@ with open("start_template.txt", encoding="utf-8") as f:
 
 # Replace recipName in start_template
 for i, line in enumerate(start_template):
-    pos = line.find("%recipName%")
+    pos = line.find("{recipName}")
     if pos != -1:  # If "recipName" is found
-        start_template[i] = line.replace("%recipName%", recipName)  # Replace with var
+        start_template[i] = line.replace("{recipName}", recipName)  # Replace with var
 
 # Add start template
 for i in start_template:
@@ -230,7 +225,7 @@ for i in chat_txt_list:
     if i == "":
         pass
     else:
-        if i.find("<attached:") != -1:  # If attachment
+        if ": <attached: " in i:  # If attachment
             if i_list[dst + 2] == "<":
                 i = add_attachments(i)
                 html_file.write(i)
