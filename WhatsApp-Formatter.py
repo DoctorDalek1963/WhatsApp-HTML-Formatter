@@ -46,7 +46,7 @@ with open("temp/_chat.txt", encoding="utf-8") as f:
     chat_txt_list = f.read().splitlines()
 
 audio_extensions = (".opus", ".m4a")  # List of accepted non-mp3 audio files
-image_tuple = (".jpg", ".png", ".webp")
+image_extensions = (".jpg", ".png", ".webp")
 format_dict = {"_": "em", "*": "strong", "~": "del"}
 
 
@@ -151,7 +151,7 @@ def add_attachments(string):
         string = f"{string_start}<video controls>\n\t<source src=\"{recipName}/{filename}\"" + \
                  " type=\"video/mp4\"></source>\n</video>"
 
-    elif extension in image_tuple:
+    elif extension in image_extensions:
         string = f"{string_start}<img src=\"{recipName}/{filename}\" alt=\"Image\" width=\"30%\" height=\"30%\">"
 
     string = create_message_block(string)
