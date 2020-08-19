@@ -39,15 +39,15 @@ try:
 except OSError:
     pass
 
-print("Reformatting...")
-
-# Creates chat_txt as list of _chat.txt
+# Creates chat_txt_list as list of _chat.txt
 with open("temp/_chat.txt", encoding="utf-8") as f:
     chat_txt_list = f.read().splitlines()
 
 audio_extensions = (".opus", ".m4a")  # List of accepted non-mp3 audio files
-image_extensions = (".jpg", ".png", ".webp")
-format_dict = {"_": "em", "*": "strong", "~": "del"}
+image_extensions = (".jpg", ".png", ".webp")  # List of accepted image extensions
+format_dict = {"_": "em", "*": "strong", "~": "del"}  # Dict of format characters and their tags
+
+print("Reformatting...")
 
 
 # ===== Define functions
