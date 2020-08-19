@@ -18,7 +18,7 @@ print(f"Please move the selected zip to {cwd}")
 print()
 input_file = input("Please enter the name of the input zip file: ")
 if not input_file.endswith(".zip"):
-    input_file = input_file + ".zip"
+    input_file = f"{input_file}.zip"
 print()
 recipName = input("Please enter the name of the recipient: ")
 print()
