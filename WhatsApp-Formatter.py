@@ -54,7 +54,7 @@ print("Reformatting...")
 
 
 def html_cleaner(string):  # Get rid of <> in non-attachment messages
-    """Remove HTML tags."""
+    """Remove the characters \"<\" and \">\" in non-attachmet messages."""
     string = string.replace("<", "&lt;")
     string = string.replace(">", "&gt;")
 
