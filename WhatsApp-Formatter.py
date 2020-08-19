@@ -8,8 +8,10 @@ import re
 # ===== Initial Setup
 
 cwd = os.getcwd()
+if not cwd.endswith("venv"):
+    os.chdir(f"{cwd}/venv")
+    cwd = os.getcwd()
 
-print()
 print("Welcome to the WhatsApp Formatter!")
 print()
 print(f"Please move the selected zip to {cwd}")
@@ -254,3 +256,5 @@ os.rmdir("temp")
 
 print()
 print("Process complete!")
+print()
+input("Press enter to exit the program")
