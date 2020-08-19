@@ -1,7 +1,7 @@
+from pydub import AudioSegment
+from datetime import datetime
 from zipfile import ZipFile
 from glob import glob
-from datetime import datetime
-from pydub import AudioSegment
 import os
 import re
 
