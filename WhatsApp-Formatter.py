@@ -8,9 +8,6 @@ import re
 # ===== Initial Setup
 
 cwd = os.getcwd()
-if not cwd.endswith("venv"):
-    os.chdir(f"{cwd}/venv")
-    cwd = os.getcwd()
 
 print("Welcome to the WhatsApp Formatter!")
 print()
