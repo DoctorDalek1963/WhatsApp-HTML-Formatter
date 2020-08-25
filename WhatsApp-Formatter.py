@@ -114,26 +114,20 @@ def reformat(string):
     return string
 
 
-def convert_audio(filename):
-    """Convert all audio files to .mp3 to be used in HTML."""
-    # Convert audio file to mp3
-    AudioSegment.from_file(f"temp/{filename}").export(
-        f"{outputDir}/{recipName}/{filename}", format="mp3")
-
-
 def add_attachments(string):
     """Embed images, videos, and audio."""
     # Parse filename and extension with a RegEx
     pattern = re.compile(r"(\d{8}-\w+-\d{4}-\d\d-\d\d-\d\d-\d\d-\d\d)(\.\w+)")
-    matches = pattern.findall(string)
-    filename = "".join(matches[0])
-    extension = matches[0][1]
+    match_object = pattern.match(string)
+    filename = match_object.group()
+    extension = match_object.group(2)
 
     string_start = string.split("<attached: ")[0]
 
     # ===== Format attachments
     if extension in audio_extensions:
-        convert_audio(filename)
+        # Convert audio file to mp3
+        AudioSegment.from_file(f"temp/{filename}").export(f"{outputDir}/{recipName}/{filename}", format="mp3")
         string = string_start + f"<audio src=\"{recipName}/{filename}\" controls></audio>"
         string = create_message_block(string)
         return string
