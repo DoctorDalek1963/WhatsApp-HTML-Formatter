@@ -51,7 +51,7 @@ print("Reformatting...")
 
 
 def html_cleaner(string):  # Get rid of <> in non-attachment messages
-    """Remove the characters \"<\" and \">\" in non-attachmet messages."""
+    """Remove the characters \"<\" and \">\" in non-attachment messages."""
     string = string.replace("<", "&lt;")
     string = string.replace(">", "&gt;")
 
@@ -103,13 +103,11 @@ def reformat(string):
                     string = tag_replace(string, char, tag)
 
     # ===== Format links
-    if "http" in string:
-        # Find links
-        links = re.findall(r"https?://\S+", string)
-        # Format links with HTML tags
-        for link in links:
-            formatted_link = f"<a href=\"{link}\" target=\"_blank\">{link}</a>"
-            string = string.replace(link, formatted_link)
+    match = re.match(r"(https?://)?(\w{3,}\.)?(\S+\.\S+)", string)
+    if match:
+        link = match.group()
+        formatted_link = f"<a href=\"{link}\" target=\"_blank\">{link}</a>"
+        string = string.replace(link, formatted_link)
 
     return string
 
@@ -117,7 +115,8 @@ def reformat(string):
 def add_attachments(string):
     """Embed images, videos, and audio."""
     # Parse filename and extension with a RegEx
-    pattern = re.compile(r"(\d{8}-\w+-\d{4}-\d\d-\d\d-\d\d-\d\d-\d\d)(\.\w+)")
+    pattern = re.compile(r"<attached: (\d{8}-[A-Z]+-\d{4}(-\d{2}){5})(\.\w+)>$")
+    # TODO: Fix this RegEx and work out why it doesn't match properly
     match_object = pattern.match(string)
     filename = match_object.group()
     extension = match_object.group(2)
@@ -166,7 +165,7 @@ def create_message_block(string):
     # ===== Parse date, time, and name
 
     # Parse date and time with RegEx
-    pattern = re.compile(r"\[\d\d/\d\d/\d{4}, \d\d?:\d\d:\d\d [ap]m")
+    pattern = re.compile(r"^\[\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m")
     date_raw = pattern.findall(string)[0]
     date_obj = datetime.strptime(date_raw, "[%d/%m/%Y, %I:%M:%S %p")
 
@@ -174,7 +173,7 @@ def create_message_block(string):
     time = datetime.strftime(date_obj, "%I:%M:%S %p")
 
     # Parse name with RegEx
-    pattern = re.compile(r"\[\d\d/\d\d/\d{4}, \d\d?:\d\d:\d\d [ap]m] (\w+): ")
+    pattern = re.compile(r"^\[\d\d/\d\d/\d{4}, \d\d?:\d\d:\d\d [ap]m] (\w+): ")
     matches = pattern.findall(string)
     name = matches[0]
 
