@@ -80,6 +80,7 @@ def tag_replace(string, char, tag):  # Replace char with tags in string
 
 def reformat(string):
     """Replace format characters (by calling tag_replace()) and add formatted links."""
+
     # ===== Format italics, bold, and strikethrough if there's an even number of format chars
 
     count = 0
@@ -103,11 +104,15 @@ def reformat(string):
                     string = tag_replace(string, char, tag)
 
     # ===== Format links
-    match = re.match(r"(https?://)?(\w{3,}\.)?(\S+\.\S+)", string)
-    if match:
-        link = match.group()
-        formatted_link = f"<a href=\"{link}\" target=\"_blank\">{link}</a>"
-        string = string.replace(link, formatted_link)
+
+    link_match_list = re.findall(r"(https?://)?(\w{3,}\.)?(\S+\.\S+)", string)
+    # Join all elements in each tuple together and put the tuples into a list
+    link_matches = ["".join(match) for match in link_match_list]
+
+    if link_matches:
+        for link in link_matches:
+            formatted_link = f"<a href=\"{link}\" target=\"_blank\">{link}</a>"
+            string = string.replace(link, formatted_link)
 
     return string
 
@@ -115,11 +120,9 @@ def reformat(string):
 def add_attachments(string):
     """Embed images, videos, and audio."""
     # Parse filename and extension with a RegEx
-    pattern = re.compile(r"<attached: (\d{8}-[A-Z]+-\d{4}(-\d{2}){5})(\.\w+)>$")
-    # TODO: Fix this RegEx and work out why it doesn't match properly
-    match_object = pattern.match(string)
-    filename = match_object.group()
-    extension = match_object.group(2)
+    attachment_match = re.search(r"<attached: ([^\.]+)(\.\w+)>$", string)
+    extension = attachment_match.group(2)
+    filename = attachment_match.group(1) + extension
 
     string_start = string.split("<attached: ")[0]
 
@@ -162,20 +165,17 @@ def create_message_block(string):
 
     del list_message[0]
 
-    # ===== Parse date, time, and name
+    # ===== Parse date, time, and name with one RegEx
 
-    # Parse date and time with RegEx
-    pattern = re.compile(r"^\[\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m")
-    date_raw = pattern.findall(string)[0]
-    date_obj = datetime.strptime(date_raw, "[%d/%m/%Y, %I:%M:%S %p")
+    message_info_match = re.match(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)\] (\w+): ", string)
 
+    date_raw = message_info_match.group(1)
+    name = message_info_match.group(2)
+
+    # Reformat date and time to be more readable
+    date_obj = datetime.strptime(date_raw, "%d/%m/%Y, %I:%M:%S %p")
     date = datetime.strftime(date_obj, "%a %d %B %Y")
     time = datetime.strftime(date_obj, "%I:%M:%S %p")
-
-    # Parse name with RegEx
-    pattern = re.compile(r"^\[\d\d/\d\d/\d{4}, \d\d?:\d\d:\d\d [ap]m] (\w+): ")
-    matches = pattern.findall(string)
-    name = matches[0]
 
     string = string.split(": ")[1]
 
