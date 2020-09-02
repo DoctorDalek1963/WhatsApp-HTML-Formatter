@@ -167,7 +167,8 @@ def create_message_block(string):
 
     # ===== Parse date, time, and name with one RegEx
 
-    message_info_match = re.match(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)\] (\w+): ", string)
+    # re.match is used because this RegEx must occur at the beginning of a string
+    message_info_match = re.match(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (\w+): ", string)
 
     date_raw = message_info_match.group(1)
     name = message_info_match.group(2)
