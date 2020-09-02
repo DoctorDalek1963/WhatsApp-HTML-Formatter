@@ -159,7 +159,7 @@ def create_message_block(string):
 
     list_message = list(string)
 
-    if list_message[0] != "[":  # If a continuation
+    if not (re.match(r"\[\d{2}/\d{2}/\d{4}, ", string)):  # If a continuation
         string = "<br>" + "".join(list_message) + "\n"
         return string
 
@@ -213,13 +213,13 @@ for i in start_template:
 for i in chat_txt_list:
     # Detect attachments
     i = i.replace("\u200e", "")  # Clear left-to-right mark
-    dst = i.find(": ")
+    distance = i.find(": ")
     i_list = list(i)
     if i == "":
         pass
     else:
         if ": <attached: " in i:  # If attachment
-            if i_list[dst + 2] == "<":
+            if i_list[distance + 2] == "<":
                 i = add_attachments(i)
                 html_file.write(i)
                 continue  # next i
