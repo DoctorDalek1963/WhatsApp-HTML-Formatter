@@ -2,7 +2,6 @@ from pydub import AudioSegment
 from datetime import datetime
 from zipfile import ZipFile
 from glob import glob
-import tkinter
 import os
 import re
 
