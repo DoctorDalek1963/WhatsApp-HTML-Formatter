@@ -2,9 +2,6 @@ from formatter_functions import write_to_file
 from zipfile import ZipFile
 from glob import glob
 import os
-# import re
-
-# ===== Initial Setup
 
 cwd = os.getcwd()
 
@@ -21,11 +18,12 @@ print()
 recipName = input("Please enter the name of the recipient: ")
 print()
 
-# Extracts selected zip file to /temp/
 print("Unzipping...")
+
 zip_file = ZipFile(input_file)
 zip_file.extractall("temp")
 zip_file.close()
+
 print("Unzipped!")
 print()
 
@@ -35,9 +33,6 @@ write_to_file(recipName, outputDir)  # All the heavy lifting is done by this fun
 
 print("Reformatting complete!")
 
-# ===== Clear up /temp/
-
-# Delete remaining files in /temp/ (should just be _chat.txt)
 files = glob("temp/*")
 for f in files:
     os.remove(f)
