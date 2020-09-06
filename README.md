@@ -7,7 +7,7 @@ A script to convert WhatsApp chats exported as zip files into formatted HTML fil
 - Feel free to change `WhatsApp-Formatter/Library/background-image.jpg` to whatever background image you'd like, just make sure it has the same name
 
 ## Dependencies:
-- pydub ([http://pydub.com/])
+- pydub (http://pydub.com/)
 
 ## Steps (Command Line):
 1. Export the desired chat (must be a private chat; group chats don't work)
