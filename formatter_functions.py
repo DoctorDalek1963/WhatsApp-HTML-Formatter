@@ -1,5 +1,7 @@
 from pydub import AudioSegment
 from datetime import datetime
+from zipfile import ZipFile
+from glob import glob
 import re
 import os
 
@@ -163,10 +165,18 @@ def create_message_block(string):
     return string
 
 
+def extract_zip(file):
+    zip_file = ZipFile(file)
+    zip_file.extractall("temp")
+    zip_file.close()
+
+
 def write_to_file(name, output):
+    """Loop through every line of _chat.txt and write it to recipName.html with proper formatting."""
     global recipName, outputDir
     recipName = name
     outputDir = output
+
     try:
         os.mkdir(f"{outputDir}/{recipName}")
     except OSError:
@@ -217,3 +227,9 @@ def write_to_file(name, output):
         html_file.write(line)
 
     html_file.close()
+
+    files = glob("temp/*")
+    for f in files:
+        os.remove(f)
+
+    os.rmdir("temp")

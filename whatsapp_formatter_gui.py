@@ -1,28 +1,28 @@
 from formatter_functions import *
-# from zipfile import ZipFile
+from zipfile import ZipFile
 # from glob import glob
 import tkinter as tk
 from tkinter import filedialog
 import os
 
-# ===== Initial setup
-
 cwd = os.getcwd()
-zip_file = outputDir = recipName = ""
+input_zip = outputDir = recipName = ""
 
 # ===== Functions used on tk buttons
 
 
 def select_zip():
-    global zip_file
-    zip_file = filedialog.askopenfilename(initialdir=cwd, title="Select an exported chat",
-                                          filetypes=[("Zip files", "*.zip")])
+    global input_zip
+    input_zip = filedialog.askopenfilename(initialdir=cwd, title="Select an exported chat",
+                                           filetypes=[("Zip files", "*.zip")])
 
 
 def select_output_dir():
     global outputDir
     outputDir = filedialog.askdirectory(initialdir="/", title="Select an output directory")
 
+
+# ===== Tkinter stuff
 
 root = tk.Tk()
 root.title("WhatsApp Formatter")

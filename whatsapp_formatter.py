@@ -1,6 +1,4 @@
-from formatter_functions import write_to_file
-from zipfile import ZipFile
-from glob import glob
+from formatter_functions import write_to_file, extract_zip
 import os
 
 cwd = os.getcwd()
@@ -19,11 +17,7 @@ recipName = input("Please enter the name of the recipient: ")
 print()
 
 print("Unzipping...")
-
-zip_file = ZipFile(input_file)
-zip_file.extractall("temp")
-zip_file.close()
-
+extract_zip(input_file)
 print("Unzipped!")
 print()
 
@@ -32,13 +26,6 @@ print("Reformatting...")
 write_to_file(recipName, outputDir)  # All the heavy lifting is done by this function
 
 print("Reformatting complete!")
-
-files = glob("temp/*")
-for f in files:
-    os.remove(f)
-
-os.rmdir("temp")
-
 print()
 print("Process complete!")
 print()
