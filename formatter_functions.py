@@ -12,13 +12,6 @@ cwd = os.getcwd()
 recipName = outputDir = ""
 
 
-def pass_vars(name, output):
-    """Pass variables to be used in formatter_functions."""
-    global recipName, outputDir
-    recipName = name
-    outputDir = output
-
-
 def clean_html(string):  # Get rid of <> in non-attachment messages
     """Remove html entities in non-attachment messages."""
     string = string.replace("<", "&lt;").replace(">", "&gt;")
@@ -170,8 +163,10 @@ def create_message_block(string):
     return string
 
 
-def write_to_file():
+def write_to_file(name, output):
     global recipName, outputDir
+    recipName = name
+    outputDir = output
     try:
         os.mkdir(f"{outputDir}/{recipName}")
     except OSError:

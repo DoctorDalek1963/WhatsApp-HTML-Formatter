@@ -1,4 +1,4 @@
-from formatter_functions import write_to_file, pass_vars
+from formatter_functions import write_to_file
 from zipfile import ZipFile
 from glob import glob
 import os
@@ -21,9 +21,6 @@ print()
 recipName = input("Please enter the name of the recipient: ")
 print()
 
-# Pass variables to formatter_functions.py to avoid circular imports
-pass_vars(recipName, outputDir)
-
 # Extracts selected zip file to /temp/
 print("Unzipping...")
 zip_file = ZipFile(input_file)
@@ -34,7 +31,7 @@ print()
 
 print("Reformatting...")
 
-write_to_file()
+write_to_file(recipName, outputDir)  # All the heavy lifting is done by this function
 
 print("Reformatting complete!")
 
