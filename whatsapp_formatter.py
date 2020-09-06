@@ -1,4 +1,3 @@
-# import formatter_functions as ff
 from formatter_functions import *
 from zipfile import ZipFile
 from glob import glob
@@ -17,9 +16,9 @@ input_file = input("Please enter the name of the input zip file: ")
 if not input_file.endswith(".zip"):
     input_file = f"{input_file}.zip"
 print()
-recipName = input("Please enter the name of the recipient: ")
-print()
 outputDir = input("Please enter a full output directory: ")
+print()
+recipName = input("Please enter the name of the recipient: ")
 print()
 
 # Pass variables to formatter_functions.py to avoid circular imports
@@ -55,7 +54,7 @@ with open("start_template.txt", encoding="utf-8") as f:
 for i, line in enumerate(start_template):
     pos = line.find("%recipName%")
     if pos != -1:  # If "recipName" is found
-        start_template[i] = line.replace("{recipName}", recipName)  # Replace with var
+        start_template[i] = line.replace("%recipName%", recipName)  # Replace with var
 
 # Add start template
 for line in start_template:
@@ -64,17 +63,14 @@ for line in start_template:
 for line in chat_txt_list:
     # Detect attachments
     line = line.replace("\u200e", "")  # Clear left-to-right mark
-    distance = line.find(": ")
-    line_list = list(line)
 
     if line == "":
         pass
     else:
         if re.search(r"<attached: ([^.]+)(\.\w+)>$", line):  # If attachment
-            if line_list[distance + 2] == "<":
-                line = add_attachments(line)
-                html_file.write(line)
-                continue  # next i
+            line = add_attachments(line)
+            html_file.write(line)
+            continue  # next line
 
     # Write reformatted & complete message to {recipName}.html
     formatted_message = reformat(clean_html(line))
@@ -87,12 +83,14 @@ with open("end_template.txt", encoding="utf-8") as f:
 for line in end_template:
     html_file.write(line)
 
+html_file.close()
+
 print("Reformatting complete!")
 
 # ===== Clear up /temp/
 
 # Delete remaining files in /temp/ (should just be _chat.txt)
-files = glob(f"temp/*")
+files = glob("temp/*")
 for f in files:
     os.remove(f)
 

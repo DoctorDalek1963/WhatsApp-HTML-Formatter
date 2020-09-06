@@ -1,4 +1,3 @@
-# from whatsapp_formatter import recipName, outputDir
 from pydub import AudioSegment
 from datetime import datetime
 import re
@@ -14,15 +13,16 @@ recipName = outputDir = ""
 
 
 def pass_vars(name, output):
+    """Pass variables to be used in formatter_functions."""
     global recipName, outputDir
     recipName = name
     outputDir = output
 
 
 def clean_html(string):  # Get rid of <> in non-attachment messages
-    """Remove the characters \"<\" and \">\" in non-attachment messages."""
-    string = string.replace("<", "&lt;")
-    string = string.replace(">", "&gt;")
+    """Remove html entities in non-attachment messages."""
+    string = string.replace("<", "&lt;").replace(">", "&gt;")
+    string = string.replace("\"", "&quot;").replace("\'", "&apos;")
 
     return string
 
@@ -74,13 +74,18 @@ def reformat(string):
 
     # ===== Format links
 
-    link_match_list = re.findall(r"(https?://)?(\w{3,}\.)?(\S+\.\S+)", string)
+    link_match_list = re.findall(r"(https?://)?(\w{3,}\.)?([^.\s]+\.[^.\s]+)", string)
     # Join all elements in each tuple together and put the tuples into a list
     link_matches = ["".join(match) for match in link_match_list]
 
     if link_matches:
         for link in link_matches:
-            formatted_link = f"<a href=\"{link}\" target=\"_blank\">{link}</a>"
+            if not link.startswith("http"):
+                working_link = f"http://{link}"  # Create URLs from non URL links
+                formatted_link = f"<a href=\"{working_link}\" target=\"_blank\">{link}</a>"
+            else:
+                formatted_link = f"<a href=\"{link}\" target=\"_blank\">{link}</a>"
+
             string = string.replace(link, formatted_link)
 
     return string
@@ -146,6 +151,9 @@ def create_message_block(string):
     date_obj = datetime.strptime(date_raw, "%d/%m/%Y, %I:%M:%S %p")
     date = datetime.strftime(date_obj, "%a %d %B %Y")
     time = datetime.strftime(date_obj, "%I:%M:%S %p")
+
+    if time.startswith("0"):
+        time = time.replace("0", "", 1)
 
     string = string.split(": ")[1]
 

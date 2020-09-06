@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>{recipName} - WhatsApp</title>
+<title>%recipName% - WhatsApp</title>
 <link rel="stylesheet" type="text/css" href="Library/style.css">
 <link rel="icon" type="image/ico" href="Library/favicon.ico">
 <div class="ui" width="100%" height="90px"><h3>%recipName%</h3></div>
