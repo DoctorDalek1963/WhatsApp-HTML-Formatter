@@ -1,4 +1,4 @@
-from whatsapp_formatter import recipName, outputDir
+# from whatsapp_formatter import recipName, outputDir
 from pydub import AudioSegment
 from datetime import datetime
 import re
@@ -9,6 +9,14 @@ image_extensions = (".jpg", ".png", ".webp")  # List of accepted image extension
 format_dict = {"_": "em", "*": "strong", "~": "del"}  # Dict of format characters and their tags
 
 cwd = os.getcwd()
+
+recipName = outputDir = ""
+
+
+def pass_vars(name, output):
+    global recipName, outputDir
+    recipName = name
+    outputDir = output
 
 
 def clean_html(string):  # Get rid of <> in non-attachment messages

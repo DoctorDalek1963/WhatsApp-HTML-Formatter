@@ -1,5 +1,5 @@
 # import formatter_functions as ff
-from formatter_functions import add_attachments, reformat, clean_html, create_message_block
+from formatter_functions import *
 from zipfile import ZipFile
 from glob import glob
 import os
@@ -21,6 +21,9 @@ recipName = input("Please enter the name of the recipient: ")
 print()
 outputDir = input("Please enter a full output directory: ")
 print()
+
+# Pass variables to formatter_functions.py to avoid circular imports
+pass_vars(recipName, outputDir)
 
 # Extracts selected zip file to /temp/
 zip_file = ZipFile(input_file)
@@ -50,7 +53,7 @@ with open("start_template.txt", encoding="utf-8") as f:
 
 # Replace recipName in start_template
 for i, line in enumerate(start_template):
-    pos = line.find("{recipName}")
+    pos = line.find("%recipName%")
     if pos != -1:  # If "recipName" is found
         start_template[i] = line.replace("{recipName}", recipName)  # Replace with var
 
