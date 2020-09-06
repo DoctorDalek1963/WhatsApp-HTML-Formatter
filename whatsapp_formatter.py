@@ -1,8 +1,8 @@
-from formatter_functions import *
+from formatter_functions import write_to_file, pass_vars
 from zipfile import ZipFile
 from glob import glob
 import os
-import re
+# import re
 
 # ===== Initial Setup
 
@@ -25,65 +25,16 @@ print()
 pass_vars(recipName, outputDir)
 
 # Extracts selected zip file to /temp/
-zip_file = ZipFile(input_file)
 print("Unzipping...")
+zip_file = ZipFile(input_file)
 zip_file.extractall("temp")
 zip_file.close()
 print("Unzipped!")
 print()
 
-try:
-    os.mkdir(f"{outputDir}/{recipName}")
-except OSError:
-    pass
-
-# Creates chat_txt_list as list of _chat.txt
-with open("temp/_chat.txt", encoding="utf-8") as f:
-    chat_txt_list = f.read().splitlines()
-
 print("Reformatting...")
 
-# ===== Reformat chat_txt into recipName.html
-
-html_file = open(f"{outputDir}/{recipName}.html", "w+", encoding="utf-8")
-
-with open("start_template.txt", encoding="utf-8") as f:
-    start_template = f.readlines()
-
-# Replace recipName in start_template
-for i, line in enumerate(start_template):
-    pos = line.find("%recipName%")
-    if pos != -1:  # If "recipName" is found
-        start_template[i] = line.replace("%recipName%", recipName)  # Replace with var
-
-# Add start template
-for line in start_template:
-    html_file.write(line)
-
-for line in chat_txt_list:
-    # Detect attachments
-    line = line.replace("\u200e", "")  # Clear left-to-right mark
-
-    if line == "":
-        pass
-    else:
-        if re.search(r"<attached: ([^.]+)(\.\w+)>$", line):  # If attachment
-            line = add_attachments(line)
-            html_file.write(line)
-            continue  # next line
-
-    # Write reformatted & complete message to {recipName}.html
-    formatted_message = reformat(clean_html(line))
-    html_file.write(create_message_block(formatted_message))
-
-with open("end_template.txt", encoding="utf-8") as f:
-    end_template = f.readlines()
-
-# Add end template
-for line in end_template:
-    html_file.write(line)
-
-html_file.close()
+write_to_file()
 
 print("Reformatting complete!")
 
