@@ -24,5 +24,5 @@ A script to convert WhatsApp chats exported as zip files into formatted HTML fil
 3. Select the zip file from the file select dialog
 4. Select an export directory from the dialog
 5. Enter the name of the recipient (case sensitive)
-6. The program will create a HTML file and a folder of attachments in the output directory and clean up the temporary files
-7. Feel free to remove the original zip file
+6. Click the `Format` button
+7. Wait until the `Finish` button is active and then click it to exit
