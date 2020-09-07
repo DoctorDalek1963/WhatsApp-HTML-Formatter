@@ -11,10 +11,13 @@ description_text = """Steps:\n
 1. Select an exported chat\n
 2. Select an export directory\n
 3. Enter the name of the recipient\n
-4. Click the format button"""
+4. Click the format button\n
+5. Wait until the finish button is active\n
+6. Click it"""
 
 default_x_padding = 10
 default_y_padding = 15
+
 
 # ===== Functions used on tk buttons
 
@@ -31,13 +34,14 @@ def select_output_dir():
 
 
 def begin_export():
-    global finish_export_flag
+    global start_export_flag, finish_export_flag
+    start_export_flag = True
     extract_zip(input_zip)
     write_to_file(recipName, outputDir)
     finish_export_flag = True
 
 
-# ===== Tkinter stuff
+# ===== Tkinter initialisation
 
 # Initialisation of window
 root = tk.Tk()
@@ -68,7 +72,9 @@ description_label.grid(row=3, column=0, pady=default_y_padding, padx=default_x_p
 format_button.grid(row=3, column=2, pady=default_y_padding, padx=default_x_padding)
 finish_export_button.grid(row=4, column=2, pady=5, padx=5)
 
-# Infinite loop to update tk window and check for conditions to activate buttons
+# ===== Loop to sustain window
+
+# Infinite loop to update tk window and check for conditions to activate or deactivate buttons
 while True:
     recipName = enter_name_box.get()
 
