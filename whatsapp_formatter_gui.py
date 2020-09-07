@@ -1,12 +1,20 @@
 from formatter_functions import *
-from zipfile import ZipFile
-# from glob import glob
 import tkinter as tk
 from tkinter import filedialog
 import os
 
 cwd = os.getcwd()
 input_zip = outputDir = recipName = ""
+finish_export_flag = start_export_flag = False
+
+description_text = """Steps:\n
+1. Select an exported chat\n
+2. Select an export directory\n
+3. Enter the name of the recipient\n
+4. Click the format button"""
+
+default_x_padding = 10
+default_y_padding = 15
 
 # ===== Functions used on tk buttons
 
@@ -22,25 +30,55 @@ def select_output_dir():
     outputDir = filedialog.askdirectory(initialdir="/", title="Select an output directory")
 
 
+def begin_export():
+    global finish_export_flag
+    extract_zip(input_zip)
+    write_to_file(recipName, outputDir)
+    finish_export_flag = True
+
+
 # ===== Tkinter stuff
 
+# Initialisation of window
 root = tk.Tk()
 root.title("WhatsApp Formatter")
-root.geometry("500x300")
+root.resizable(False, False)
 
-introMessage = tk.Label(root, text="Welcome to the WhatsApp Formatter!", anchor="n")
-introMessage.pack()
-
+# Create widgets
+middle_column_padding = tk.LabelFrame(root)
 select_zip_button = tk.Button(root, text="Select an exported chat", command=select_zip)
-select_zip_button.pack()
-
 select_output_button = tk.Button(root, text="Select an output directory", command=select_output_dir)
-select_output_button.pack()
-
 name_box_label = tk.Label(root, text="Enter the name of the recipient:")
-name_box_label.pack()
+enter_name_box = tk.Entry(root)
+description_label = tk.Label(root, text=description_text)
 
-enter_name_box = tk.Entry(root, textvariable=recipName)
-enter_name_box.pack()
+# Create special widgets
+format_button = tk.Button(root, text="Format", command=begin_export, state="disabled")
+finish_export_button = tk.Button(root, text="Finish", command=root.destroy, state="disabled")
 
-root.mainloop()
+# Place widgets
+middle_column_padding.grid(row=1, column=1, padx=25)
+select_zip_button.grid(row=1, column=0, pady=default_y_padding, padx=default_x_padding)
+select_output_button.grid(row=2, column=0, pady=default_y_padding, padx=default_x_padding)
+name_box_label.grid(row=1, column=2, pady=default_y_padding, padx=default_x_padding)
+enter_name_box.grid(row=2, column=2, pady=default_y_padding, padx=default_x_padding)
+description_label.grid(row=3, column=0, pady=default_y_padding, padx=default_x_padding)
+
+# Place special widgets
+format_button.grid(row=3, column=2, pady=default_y_padding, padx=default_x_padding)
+finish_export_button.grid(row=4, column=2, pady=5, padx=5)
+
+# Infinite loop to update tk window and check for conditions to activate buttons
+while True:
+    recipName = enter_name_box.get()
+
+    if input_zip and outputDir and recipName:
+        format_button.config(state="normal")
+
+    if start_export_flag:
+        format_button.config(state="disabled")
+
+    if finish_export_flag:
+        finish_export_button.config(state="normal")
+
+    root.update()
