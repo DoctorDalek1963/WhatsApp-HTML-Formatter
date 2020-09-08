@@ -10,13 +10,13 @@ finish_export_flag = start_export_flag = False
 description_text = """Steps:\n
 1. Select an exported chat\n
 2. Select an export directory\n
-3. Enter the name of the recipient\n
+3. Enter the name of the recipient (case sensitive)\n
 4. Click the format button\n
-5. Wait until the finish button is active\n
-6. Click it"""
+5. Wait until the exit button is active\n
+6. Click it to exit"""
 
 default_x_padding = 10
-default_y_padding = 15
+default_y_padding = 5
 
 
 # ===== Functions used on tk buttons
@@ -50,27 +50,32 @@ root.resizable(False, False)
 
 # Create widgets
 middle_column_padding = tk.LabelFrame(root)
-select_zip_button = tk.Button(root, text="Select an exported chat", command=select_zip)
-select_output_button = tk.Button(root, text="Select an output directory", command=select_output_dir)
+row_padding_1 = tk.LabelFrame(root)
+row_padding_2 = tk.LabelFrame(root)
+select_zip_button = tk.Button(root, text="Select an exported chat", command=select_zip, bd=3)
+select_output_button = tk.Button(root, text="Select an output directory", command=select_output_dir, bd=3)
 name_box_label = tk.Label(root, text="Enter the name of the recipient:")
 enter_name_box = tk.Entry(root)
 description_label = tk.Label(root, text=description_text)
 
 # Create special widgets
-format_button = tk.Button(root, text="Format", command=begin_export, state="disabled")
-finish_export_button = tk.Button(root, text="Finish", command=root.destroy, state="disabled")
+format_button = tk.Button(root, text="Format", command=begin_export, state="disabled", bd=3)
+exit_button = tk.Button(root, text="Exit", command=root.destroy, state="disabled", bd=3)
 
 # Place widgets
-middle_column_padding.grid(row=1, column=1, padx=25)
-select_zip_button.grid(row=1, column=0, pady=default_y_padding, padx=default_x_padding)
-select_output_button.grid(row=2, column=0, pady=default_y_padding, padx=default_x_padding)
-name_box_label.grid(row=1, column=2, pady=default_y_padding, padx=default_x_padding)
-enter_name_box.grid(row=2, column=2, pady=default_y_padding, padx=default_x_padding)
-description_label.grid(row=3, column=0, pady=default_y_padding, padx=default_x_padding)
+middle_column_padding.grid(row=2, column=1, padx=20)
+row_padding_1.grid(row=4, column=2, pady=15)
+select_zip_button.grid(row=2, column=2, pady=default_y_padding, padx=default_x_padding)
+select_output_button.grid(row=3, column=2, pady=default_y_padding, padx=default_x_padding)
+name_box_label.grid(row=5, column=2, pady=default_y_padding, padx=default_x_padding)
+enter_name_box.grid(row=6, column=2, pady=default_y_padding, padx=default_x_padding)
+
+description_label.grid(row=1, rowspan=9, column=0, pady=default_y_padding, padx=default_x_padding)
+row_padding_2.grid(row=7, column=2, pady=15)
 
 # Place special widgets
-format_button.grid(row=3, column=2, pady=default_y_padding, padx=default_x_padding)
-finish_export_button.grid(row=4, column=2, pady=5, padx=5)
+format_button.grid(row=8, column=2, pady=default_y_padding, padx=default_x_padding)
+exit_button.grid(row=9, column=2, pady=15, padx=5)
 
 # ===== Loop to sustain window
 
@@ -85,6 +90,6 @@ while True:
         format_button.config(state="disabled")
 
     if finish_export_flag:
-        finish_export_button.config(state="normal")
+        exit_button.config(state="normal")
 
     root.update()
