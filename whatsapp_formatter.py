@@ -13,7 +13,7 @@ if not input_file.endswith(".zip"):
 print()
 outputDir = input("Please enter a full output directory: ")
 print()
-recipName = input("Please enter the name of the recipient: ")
+recipName = input("Please enter the name of the recipient (case sensitive): ")
 print()
 
 print("Unzipping...")
