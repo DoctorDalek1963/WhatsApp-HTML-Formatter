@@ -1,5 +1,8 @@
 from pydub import AudioSegment
 from datetime import datetime
+from zipfile import ZipFile
+from shutil import copytree
+from glob import glob
 import re
 import os
 
@@ -8,15 +11,8 @@ image_extensions = (".jpg", ".png", ".webp")  # List of accepted image extension
 format_dict = {"_": "em", "*": "strong", "~": "del"}  # Dict of format characters and their tags
 
 cwd = os.getcwd()
-
 recipName = outputDir = ""
-
-
-def pass_vars(name, output):
-    """Pass variables to be used in formatter_functions."""
-    global recipName, outputDir
-    recipName = name
-    outputDir = output
+attachment_pattern = re.compile(r"\[\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m] \w+: (.+)?<attached: ([^.]+)(\.\w+)>$")
 
 
 def clean_html(string):  # Get rid of <> in non-attachment messages
@@ -168,3 +164,70 @@ def create_message_block(string):
     string = f"{string}<span class=\"message-info date\">{date}</span>"
 
     return string
+
+
+def extract_zip(file):
+    zip_file = ZipFile(file)
+    zip_file.extractall("temp")
+    zip_file.close()
+
+
+def write_to_file(name, output):
+    """Loop through every line of _chat.txt and write it to recipName.html with proper formatting."""
+    global recipName, outputDir
+    recipName = name
+    outputDir = output
+
+    if not os.path.isdir(f"{outputDir}/Library"):
+        copytree("Library", f"{outputDir}/Library")
+
+    if not os.path.isdir(f"{outputDir}/{recipName}"):
+        os.mkdir(f"{outputDir}/{recipName}")
+
+    # Creates chat_txt_list as list of _chat.txt
+    with open("temp/_chat.txt", encoding="utf-8") as f:
+        chat_txt_list = f.read().splitlines()
+
+    # ===== Reformat chat_txt into recipName.html
+
+    html_file = open(f"{outputDir}/{recipName}.html", "w+", encoding="utf-8")
+
+    with open("start_template.txt", encoding="utf-8") as f:
+        start_template = f.readlines()
+
+    # Replace recipName in start_template
+    for i, line in enumerate(start_template):
+        pos = line.find("%recipName%")
+        if pos != -1:  # If "recipName" is found
+            start_template[i] = line.replace("%recipName%", recipName)  # Replace with var
+
+    # Add start template
+    for line in start_template:
+        html_file.write(line)
+
+    for line in chat_txt_list:
+        line = line.replace("\u200e", "")  # Clear left-to-right mark
+
+        if re.search(attachment_pattern, line):
+            line = add_attachments(line)
+            html_file.write(line)
+            continue  # Next line of chat
+
+        # Write reformatted & complete message to recipName.html
+        formatted_message = reformat(clean_html(line))
+        html_file.write(create_message_block(formatted_message))
+
+    with open("end_template.txt", encoding="utf-8") as f:
+        end_template = f.readlines()
+
+    # Add end template
+    for line in end_template:
+        html_file.write(line)
+
+    html_file.close()
+
+    files = glob("temp/*")
+    for f in files:
+        os.remove(f)
+
+    os.rmdir("temp")
