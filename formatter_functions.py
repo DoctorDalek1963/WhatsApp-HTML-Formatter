@@ -1,6 +1,7 @@
 from pydub import AudioSegment
 from datetime import datetime
 from zipfile import ZipFile
+from shutil import copytree
 from glob import glob
 import re
 import os
@@ -10,8 +11,8 @@ image_extensions = (".jpg", ".png", ".webp")  # List of accepted image extension
 format_dict = {"_": "em", "*": "strong", "~": "del"}  # Dict of format characters and their tags
 
 cwd = os.getcwd()
-
 recipName = outputDir = ""
+attachment_pattern = re.compile(r"\[\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m] \w+: (.+)?<attached: ([^.]+)(\.\w+)>$")
 
 
 def clean_html(string):  # Get rid of <> in non-attachment messages
@@ -177,10 +178,11 @@ def write_to_file(name, output):
     recipName = name
     outputDir = output
 
-    try:
+    if not os.path.isdir(f"{outputDir}/Library"):
+        copytree("Library", f"{outputDir}/Library")
+
+    if not os.path.isdir(f"{outputDir}/{recipName}"):
         os.mkdir(f"{outputDir}/{recipName}")
-    except OSError:
-        pass
 
     # Creates chat_txt_list as list of _chat.txt
     with open("temp/_chat.txt", encoding="utf-8") as f:
@@ -204,18 +206,14 @@ def write_to_file(name, output):
         html_file.write(line)
 
     for line in chat_txt_list:
-        # Detect attachments
         line = line.replace("\u200e", "")  # Clear left-to-right mark
 
-        if line == "":
-            pass
-        else:
-            if re.search(r"<attached: ([^.]+)(\.\w+)>$", line):  # If attachment
-                line = add_attachments(line)
-                html_file.write(line)
-                continue  # next line
+        if re.search(attachment_pattern, line):
+            line = add_attachments(line)
+            html_file.write(line)
+            continue  # Next line of chat
 
-        # Write reformatted & complete message to {recipName}.html
+        # Write reformatted & complete message to recipName.html
         formatted_message = reformat(clean_html(line))
         html_file.write(create_message_block(formatted_message))
 
