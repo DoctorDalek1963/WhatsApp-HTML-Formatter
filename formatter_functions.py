@@ -208,7 +208,7 @@ def write_to_file(name, output):
     for line in chat_txt_list:
         line = line.replace("\u200e", "")  # Clear left-to-right mark
 
-        if re.search(attachment_pattern, line):
+        if re.match(attachment_pattern, line):
             line = add_attachments(line)
             html_file.write(line)
             continue  # Next line of chat
