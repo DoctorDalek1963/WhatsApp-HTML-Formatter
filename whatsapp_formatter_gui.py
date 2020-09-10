@@ -18,7 +18,7 @@ description_text = """Steps:\n
 
 default_x_padding = 10
 default_y_padding = 5
-padding_y = 15
+dedicated_padding_y = 15
 
 
 # ===== Functions used on tk buttons
@@ -86,31 +86,31 @@ exit_button = tk.Button(root, text="Exit", command=root.destroy, bd=3)
 # Spacing between instructions & inputs
 middle_column_padding.grid(row=1, rowspan=9, column=1, padx=20)
 
-row_padding_1.grid(row=4, column=2, pady=padding_y)
+row_padding_1.grid(row=4, column=2, pady=dedicated_padding_y)
 
 # Select zip and display name
-select_zip_button.grid(row=2, column=2, pady=default_y_padding, padx=default_x_padding)
-selected_zip_label.grid(row=3, column=2, pady=default_y_padding, padx=default_x_padding)
+select_zip_button.grid(row=2, column=2, padx=default_x_padding, pady=default_y_padding)
+selected_zip_label.grid(row=3, column=2, padx=default_x_padding, pady=default_y_padding)
 
-row_padding_2.grid(row=4, column=2, pady=padding_y)
+row_padding_2.grid(row=4, column=2, pady=dedicated_padding_y)
 
 # Select output directory and display it
-select_output_button.grid(row=5, column=2, pady=default_y_padding, padx=default_x_padding)
-selected_output_label.grid(row=6, column=2, pady=default_y_padding, padx=default_x_padding)
+select_output_button.grid(row=5, column=2, padx=default_x_padding, pady=default_y_padding)
+selected_output_label.grid(row=6, column=2, padx=default_x_padding, pady=default_y_padding)
 
-row_padding_3.grid(row=7, column=2, pady=padding_y)
+row_padding_3.grid(row=7, column=2, pady=dedicated_padding_y)
 
 # Enter recipient name
-name_box_label.grid(row=8, column=2, pady=default_y_padding, padx=default_x_padding)
-enter_name_box.grid(row=9, column=2, pady=default_y_padding, padx=default_x_padding)
+name_box_label.grid(row=8, column=2, padx=default_x_padding, pady=default_y_padding)
+enter_name_box.grid(row=9, column=2, padx=default_x_padding, pady=default_y_padding)
 
 # Instructions for use
-description_label.grid(row=1, rowspan=12, column=0, pady=default_y_padding, padx=default_x_padding)
+description_label.grid(row=1, rowspan=12, column=0, padx=default_x_padding, pady=default_y_padding)
 
-row_padding_4.grid(row=10, column=2, pady=padding_y)
+row_padding_4.grid(row=10, column=2, pady=dedicated_padding_y)
 
 # Place special button widgets
-format_button.grid(row=11, column=2, pady=default_y_padding, padx=default_x_padding)
+format_button.grid(row=11, column=2, padx=default_x_padding, pady=default_y_padding)
 exit_button.grid(row=12, column=2, pady=15, padx=5)
 
 
