@@ -12,7 +12,7 @@ format_dict = {"_": "em", "*": "strong", "~": "del"}  # Dict of format character
 
 cwd = os.getcwd()
 recipName = outputDir = ""
-attachment_pattern = re.compile(r"\[\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m] \w+: (.+)?<attached: ([^.]+)(\.\w+)>$")
+attachment_pattern = re.compile(r"\[\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m] \w+: <attached: ([^.]+)(\.\w+)>$")
 
 
 def clean_html(string):  # Get rid of <> in non-attachment messages
