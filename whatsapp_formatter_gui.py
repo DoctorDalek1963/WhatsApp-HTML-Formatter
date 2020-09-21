@@ -1,6 +1,8 @@
 from tkinter import filedialog, StringVar
 from formatter_functions import *
+from time import sleep
 import tkinter as tk
+import _thread
 import os
 
 cwd = os.getcwd()
@@ -38,8 +40,14 @@ def select_output_dir():
 def begin_export():
     global startExportFlag, finishExportFlag
     startExportFlag = True
+    sleep(1)  # Wait and let Format button update
     extract_zip(inputZip)
-    write_to_file(recipName, outputDir)
+
+    # Start new thread for formatting function
+    _thread.start_new_thread(write_to_file, (recipName, outputDir))
+
+    # TODO: Use new 'threading' module to wait until thread is finished
+
     finishExportFlag = True
 
 
