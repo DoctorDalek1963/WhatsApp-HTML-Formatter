@@ -2,17 +2,17 @@ from formatter_functions import write_to_file, extract_zip
 import os
 
 cwd = os.getcwd()
-quit_flag = False
+quitFlag = False
 
 print("Welcome to the WhatsApp Formatter!")
 
-while not quit_flag:
+while not quitFlag:
     print()
     print(f"Please move the selected zip to {cwd}")
     print()
-    input_file = input("Please enter the name of the input zip file: ")
-    if not input_file.endswith(".zip"):
-        input_file = f"{input_file}.zip"
+    inputFile = input("Please enter the name of the input zip file: ")
+    if not inputFile.endswith(".zip"):
+        inputFile = f"{inputFile}.zip"
     print()
     outputDir = input("Please enter a full output directory: ")
     print()
@@ -20,7 +20,7 @@ while not quit_flag:
     print()
 
     print("Unzipping...")
-    extract_zip(input_file)
+    extract_zip(inputFile)
     print("Unzipped!")
     print()
 
@@ -32,4 +32,4 @@ while not quit_flag:
     print()
     print("Process complete!")
     print()
-    quit_flag = input("Type \'1\' to quit, press enter to continue with another zip... ")
+    quitFlag = input("Type \'1\' to quit, press enter to continue with another zip... ")

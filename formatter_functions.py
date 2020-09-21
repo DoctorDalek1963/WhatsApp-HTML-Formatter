@@ -6,13 +6,13 @@ from glob import glob
 import re
 import os
 
-audio_extensions = (".opus", ".m4a")  # List of accepted non-mp3 audio files
-image_extensions = (".jpg", ".png", ".webp")  # List of accepted image extensions
-format_dict = {"_": "em", "*": "strong", "~": "del"}  # Dict of format characters and their tags
+audioExtensions = (".opus", ".m4a")  # List of accepted non-mp3 audio files
+imageExtensions = (".jpg", ".png", ".webp")  # List of accepted image extensions
+formatDict = {"_": "em", "*": "strong", "~": "del"}  # Dict of format characters and their tags
 
 cwd = os.getcwd()
 recipName = outputDir = ""
-attachment_pattern = re.compile(r"\[\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m] \w+: <attached: ([^.]+)(\.\w+)>$")
+attachmentPattern = re.compile(r"\[\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m] \w+: <attached: ([^.]+)(\.\w+)>$")
 
 
 def clean_html(string):  # Get rid of <> in non-attachment messages
@@ -63,7 +63,7 @@ def reformat(string):
                     count = 0
         string = "".join(list_string)
     else:
-        for x, (char, tag) in enumerate(format_dict.items()):
+        for x, (char, tag) in enumerate(formatDict.items()):
             if char in string:
                 if string.count(char) % 2 == 0:
                     string = replace_tags(string, char, tag)
@@ -97,7 +97,7 @@ def add_attachments(string):
     string_start = string.split("<attached: ")[0]
 
     # ===== Format attachments
-    if extension in audio_extensions:
+    if extension in audioExtensions:
         # Convert audio file to mp3
         AudioSegment.from_file(f"temp/{filename}").export(f"{outputDir}/{recipName}/{filename}", format="mp3")
         string = string_start + f"<audio src=\"{recipName}/{filename}\" controls></audio>"
@@ -114,7 +114,7 @@ def add_attachments(string):
         string = f"{string_start}<video controls>\n\t<source src=\"{recipName}/{filename}\"" + \
                  " type=\"video/mp4\"></source>\n</video>"
 
-    elif extension in image_extensions:
+    elif extension in imageExtensions:
         string = f"{string_start}<img src=\"{recipName}/{filename}\" alt=\"Image\" width=\"30%\" height=\"30%\">"
 
     string = create_message_block(string)
@@ -208,7 +208,7 @@ def write_to_file(name, output):
     for line in chat_txt_list:
         line = line.replace("\u200e", "")  # Clear left-to-right mark
 
-        if re.match(attachment_pattern, line):
+        if re.match(attachmentPattern, line):
             line = add_attachments(line)
             html_file.write(line)
             continue  # Next line of chat
