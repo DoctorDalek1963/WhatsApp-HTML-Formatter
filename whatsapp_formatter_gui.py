@@ -3,10 +3,13 @@ from formatter_functions import *
 from time import sleep
 import tkinter as tk
 import _thread
+import threading
 import os
 
 cwd = os.getcwd()
-inputZip = outputDir = recipName = ""
+inputZip = ""
+outputDir = ""
+recipName = ""
 finishExportFlag = startExportFlag = False
 
 descriptionText = """Steps:\n
@@ -44,9 +47,14 @@ def begin_export():
     extract_zip(inputZip)
 
     # Start new thread for formatting function
-    _thread.start_new_thread(write_to_file, (recipName, outputDir))
+    # _thread.start_new_thread(write_to_file, (recipName, outputDir))
+
+    write_to_file(recipName, outputDir)
 
     # TODO: Use new 'threading' module to wait until thread is finished
+    t = threading.Thread(target=update_loop)
+    t.start()
+    t.join()
 
     finishExportFlag = True
 
@@ -125,27 +133,32 @@ exit_button.grid(row=12, column=2, pady=15, padx=5)
 # ===== Loop to sustain window
 
 # Infinite loop to update tk window and check for conditions to activate or deactivate buttons
-while True:
-    recipName = enter_name_box.get()  # Get var from entry widget
+def update_loop():
+    global recipName, inputZip, startExportFlag, finishExportFlag
+    while True:
+        recipName = enter_name_box.get()  # Get var from entry widget
 
-    # Get name of zip file and display it in label widget
-    truncatedInputZip = inputZip.split("/")[-1]
-    selected_zip_var.set(f"Selected: {truncatedInputZip}")
+        # Get name of zip file and display it in label widget
+        truncated_input_zip = inputZip.split("/")[-1]
+        selected_zip_var.set(f"Selected: {truncated_input_zip}")
 
-    # Display outputDir in label widget
-    selected_output_var.set(f"Selected: \n{outputDir}")
+        # Display outputDir in label widget
+        selected_output_var.set(f"Selected: \n{outputDir}")
 
-    if inputZip and outputDir and recipName:
-        format_button.config(state="normal")
+        if inputZip and outputDir and recipName:
+            format_button.config(state="normal")
 
-    if startExportFlag:
-        format_button.config(state="disabled")
-        startExportFlag = False
+        if startExportFlag:
+            format_button.config(state="disabled")
+            startExportFlag = False
 
-    if finishExportFlag:
-        inputZip = ""
-        enter_name_box.delete(0, tk.END)  # Clear entry box
-        format_button.config(state="normal")
-        finishExportFlag = False
+        if finishExportFlag:
+            inputZip = ""
+            enter_name_box.delete(0, tk.END)  # Clear entry box
+            format_button.config(state="normal")
+            finishExportFlag = False
 
-    root.update()
+        root.update()
+
+
+update_loop()
