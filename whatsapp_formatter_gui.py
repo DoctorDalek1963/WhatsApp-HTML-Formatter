@@ -24,7 +24,9 @@ import threading
 import os
 
 cwd = os.getcwd()
-inputZip = outputDir = recipName = ""
+inputZip = ""
+outputDir = ""
+recipName = ""
 finishExportFlag = startExportFlag = False
 
 descriptionText = """Steps:\n
@@ -58,7 +60,7 @@ def begin_export():
     global startExportFlag, finishExportFlag
     startExportFlag = True
     sleep(0.1)  # Wait and let Format button update
-
+    
     extract_thread = threading.Thread(extract_zip(inputZip))
     file_write_thread = threading.Thread(write_to_file(recipName, outputDir))
     extract_thread.start()
@@ -156,29 +158,33 @@ exit_button.grid(row=12, column=2, pady=15, padx=5)
 # ===== Loop to sustain window
 
 # Infinite loop to update tk window and check for conditions to activate or deactivate buttons
-while True:
-    recipName = enter_name_box.get()  # Get var from entry widget
+def update_loop():
+    global recipName, inputZip, startExportFlag, finishExportFlag
+    while True:
+        recipName = enter_name_box.get()  # Get var from entry widget
 
-    # Get name of zip file and display it in label widget
-    truncatedInputZip = inputZip.split("/")[-1]
-    selected_zip_var.set(f"Selected: {truncatedInputZip}")
+        # Get name of zip file and display it in label widget
+        truncated_input_zip = inputZip.split("/")[-1]
+        selected_zip_var.set(f"Selected: {truncated_input_zip}")
+
+        # Display outputDir in label widget
+        selected_output_var.set(f"Selected: \n{outputDir}")
+
+        if inputZip and outputDir and recipName:
+            format_button.config(state="normal")
 
         if startExportFlag:
             format_button.config(state="disabled")
             startExportFlag = False
             begin_export_thread.join()
 
-    if inputZip and outputDir and recipName:
-        format_button.config(state="normal")
+        if finishExportFlag:
+            inputZip = ""
+            enter_name_box.delete(0, tk.END)  # Clear entry box
+            format_button.config(state="normal")
+            finishExportFlag = False
 
-    if startExportFlag:
-        format_button.config(state="disabled")
-        startExportFlag = False
+        root.update()
 
-    if finishExportFlag:
-        inputZip = ""
-        enter_name_box.delete(0, tk.END)  # Clear entry box
-        format_button.config(state="normal")
-        finishExportFlag = False
 
-    root.update()
+update_loop()

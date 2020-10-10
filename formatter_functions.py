@@ -110,15 +110,16 @@ def add_attachments(string):
     # Parse filename and extension with a RegEx
     attachment_match = re.search(r"<attached: ([^.]+)(\.\w+)>$", string)
     extension = attachment_match.group(2)
-    filename = attachment_match.group(1) + extension
+    filename_no_extension = attachment_match.group(1)
+    filename = filename_no_extension + extension
 
     string_start = string.split("<attached: ")[0]
 
     # ===== Format attachments
     if extension in audioExtensions:
         # Convert audio file to mp3
-        AudioSegment.from_file(f"temp/{filename}").export(f"{outputDir}/{recipName}/{filename}", format="mp3")
-        string = string_start + f"<audio src=\"{recipName}/{filename}\" controls></audio>"
+        AudioSegment.from_file(f"temp/{filename}").export(f"{outputDir}/{recipName}/{filename_no_extension}.mp3", format="mp3")
+        string = string_start + f"<audio src=\"{recipName}/{filename_no_extension}.mp3\" controls></audio>"
         string = create_message_block(string)
         return string
 
@@ -223,8 +224,9 @@ def write_to_file(name, output):
     for line in start_template:
         html_file.write(line)
 
-    for line in chat_txt_list:
-        line = line.replace("\u200e", "")  # Clear left-to-right mark
+    while len(chat_txt_list) > 0:
+        line = chat_txt_list[0].replace("\u200e", "")
+        del chat_txt_list[0]
 
         if re.match(attachmentPattern, line):
             line = add_attachments(line)
