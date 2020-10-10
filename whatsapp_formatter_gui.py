@@ -20,7 +20,7 @@ from tkinter import filedialog, StringVar
 from formatter_functions import *
 from time import sleep
 import tkinter as tk
-import _thread
+import threading
 import os
 
 cwd = os.getcwd()
@@ -40,7 +40,6 @@ default_x_padding = 10
 default_y_padding = 5
 dedicated_padding_y = 15
 
-
 # ===== Functions used on tk buttons
 
 
@@ -58,15 +57,29 @@ def select_output_dir():
 def begin_export():
     global startExportFlag, finishExportFlag
     startExportFlag = True
-    sleep(1)  # Wait and let Format button update
-    extract_zip(inputZip)
+    sleep(0.1)  # Wait and let Format button update
 
-    # Start new thread for formatting function
-    _thread.start_new_thread(write_to_file, (recipName, outputDir))
+    extract_thread = threading.Thread(extract_zip(inputZip))
+    file_write_thread = threading.Thread(write_to_file(recipName, outputDir))
+    extract_thread.start()
+    file_write_thread.start()
+    sleep(1)
+    extract_thread.join()
+    file_write_thread.join()
 
-    # TODO: Use new 'threading' module to wait until thread is finished
+    # # TODO: Use new 'threading' module to wait until thread is finished
+    # t = threading.Thread(target=update_loop)
+    # t.start()
+    # t.join()
 
     finishExportFlag = True
+
+
+begin_export_thread = threading.Thread(begin_export())
+
+
+def begin_export_thread_func():
+    begin_export_thread.start()
 
 
 # ===== Tkinter initialisation
@@ -103,7 +116,7 @@ enter_name_box = tk.Entry(root)
 description_label = tk.Label(root, text=descriptionText)
 
 # Create special button widgets
-format_button = tk.Button(root, text="Format", command=begin_export, state="disabled", bd=3)
+format_button = tk.Button(root, text="Format", command=begin_export_thread_func, state="disabled", bd=3)
 exit_button = tk.Button(root, text="Exit", command=root.destroy, bd=3)
 
 
@@ -150,8 +163,10 @@ while True:
     truncatedInputZip = inputZip.split("/")[-1]
     selected_zip_var.set(f"Selected: {truncatedInputZip}")
 
-    # Display outputDir in label widget
-    selected_output_var.set(f"Selected: \n{outputDir}")
+        if startExportFlag:
+            format_button.config(state="disabled")
+            startExportFlag = False
+            begin_export_thread.join()
 
     if inputZip and outputDir and recipName:
         format_button.config(state="normal")
