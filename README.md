@@ -9,10 +9,10 @@ A script to convert WhatsApp chats exported as zip files into formatted HTML fil
 - [pydub](http://pydub.com/)
 
 ## Example:
-##### Original:
+### Original:
 ![Exported chat in plain text](images/o1.jpg)
 
-##### Formatted:
+### Formatted:
 ![Formatted chat 1](images/f1.jpg)
 ![Formatted chat 2](images/f2.jpg)
 ![Formatted chat 3](images/f3.jpg)
