@@ -27,7 +27,10 @@ cwd = os.getcwd()
 inputZip = ""
 outputDir = ""
 recipName = ""
-finishExportFlag = startExportFlag = False
+finishExportFlag = startExportFlag = formattingFlag = False
+
+extract_thread = threading.Thread()
+file_write_thread = threading.Thread()
 
 descriptionText = """Steps:\n
 1. Select an exported chat\n
@@ -35,8 +38,9 @@ descriptionText = """Steps:\n
 3. Enter the name of the recipient (case sensitive)\n
 4. Click the format button\n
 5. The format button will be greyed out\n
-6. Wait until it's active again\n
-7. Choose a new zip to format or exit the program"""
+6. Wait until the 'Formatting...' text disappears\n
+7. If the zip file is big, this may take some time\n
+8. Choose a new zip to format or exit the program"""
 
 default_x_padding = 10
 default_y_padding = 5
@@ -56,32 +60,21 @@ def select_output_dir():
     outputDir = filedialog.askdirectory(initialdir="/", title="Select an output directory")
 
 
-def begin_export():
-    global startExportFlag, finishExportFlag
+def start_export():
+    global startExportFlag
     startExportFlag = True
-    sleep(0.1)  # Wait and let Format button update
-    
-    extract_thread = threading.Thread(extract_zip(inputZip))
-    file_write_thread = threading.Thread(write_to_file(recipName, outputDir))
-    extract_thread.start()
-    file_write_thread.start()
-    sleep(1)
-    extract_thread.join()
-    file_write_thread.join()
-
-    # # TODO: Use new 'threading' module to wait until thread is finished
-    # t = threading.Thread(target=update_loop)
-    # t.start()
-    # t.join()
-
-    finishExportFlag = True
 
 
-begin_export_thread = threading.Thread(begin_export())
+def process():
+    global inputZip, recipName, outputDir
+    global formattingFlag
+    fixed_name_zip = inputZip
+    fixed_name_recip = recipName
+    fixed_name_dir = outputDir
 
-
-def begin_export_thread_func():
-    begin_export_thread.start()
+    extract_zip(fixed_name_zip)
+    formattingFlag = True
+    write_to_file(fixed_name_recip, fixed_name_dir)
 
 
 # ===== Tkinter initialisation
@@ -93,6 +86,7 @@ root.resizable(False, False)
 
 selected_zip_var = StringVar()
 selected_output_var = StringVar()
+formatting_string_var = StringVar()
 
 
 # ===== Create widgets
@@ -118,14 +112,15 @@ enter_name_box = tk.Entry(root)
 description_label = tk.Label(root, text=descriptionText)
 
 # Create special button widgets
-format_button = tk.Button(root, text="Format", command=begin_export_thread_func, state="disabled", bd=3)
+format_button = tk.Button(root, text="Format", command=start_export, state="disabled", bd=3)
+formatting_string_label = tk.Label(root, textvariable=formatting_string_var)
 exit_button = tk.Button(root, text="Exit", command=root.destroy, bd=3)
 
 
 # ===== Place widgets
 
 # Spacing between instructions & inputs
-middle_column_padding.grid(row=1, rowspan=9, column=1, padx=20)
+middle_column_padding.grid(row=1, rowspan=9, column=1, padx=30)
 
 row_padding_1.grid(row=4, column=2, pady=dedicated_padding_y)
 
@@ -152,36 +147,57 @@ row_padding_4.grid(row=10, column=2, pady=dedicated_padding_y)
 
 # Place special button widgets
 format_button.grid(row=11, column=2, padx=default_x_padding, pady=default_y_padding)
-exit_button.grid(row=12, column=2, pady=15, padx=5)
+formatting_string_label.grid(row=12, column=2, padx=default_x_padding, pady=default_y_padding)
+exit_button.grid(row=13, column=2, padx=default_x_padding, pady=default_y_padding)
 
 
 # ===== Loop to sustain window
 
 # Infinite loop to update tk window and check for conditions to activate or deactivate buttons
 def update_loop():
-    global recipName, inputZip, startExportFlag, finishExportFlag
+    global recipName, inputZip
+    global startExportFlag, finishExportFlag, formattingFlag
+    global extract_thread, file_write_thread
+
     while True:
-        recipName = enter_name_box.get()  # Get var from entry widget
+        if enter_name_box.get():
+            recipName = enter_name_box.get()
 
-        # Get name of zip file and display it in label widget
         truncated_input_zip = inputZip.split("/")[-1]
-        selected_zip_var.set(f"Selected: {truncated_input_zip}")
+        selected_zip_var.set(f"Selected: \n{truncated_input_zip}")
 
-        # Display outputDir in label widget
         selected_output_var.set(f"Selected: \n{outputDir}")
 
         if inputZip and outputDir and recipName:
             format_button.config(state="normal")
+        else:
+            format_button.config(state="disabled")
 
         if startExportFlag:
-            format_button.config(state="disabled")
-            startExportFlag = False
-            begin_export_thread.join()
+            process_thread = threading.Thread(target=process)
+            process_thread.start()
+            formatting_string_var.set("Formatting...")
 
-        if finishExportFlag:
+            # Allow format button to be greyed out
             inputZip = ""
             enter_name_box.delete(0, tk.END)  # Clear entry box
-            format_button.config(state="normal")
+
+            select_zip_button.config(state="disabled")
+            select_output_button.config(state="disabled")
+            enter_name_box.config(state="disabled")
+            exit_button.config(state="disabled")
+            startExportFlag = False
+
+        if formattingFlag and not os.path.isdir("temp"):
+            finishExportFlag = True
+            formattingFlag = False
+
+        if finishExportFlag:
+            formatting_string_var.set("")
+            select_zip_button.config(state="normal")
+            select_output_button.config(state="normal")
+            enter_name_box.config(state="normal")
+            exit_button.config(state="normal")
             finishExportFlag = False
 
         root.update()
