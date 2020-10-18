@@ -1,6 +1,13 @@
 # WhatsApp-Formatter
 
-A script to convert WhatsApp chats exported as zip files into formatted HTML files.
+![License](https://img.shields.io/github/license/DoctorDalek1963/WhatsApp-Formatter)
+![Release](https://img.shields.io/github/v/release/DoctorDalek1963/WhatsApp-Formatter)
+![Last Commit](https://img.shields.io/github/last-commit/DoctorDalek1963/WhatsApp-Formatter)
+
+![Repo Size](https://img.shields.io/github/repo-size/DoctorDalek1963/WhatsApp-Formatter)
+![Code Size](https://img.shields.io/github/languages/code-size/DoctorDalek1963/WhatsApp-Formatter)
+
+A program to convert WhatsApp chats exported as zip files into formatted HTML files for easier reading.
 
 ## Notices:
 - Feel free to change `Library/background-image.jpg` to whatever background image you'd like, just make sure it has the same name
