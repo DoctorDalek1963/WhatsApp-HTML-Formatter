@@ -30,19 +30,25 @@ while not quitFlag:
     print()
     inputFile = input("Please enter the name of the input zip file: ")
     if not inputFile.endswith(".zip"):
-        inputFile = f"{inputFile}.zip"
+        inputFile += ".zip"
     print()
     outputDir = input("Please enter a full output directory: ")
     print()
     recipName = input("Please enter the name of the recipient (case sensitive): ")
     print()
-
-    print("Unzipping...")
-    extract_zip(inputFile)
-    print("Unzipped!")
+	
+	try:
+		print(f"Unzipping {inputFile}...")
+		extract_zip(inputFile)
+		print("Unzipped!")
+	except OSError:
+		print(f"{inputFile} not found")
+		input("Press enter to exit")
+		exit(0)
+		
     print()
 
-    print("Reformatting...")
+    print(f"Reformatting {inputFile}...")
 
     write_to_file(recipName, outputDir)  # All the heavy lifting is done by this function
 
