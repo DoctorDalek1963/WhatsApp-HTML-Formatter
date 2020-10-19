@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from formatter_functions import extract_zip, write_to_file
 from tkinter import filedialog, StringVar
-from formatter_functions import *
 import tkinter as tk
 import threading
 import os
