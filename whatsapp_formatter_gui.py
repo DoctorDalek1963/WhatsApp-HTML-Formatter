@@ -18,7 +18,6 @@
 
 from tkinter import filedialog, StringVar
 from formatter_functions import *
-from time import sleep
 import tkinter as tk
 import threading
 import os

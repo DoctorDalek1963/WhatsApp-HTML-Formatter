@@ -118,7 +118,8 @@ def add_attachments(string):
     # ===== Format attachments
     if extension in audioExtensions:
         # Convert audio file to mp3
-        AudioSegment.from_file(f"temp/{filename}").export(f"{outputDir}/{recipName}/{filename_no_extension}.mp3", format="mp3")
+        AudioSegment.from_file(
+            f"temp/{filename}").export(f"{outputDir}/{recipName}/{filename_no_extension}.mp3", format="mp3")
         string = string_start + f"<audio src=\"{recipName}/{filename_no_extension}.mp3\" controls></audio>"
         string = create_message_block(string)
         return string

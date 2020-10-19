@@ -36,16 +36,16 @@ while not quitFlag:
     print()
     recipName = input("Please enter the name of the recipient (case sensitive): ")
     print()
-	
-	try:
-		print(f"Unzipping {inputFile}...")
-		extract_zip(inputFile)
-		print("Unzipped!")
-	except OSError:
-		print(f"{inputFile} not found")
-		input("Press enter to exit")
-		exit(0)
-		
+
+    try:
+        print(f"Unzipping {inputFile}...")
+        extract_zip(inputFile)
+        print("Unzipped!")
+    except OSError:
+        print(f"{inputFile} not found")
+        input("Press enter to exit")
+        exit(0)
+
     print()
 
     print(f"Reformatting {inputFile}...")
