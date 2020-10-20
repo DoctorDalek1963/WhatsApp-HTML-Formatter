@@ -28,9 +28,6 @@ outputDir = ""
 recipName = ""
 finishExportFlag = startExportFlag = formattingFlag = False
 
-extract_thread = threading.Thread()
-file_write_thread = threading.Thread()
-
 descriptionText = """Steps:\n
 1. Select an exported chat\n
 2. Select an export directory\n
@@ -156,7 +153,6 @@ exit_button.grid(row=13, column=2, padx=default_x_padding, pady=default_y_paddin
 def update_loop():
     global recipName, inputZip
     global startExportFlag, finishExportFlag, formattingFlag
-    global extract_thread, file_write_thread
 
     while True:
         if enter_name_box.get():
