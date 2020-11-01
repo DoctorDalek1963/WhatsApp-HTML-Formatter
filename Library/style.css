@@ -32,10 +32,10 @@ h3 { /* Style for recipName */
 .time { /* The timestamp in the bottom right of messages */
 	bottom: 2px;
 }
-.date {
+.date { /* The timestamp in the top right of messages */
 	top: 2px;
 }
-.message-info {
+.message-info { /* The message information at the right of messages */
 	color: #7f7f84;
 	font-size: 50%;
 	position: absolute;
