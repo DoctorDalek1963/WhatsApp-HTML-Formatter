@@ -81,7 +81,7 @@ def reformat(string):
                     count = 0
         string = "".join(list_string)
     else:
-        for x, (char, tag) in enumerate(formatDict.items()):
+        for _, (char, tag) in enumerate(formatDict.items()):
             if char in string:
                 if string.count(char) % 2 == 0:
                     string = replace_tags(string, char, tag)
