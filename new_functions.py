@@ -68,8 +68,8 @@ class Message:
         else:
             start_string = f"<div class=\"message sender\">"
 
-        return f"{start_string}<span class=\"message-info time\">{time}</span>" + \
-               f"<span class=\"message-info date\">{date}</span>\n\t{self.content}\n</div>"
+        return f"{start_string}\n<span class=\"message-info time\">{time}</span>" + \
+               f"\n<span class=\"message-info date\">{date}</span>\n\t{self.content}\n</div>"
 
 
 def clean_html(string: str):
