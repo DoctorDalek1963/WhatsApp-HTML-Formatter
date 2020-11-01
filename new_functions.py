@@ -31,9 +31,9 @@ cwd = os.getcwd()
 recipientName = outputDir = ""
 
 # RegEx patterns
-prefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (\w+): ")
+prefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (\w+): (.+)?")
 # &lt; and &gt; are used here because Message.content is run through format_content(), which removes <>
-attachmentPattern = re.compile(r"&lt;attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)&gt;$")
+attachmentPattern = re.compile(r"<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$")
 linkPattern = re.compile(r"(https?://)?(\w{3,}\.)?([^.\s]+\.[^.\s]+)")
 
 # TODO: When parsing dates, add <div>s with date to separate days
@@ -44,19 +44,20 @@ class Message:
         self.original = original_string
         self.prefix = re.match(prefixPattern, self.original).group(0)
 
-        self.content = format_content(self.original.split(": ")[1])
+        # self.content = self.original.split(": ")[1]
+        self.content = re.search(prefixPattern, self.original).group(3)
 
         if re.match(attachmentPattern, self.content):
             self.content = add_attachments(self.content)
-        # else:
-        #     self.attachmentFlag = False
+        else:
+            self.content = format_content(self.content)
 
     def __repr__(self):
         return self.create_html()
 
     def create_html(self) -> str:
         """Create HTML code from Message object."""
-        message_info_match = re.match(prefixPattern, self.original)
+        message_info_match = re.match(prefixPattern, self.prefix)
 
         date_raw = message_info_match.group(1)
         name = message_info_match.group(2)
@@ -73,9 +74,6 @@ class Message:
             start_string = f'<div class="message recipient">'
         else:
             start_string = f'<div class="message sender">'
-
-        # if self.attachmentFlag:
-        #     self.content = add_attachments(self.content)
 
         return f'{start_string}\n<span class="message-info time">{time}</span>' + \
                f'\n<span class="message-info date">{date}</span>\n\t{self.content}\n</div>'
@@ -184,6 +182,8 @@ def add_attachments(message_content: str) -> str:
 
     elif file_type == "PHOTO" or "GIF":
         message_content = f'<img src="{recipientName}/{filename}" alt="Image" width="30%" height="30%">'
+    else:
+        message_content = "UNKNOWN ATTACHMENT"
 
     # Move file to new directory
     os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/{recipientName}/{filename}")
