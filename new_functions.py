@@ -173,8 +173,8 @@ def add_attachments(message_content: str) -> str:
 
         else:  # If none of the standard html audio formats broke out of the for loop, convert to .mp3
             # Convert audio file to .mp3
-            # AudioSegment.from_file(f"temp/{filename}").export(
-            #     f"temp/{filename_no_extension}.mp3", format="mp3")
+            AudioSegment.from_file(f"temp/{filename}").export(
+                f"temp/{filename_no_extension}.mp3", format="mp3")
             filename = filename_no_extension + ".mp3"
             message_content = f'<audio controls>\n\t' + \
                               f'<source src="{recipientName}/{filename}" type="audio/mpeg">\n</audio>'
@@ -186,7 +186,7 @@ def add_attachments(message_content: str) -> str:
         message_content = f'<img src="{recipientName}/{filename}" alt="Image" width="30%" height="30%">'
 
     # Move file to new directory
-    # os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/{recipientName}/{filename}")
+    os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/{recipientName}/{filename}")
 
     return message_content
 
