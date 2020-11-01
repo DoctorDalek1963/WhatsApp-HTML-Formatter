@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# from pydub import AudioSegment
-# from datetime import datetime
+from pydub import AudioSegment
+from datetime import datetime
 # from zipfile import ZipFile
 # from shutil import copytree
 # from glob import glob
@@ -42,15 +42,14 @@ class Message:
     def __init__(self, original_string: str):
         self.original = original_string.replace("\u200e", "")
         self.prefix = re.match(prefixPattern, self.original).group(0)
+        self.content = self.original.split(": ")[1]
 
-        if re.search(attachmentPattern, self.original).group(0):
+        if re.search(attachmentPattern, self.original):
             self.attachment = True
         else:
             self.attachment = False
 
     def __repr__(self):
-        # TODO: Format whole message as <div> and return as __repr__()
-
         message_info_match = re.match(prefixPattern, self.original)
 
         date_raw = message_info_match.group(1)
@@ -64,15 +63,13 @@ class Message:
         if time.startswith("0"):
             time = time.replace("0", "", 1)
 
-        message_content = self.original.split(": ")[1]
-
         if name == recipientName:
             start_string = f"<div class=\"message recipient\">"
         else:
             start_string = f"<div class=\"message sender\">"
 
         return f"{start_string}<span class=\"message-info time\">{time}</span>" + \
-               f"<span class=\"message-info date\">{date}</span>\n\t{message_content}\n</div>"
+               f"<span class=\"message-info date\">{date}</span>\n\t{self.content}\n</div>"
 
 
 def clean_html(string: str):
@@ -142,35 +139,40 @@ def format_links(string: str):
         return string
 
 
-def add_attachments(message: str):
+def add_attachments(string: str):
     """Embed images, videos, GIFs, and audios."""
-    attachment_match = re.search(attachmentPattern, message)
+    attachment_match = re.search(attachmentPattern, string)
     filename_no_extension = attachment_match.group(1)
     file_type = attachment_match.group(2)
     extension = attachment_match.group(3)
 
     filename = filename_no_extension + extension
 
-    message_prefix = re.match(prefixPattern, message).group(0)
+    message_prefix = re.match(prefixPattern, string).group(0)
 
     if file_type == "AUDIO":
         for ext, html_format in htmlAudioFormats:
             if extension == ext:
+                string = f"{message_prefix}<audio controls>\n\t" + \
+                         f"<source src=\"{recipientName}/{filename}\" type=\"audio/{html_format}\">\n</audio>"
+                return string
 
-                return message
         else:  # If none of the standard html audio formats broke out of the for loop, convert to .mp3
             # Convert audio file to .mp3
             AudioSegment.from_file(f"temp/{filename}").export(
                 f"temp/{filename_no_extension}.mp3", format="mp3")
-            message = f"{message_prefix}<audio controls>\n\t" + \
-                      f"<source src=\"{recipientName}/{filename}\" type=\"audio/mpeg\">\n</audio>"
+            string = f"{message_prefix}<audio controls>\n\t" + \
+                     f"<source src=\"{recipientName}/{filename}\" type=\"audio/mpeg\">\n</audio>"
 
-            return message
+            return string
+
     elif file_type == "VIDEO":
-        message = f"{message_prefix}<video controls>\n\t<source src=\"{recipientName}/{filename}\">\n</video>"
-    elif file_type == "PHOTO" or "GIF":
-        message = f"{message_prefix}<img src=\"{recipientName}/{filename}\" alt=\"Image\" width=\"30%\" height=\"30%\">"
+        string = f"{message_prefix}<video controls>\n\t<source src=\"{recipientName}/{filename}\">\n</video>"
 
-    return message
+    elif file_type == "PHOTO" or "GIF":
+        string = f"{message_prefix}<img src=\"{recipientName}/{filename}\" alt=\"Image\" width=\"30%\" height=\"30%\">"
+
+    return string
+
 
 #
