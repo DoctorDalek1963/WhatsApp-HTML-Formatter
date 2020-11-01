@@ -232,4 +232,17 @@ def write_to_file(name: str, output_dir: str):
     # TODO: Separate chat_txt into Message objects
     # TODO: Find attachments in each message - how?
 
+    with open("end_template.txt", encoding="utf-8") as f:
+        end_template = f.readlines()
+
+    for line in end_template:
+        html_file.write(line)
+
     html_file.close()
+
+    files = glob("temp/*")
+    for f in files:
+        print(f)  # DEBUG LINE
+    #     os.remove(f)
+    #
+    # os.rmdir("temp")
