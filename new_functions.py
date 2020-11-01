@@ -32,7 +32,8 @@ recipientName = outputDir = ""
 
 # RegEx patterns
 prefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (\w+): ")
-attachmentPattern = re.compile(r"<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$") 
+# &lt; and &gt; are used here because Message.content is run through format_content(), which removes <>
+attachmentPattern = re.compile(r"&lt;attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)&gt;$")
 linkPattern = re.compile(r"(https?://)?(\w{3,}\.)?([^.\s]+\.[^.\s]+)")
 
 # TODO: When parsing dates, add <div>s with date to separate days
@@ -45,12 +46,16 @@ class Message:
 
         self.content = format_content(self.original.split(": ")[1])
 
-        if re.search(attachmentPattern, self.original):
-            self.attachment = True
-        else:
-            self.attachment = False
+        if re.match(attachmentPattern, self.content):
+            self.content = add_attachments(self.content)
+        # else:
+        #     self.attachmentFlag = False
 
     def __repr__(self):
+        return self.create_html()
+
+    def create_html(self) -> str:
+        """Create HTML code from Message object."""
         message_info_match = re.match(prefixPattern, self.original)
 
         date_raw = message_info_match.group(1)
@@ -69,18 +74,21 @@ class Message:
         else:
             start_string = f'<div class="message sender">'
 
+        # if self.attachmentFlag:
+        #     self.content = add_attachments(self.content)
+
         return f'{start_string}\n<span class="message-info time">{time}</span>' + \
                f'\n<span class="message-info date">{date}</span>\n\t{self.content}\n</div>'
 
 
-def clean_html(string: str):
+def clean_html(string: str) -> str:
     """Remove <> to avoid rogue html tags."""
     string = string.replace("<", "&lt;").replace(">", "&gt;")
     string = string.replace('"', "&quot;").replace("'", "&apos;")
     return string
 
 
-def format_to_html(string: str):
+def format_to_html(string: str) -> str:
     """Replace format characters with their html tags."""
     first_tag = True
     list_string = list(string)
@@ -98,7 +106,7 @@ def format_to_html(string: str):
     return "".join(list_string)
 
 
-def replace_tags(string: str):
+def replace_tags(string: str) -> str:
     """Replace format characters with html tags in string."""
     first_tag = True
     if "```" in string:
@@ -119,7 +127,7 @@ def replace_tags(string: str):
     return string
 
 
-def format_links(string: str):
+def format_links(string: str) -> str:
     """Find links in message and put them in <a> tags."""
     # Get links and concat the RegEx groups into a list of links
     link_match_list = re.findall(linkPattern, string)
@@ -135,12 +143,10 @@ def format_links(string: str):
             formatted_link = f'<a href="{working_link}" target="_blank">{link}</a>'
             string = string.replace(link, formatted_link)
 
-        return string
-    else:
-        return string
+    return string
 
 
-def format_content(string: str):
+def format_content(string: str) -> str:
     """Take message content and format it properly."""
     string = clean_html(string)
     string = replace_tags(string)
@@ -149,44 +155,40 @@ def format_content(string: str):
     return string
 
 
-def add_attachments(string: str):
+def add_attachments(message_content: str) -> str:
     """Embed images, videos, GIFs, and audios."""
-    attachment_match = re.search(attachmentPattern, string)
+    attachment_match = re.match(attachmentPattern, message_content)
     filename_no_extension = attachment_match.group(1)
     file_type = attachment_match.group(2)
     extension = attachment_match.group(3)
 
     filename = filename_no_extension + extension
 
-    message_prefix = re.match(prefixPattern, string).group(0)
-
-    recipient_output = outputDir + recipientName
-
     if file_type == "AUDIO":
         for ext, html_format in htmlAudioFormats:
             if extension == ext:
-                string = f"{message_prefix}<audio controls>\n\t" + \
-                         f'<source src="{recipientName}/{filename}" type="audio/{html_format}">\n</audio>'
+                message_content = f'<audio controls>\n\t' + \
+                                  f'<source src="{recipientName}/{filename}" type="audio/{html_format}">\n</audio>'
                 break
 
         else:  # If none of the standard html audio formats broke out of the for loop, convert to .mp3
             # Convert audio file to .mp3
-            AudioSegment.from_file(f"temp/{filename}").export(
-                f"temp/{filename_no_extension}.mp3", format="mp3")
+            # AudioSegment.from_file(f"temp/{filename}").export(
+            #     f"temp/{filename_no_extension}.mp3", format="mp3")
             filename = filename_no_extension + ".mp3"
-            string = f"{message_prefix}<audio controls>\n\t" + \
-                     f'<source src="{recipientName}/{filename}" type="audio/mpeg">\n</audio>'
+            message_content = f'<audio controls>\n\t' + \
+                              f'<source src="{recipientName}/{filename}" type="audio/mpeg">\n</audio>'
 
     elif file_type == "VIDEO":
-        string = f'{message_prefix}<video controls>\n\t<source src="{recipientName}/{filename}">\n</video>'
+        message_content = f'<video controls>\n\t<source src="{recipientName}/{filename}">\n</video>'
 
     elif file_type == "PHOTO" or "GIF":
-        string = f'{message_prefix}<img src="{recipientName}/{filename}" alt="Image" width="30%" height="30%">'
+        message_content = f'<img src="{recipientName}/{filename}" alt="Image" width="30%" height="30%">'
 
     # Move file to new directory
-    os.rename(f"{cwd}/temp/{filename}", f"{recipient_output}/{filename}")
+    # os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/{recipientName}/{filename}")
 
-    return string
+    return message_content
 
 
 def extract_zip(file_dir: str):
@@ -229,7 +231,14 @@ def write_to_file(name: str, output_dir: str):
     for line in start_template:
         html_file.write(line)
 
-    # TODO: Separate chat_txt into Message objects
+    # Use a re.sub to place LRMs between each message and then create a list by splitting by LRM
+    chat_txt = re.sub(r"\n\[(?=\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m] \w+: )", "\n\u200e[", chat_txt)
+    chat_txt_list = chat_txt.split("\u200e")
+
+    for string in chat_txt_list:
+        msg = Message(string)
+        html_file.write(msg.create_html())
+
     # TODO: Find attachments in each message - how?
 
     with open("end_template.txt", encoding="utf-8") as f:
