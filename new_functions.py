@@ -64,18 +64,18 @@ class Message:
             time = time.replace("0", "", 1)
 
         if name == recipientName:
-            start_string = f"<div class=\"message recipient\">"
+            start_string = f'<div class="message recipient">'
         else:
-            start_string = f"<div class=\"message sender\">"
+            start_string = f'<div class="message sender">'
 
-        return f"{start_string}\n<span class=\"message-info time\">{time}</span>" + \
-               f"\n<span class=\"message-info date\">{date}</span>\n\t{self.content}\n</div>"
+        return f'{start_string}\n<span class="message-info time">{time}</span>' + \
+               f'\n<span class="message-info date">{date}</span>\n\t{self.content}\n</div>'
 
 
 def clean_html(string: str):
     """Remove <> to avoid rogue html tags."""
     string = string.replace("<", "&lt;").replace(">", "&gt;")
-    string = string.replace("\"", "&quot;").replace("\'", "&apos;")
+    string = string.replace('"', "&quot;").replace("'", "&apos;")
     return string
 
 
@@ -131,7 +131,7 @@ def format_links(string: str):
             else:
                 working_link = link
 
-            formatted_link = f"<a href=\"{working_link}\" target=\"_blank\">{link}</a>"
+            formatted_link = f'<a href="{working_link}" target="_blank">{link}</a>'
             string = string.replace(link, formatted_link)
 
         return string
@@ -154,7 +154,7 @@ def add_attachments(string: str):
         for ext, html_format in htmlAudioFormats:
             if extension == ext:
                 string = f"{message_prefix}<audio controls>\n\t" + \
-                         f"<source src=\"{recipientName}/{filename}\" type=\"audio/{html_format}\">\n</audio>"
+                         f'<source src="{recipientName}/{filename}" type="audio/{html_format}">\n</audio>'
                 return string
 
         else:  # If none of the standard html audio formats broke out of the for loop, convert to .mp3
@@ -162,15 +162,15 @@ def add_attachments(string: str):
             AudioSegment.from_file(f"temp/{filename}").export(
                 f"temp/{filename_no_extension}.mp3", format="mp3")
             string = f"{message_prefix}<audio controls>\n\t" + \
-                     f"<source src=\"{recipientName}/{filename}\" type=\"audio/mpeg\">\n</audio>"
+                     f'<source src="{recipientName}/{filename}" type="audio/mpeg">\n</audio>'
 
             return string
 
     elif file_type == "VIDEO":
-        string = f"{message_prefix}<video controls>\n\t<source src=\"{recipientName}/{filename}\">\n</video>"
+        string = f'{message_prefix}<video controls>\n\t<source src="{recipientName}/{filename}">\n</video>'
 
     elif file_type == "PHOTO" or "GIF":
-        string = f"{message_prefix}<img src=\"{recipientName}/{filename}\" alt=\"Image\" width=\"30%\" height=\"30%\">"
+        string = f'{message_prefix}<img src="{recipientName}/{filename}" alt="Image" width="30%" height="30%">'
 
     return string
 
