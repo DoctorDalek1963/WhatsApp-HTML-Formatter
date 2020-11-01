@@ -18,9 +18,9 @@
 
 from pydub import AudioSegment
 from datetime import datetime
-# from zipfile import ZipFile
-# from shutil import copytree
-# from glob import glob
+from zipfile import ZipFile
+from shutil import copytree
+from glob import glob
 import re
 import os
 
@@ -40,9 +40,10 @@ linkPattern = re.compile(r"(https?://)?(\w{3,}\.)?([^.\s]+\.[^.\s]+)")
 
 class Message:
     def __init__(self, original_string: str):
-        self.original = original_string.replace("\u200e", "")
+        self.original = original_string
         self.prefix = re.match(prefixPattern, self.original).group(0)
-        self.content = self.original.split(": ")[1]
+
+        self.content = format_content(self.original.split(": ")[1])
 
         if re.search(attachmentPattern, self.original):
             self.attachment = True
@@ -97,25 +98,25 @@ def format_to_html(string: str):
     return "".join(list_string)
 
 
-def replace_tags(message: str):
-    """Replace format characters with html tags in message."""
+def replace_tags(string: str):
+    """Replace format characters with html tags in string."""
     first_tag = True
-    if "```" in message:
-        message = message.replace("```", "<code>")
-        list_message = list(message)
-        for x, letter in enumerate(list_message):
+    if "```" in string:
+        string = string.replace("```", "<code>")
+        list_string = list(string)
+        for x, letter in enumerate(list_string):
             if letter == "<":
                 if first_tag:
                     first_tag = False
                 else:
-                    list_message[x] = "</"
+                    list_string[x] = "</"
                     first_tag = True
 
-        message = "".join(list_message)
+        string = "".join(list_string)
     else:
-        message = format_to_html(message) 
+        string = format_to_html(string)
 
-    return message
+    return string
 
 
 def format_links(string: str):
@@ -139,6 +140,15 @@ def format_links(string: str):
         return string
 
 
+def format_content(string: str):
+    """Take message content and format it properly."""
+    string = clean_html(string)
+    string = replace_tags(string)
+    string = format_links(string)
+    string = string.replace("\n", "<br>\n")
+    return string
+
+
 def add_attachments(string: str):
     """Embed images, videos, GIFs, and audios."""
     attachment_match = re.search(attachmentPattern, string)
@@ -150,21 +160,22 @@ def add_attachments(string: str):
 
     message_prefix = re.match(prefixPattern, string).group(0)
 
+    recipient_output = outputDir + recipientName
+
     if file_type == "AUDIO":
         for ext, html_format in htmlAudioFormats:
             if extension == ext:
                 string = f"{message_prefix}<audio controls>\n\t" + \
                          f'<source src="{recipientName}/{filename}" type="audio/{html_format}">\n</audio>'
-                return string
+                break
 
         else:  # If none of the standard html audio formats broke out of the for loop, convert to .mp3
             # Convert audio file to .mp3
             AudioSegment.from_file(f"temp/{filename}").export(
                 f"temp/{filename_no_extension}.mp3", format="mp3")
+            filename = filename_no_extension + ".mp3"
             string = f"{message_prefix}<audio controls>\n\t" + \
                      f'<source src="{recipientName}/{filename}" type="audio/mpeg">\n</audio>'
-
-            return string
 
     elif file_type == "VIDEO":
         string = f'{message_prefix}<video controls>\n\t<source src="{recipientName}/{filename}">\n</video>'
@@ -172,7 +183,53 @@ def add_attachments(string: str):
     elif file_type == "PHOTO" or "GIF":
         string = f'{message_prefix}<img src="{recipientName}/{filename}" alt="Image" width="30%" height="30%">'
 
+    # Move file to new directory
+    os.rename(f"{cwd}/temp/{filename}", f"{recipient_output}/{filename}")
+
     return string
 
 
-#
+def extract_zip(file_dir: str):
+    """MUST BE RUN BEFORE write_to_file().
+
+    Extract the given zip file into the temp directory."""
+    zip_file_object = ZipFile(file_dir)
+    zip_file_object.extractall("temp")
+    zip_file_object.close()
+
+
+def write_to_file(name: str, output_dir: str):
+    """MUST RUN extract_zip() FIRST.
+
+    Go through _chat.txt, format every message, and write them all to output_dir/name.html."""
+    global recipientName, outputDir
+    recipientName = name
+    outputDir = output_dir
+
+    if not os.path.isdir(f"{outputDir}/Library"):
+        copytree("Library", f"{outputDir}/Library")
+
+    if not os.path.isdir(f"{outputDir}/{recipientName}"):
+        os.mkdir(f"{outputDir}/{recipientName}")
+
+    with open("temp/_chat.txt", encoding="utf-8") as f:
+        chat_txt = f.read().replace("\u200e", "")
+
+    html_file = open(f"{outputDir}/{recipientName}.html", "w+", encoding="utf-8")
+
+    with open("start_template.txt", encoding="utf-8") as f:
+        start_template = f.readlines()  # f.readlines() preserves \n characters
+
+    # Replace recipientName in start_template
+    for i, line in enumerate(start_template):
+        pos = line.find("%recipName%")
+        if pos != -1:  # If "recipName" is found
+            start_template[i] = line.replace("%recipName%", recipientName)
+
+    for line in start_template:
+        html_file.write(line)
+
+    # TODO: Separate chat_txt into Message objects
+    # TODO: Find attachments in each message - how?
+
+    html_file.close()
