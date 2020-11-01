@@ -44,8 +44,8 @@ class Message:
         self.original = original_string
         self.prefix = re.match(prefixPattern, self.original).group(0)
 
-        # self.content = self.original.split(": ")[1]
-        self.content = re.search(prefixPattern, self.original).group(3)
+        # Only split once to avoid breaking attachment messages
+        self.content = self.original.split(": ", 1)[1]
 
         if re.match(attachmentPattern, self.content):
             self.content = add_attachments(self.content)
