@@ -237,7 +237,7 @@ def write_to_file(name: str, output_dir: str):
         html_file.write(line)
 
     # Use a re.sub to place LRMs between each message and then create a list by splitting by LRM
-    chat_txt = re.sub(r"\n\[(?=\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m] \w+: )", "\n\u200e[", chat_txt)
+    chat_txt = re.sub(r"\n\[(?=\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m] \w+: )", "\u200e[", chat_txt)
     chat_txt_list = chat_txt.split("\u200e")
 
     # ===== MAIN WRITE LOOP
@@ -247,7 +247,7 @@ def write_to_file(name: str, output_dir: str):
 
         if msg.date != date_separator:
             date_separator = msg.date
-            html_file.write(f'<div class="date-separator">{date_separator}</div>\n')
+            html_file.write(f'<div class="date-separator">{date_separator}</div>\n\n')
 
         html_file.write(msg.create_html())
 
