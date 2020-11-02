@@ -16,8 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# from formatter_functions import write_to_file, extract_zip
-from new_functions import write_to_file, extract_zip
+from formatter_functions import write_to_file, extract_zip
 import os
 
 cwd = os.getcwd()
