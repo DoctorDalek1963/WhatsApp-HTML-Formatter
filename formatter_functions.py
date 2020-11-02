@@ -161,7 +161,9 @@ def add_attachments(message_content: str) -> str:
     filename = filename_no_extension + extension
 
     if file_type == "AUDIO":
-        for ext, html_format in enumerate(htmlAudioFormats):
+        for _, tup in enumerate(htmlAudioFormats.items()):
+            ext = tup[0]
+            html_format = tup[1]
             if extension == ext:
                 message_content = f'<audio controls>\n\t' + \
                                   f'<source src="{recipientName}/{filename}" type="audio/{html_format}">\n</audio>'
