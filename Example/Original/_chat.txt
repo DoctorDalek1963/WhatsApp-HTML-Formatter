@@ -1,0 +1,13 @@
+[02/11/2020, 9:47:19 pm] Alice: Hello Bob, I need an example WhatsApp chat for a GitHub project
+[02/11/2020, 9:47:35 pm] Bob: Hey Alice, what do you need exactly?
+[02/11/2020, 9:47:51 pm] Alice: Some fancy formatting. Maybe some _italics_
+[02/11/2020, 9:48:09 pm] Bob: Some *bold text* and ~strike through~?
+[02/11/2020, 9:48:35 pm] Alice: And maybe some ```code sections```
+[02/11/2020, 9:48:45 pm] Bob: What about an image?
+[02/11/2020, 9:48:48 pm] Alice: Sure
+‎[02/11/2020, 9:49:51 pm] Bob: ‎<attached: 00000010-PHOTO-2020-11-02-21-49-51.jpg>
+[02/11/2020, 9:50:00 pm] Alice: Great!
+[02/11/2020, 9:50:11 pm] Alice: Maybe some audio as well please, Bob
+‎[02/11/2020, 9:50:21 pm] Bob: ‎<attached: 00000013-AUDIO-2020-11-02-21-50-21.opus>
+[02/11/2020, 9:50:33 pm] Alice: Thanks!
+[02/11/2020, 9:50:40 pm] Bob: You’re welcome, Alice
