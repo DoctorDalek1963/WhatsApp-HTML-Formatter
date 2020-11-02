@@ -164,9 +164,7 @@ def add_attachments(message_content: str) -> str:
     filename = filename_no_extension + extension
 
     if file_type == "AUDIO":
-        for _, tup in enumerate(htmlAudioFormats.items()):
-            ext = tup[0]
-            html_format = tup[1]
+        for ext, html_format in htmlAudioFormats.items():
             if extension == ext:
                 message_content = f'<audio controls>\n\t' + \
                                   f'<source src="{recipientName}/{filename}" type="audio/{html_format}">\n</audio>'
@@ -187,7 +185,7 @@ def add_attachments(message_content: str) -> str:
     elif file_type == "PHOTO" or "GIF":
         message_content = f'<img src="{recipientName}/{filename}" alt="Image" width="30%" height="30%">'
     else:
-        message_content = "UNKNOWN ATTACHMENT"
+        message_content = f'UNKNOWN ATTACHMENT "{filename}"'
 
     # Move file to new directory
     os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/{recipientName}/{filename}")
