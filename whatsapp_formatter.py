@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from formatter_functions import write_to_file, extract_zip
+# from formatter_functions import write_to_file, extract_zip
+from new_functions import write_to_file, extract_zip
 import os
 
 cwd = os.getcwd()
@@ -32,9 +33,9 @@ while not quitFlag:
     if not inputFile.endswith(".zip"):
         inputFile += ".zip"
     print()
-    outputDir = input("Please enter a full output directory: ")
+    output = input("Please enter a full output directory: ")
     print()
-    recipName = input("Please enter the name of the recipient (case sensitive): ")
+    name = input("Please enter the name of the recipient (case sensitive): ")
     print()
 
     try:
@@ -50,7 +51,7 @@ while not quitFlag:
 
     print(f"Reformatting {inputFile}...")
 
-    write_to_file(recipName, outputDir)  # All the heavy lifting is done by this function
+    write_to_file(name, output)  # All the heavy lifting is done by this function
 
     print("Reformatting complete!")
     print()

@@ -8,4 +8,3 @@
 </head>
 <body>
 <div class="message-block">
-<div>

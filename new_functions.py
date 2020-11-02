@@ -36,8 +36,6 @@ prefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (
 attachmentPattern = re.compile(r"<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$")
 linkPattern = re.compile(r"(https?://)?(\w{3,}\.)?([^.\s]+\.[^.\s]+)")
 
-# TODO: When parsing dates, add <div>s with date to separate days
-
 
 class Message:
     def __init__(self, original_string: str):
@@ -52,31 +50,31 @@ class Message:
         else:
             self.content = format_content(self.content)
 
-    def __repr__(self):
-        return self.create_html()
-
-    def create_html(self) -> str:
-        """Create HTML code from Message object."""
         message_info_match = re.match(prefixPattern, self.prefix)
 
         date_raw = message_info_match.group(1)
-        name = message_info_match.group(2)
+        self.name = message_info_match.group(2)
 
         # Reformat date and time to be more readable
         date_obj = datetime.strptime(date_raw, "%d/%m/%Y, %I:%M:%S %p")
-        date = datetime.strftime(date_obj, "%a %d %B %Y")
-        time = datetime.strftime(date_obj, "%I:%M:%S %p")
+        self.date = datetime.strftime(date_obj, "%a %d %B %Y")
+        self.time = datetime.strftime(date_obj, "%I:%M:%S %p")
 
-        if time.startswith("0"):
-            time = time.replace("0", "", 1)
+        if self.time.startswith("0"):
+            self.time = self.time.replace("0", "", 1)
 
-        if name == recipientName:
+    def __repr__(self):
+        return f'<Message object with name="{self.name}", date="{self.date}", and time="{self.time}">'
+
+    def create_html(self) -> str:
+        """Create HTML code from Message object."""
+        if self.name == recipientName:
             start_string = f'<div class="message recipient">'
         else:
             start_string = f'<div class="message sender">'
 
-        return f'{start_string}\n<span class="message-info time">{time}</span>' + \
-               f'\n<span class="message-info date">{date}</span>\n\t{self.content}\n</div>'
+        return f'{start_string}\n<span class="message-info time">{self.time}</span>' + \
+               f'\n<span class="message-info date">{self.date}</span>\n\t{self.content}\n</div>\n\n'
 
 
 def clean_html(string: str) -> str:
@@ -92,14 +90,15 @@ def format_to_html(string: str) -> str:
     list_string = list(string)
 
     for char, tag in formatDict.items():
-        for x, letter in enumerate(list_string):
-            if letter == char:
-                if first_tag:
-                    list_string[x] = f"<{tag}>"
-                    first_tag = False
-                else:
-                    list_string[x] = f"</{tag}>"
-                    first_tag = True
+        if char in string and string.count(char) % 2 == 0:
+            for x, letter in enumerate(list_string):
+                if letter == char:
+                    if first_tag:
+                        list_string[x] = f"<{tag}>"
+                        first_tag = False
+                    else:
+                        list_string[x] = f"</{tag}>"
+                        first_tag = True
 
     return "".join(list_string)
 
@@ -149,7 +148,7 @@ def format_content(string: str) -> str:
     string = clean_html(string)
     string = replace_tags(string)
     string = format_links(string)
-    string = string.replace("\n", "<br>\n")
+    string = string.replace("\n", "<br>\n\t")
     return string
 
 
@@ -163,7 +162,7 @@ def add_attachments(message_content: str) -> str:
     filename = filename_no_extension + extension
 
     if file_type == "AUDIO":
-        for ext, html_format in htmlAudioFormats:
+        for ext, html_format in enumerate(htmlAudioFormats):
             if extension == ext:
                 message_content = f'<audio controls>\n\t' + \
                                   f'<source src="{recipientName}/{filename}" type="audio/{html_format}">\n</audio>'
@@ -173,6 +172,7 @@ def add_attachments(message_content: str) -> str:
             # Convert audio file to .mp3
             AudioSegment.from_file(f"temp/{filename}").export(
                 f"temp/{filename_no_extension}.mp3", format="mp3")
+            os.remove(f"temp/{filename}")
             filename = filename_no_extension + ".mp3"
             message_content = f'<audio controls>\n\t' + \
                               f'<source src="{recipientName}/{filename}" type="audio/mpeg">\n</audio>'
@@ -207,6 +207,7 @@ def write_to_file(name: str, output_dir: str):
     global recipientName, outputDir
     recipientName = name
     outputDir = output_dir
+    date_separator = ""
 
     if not os.path.isdir(f"{outputDir}/Library"):
         copytree("Library", f"{outputDir}/Library")
@@ -235,11 +236,16 @@ def write_to_file(name: str, output_dir: str):
     chat_txt = re.sub(r"\n\[(?=\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m] \w+: )", "\n\u200e[", chat_txt)
     chat_txt_list = chat_txt.split("\u200e")
 
+    # ===== MAIN WRITE LOOP
+
     for string in chat_txt_list:
         msg = Message(string)
-        html_file.write(msg.create_html())
 
-    # TODO: Find attachments in each message - how?
+        if msg.date != date_separator:
+            date_separator = msg.date
+            html_file.write(f'<div class="date-separator">{date_separator}</div>\n')
+
+        html_file.write(msg.create_html())
 
     with open("end_template.txt", encoding="utf-8") as f:
         end_template = f.readlines()
@@ -249,9 +255,12 @@ def write_to_file(name: str, output_dir: str):
 
     html_file.close()
 
+    os.remove("temp/_chat.txt")
     files = glob("temp/*")
-    for f in files:
-        print(f)  # DEBUG LINE
-    #     os.remove(f)
-    #
-    # os.rmdir("temp")
+
+    if files:  # Clear up any left over files (probably attachments with weird names)
+        # TODO:
+        for f in files:
+            os.remove(f)
+
+    os.rmdir("temp")

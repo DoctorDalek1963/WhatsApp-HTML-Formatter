@@ -50,7 +50,20 @@ h3 { /* Style for recipName */
 	height: 90px;
 	z-index: 100;
 }
-.message { /* Sets the style for all messages */
+.date-separator{
+	border-radius: 5px;
+	background-color: #7f7f84;
+	opacity: 0.8;
+	text-align: center;
+	padding: 3px;
+	border: 10px;
+	position: relative;
+	width: 20%;
+	margin: auto;
+	margin-bottom: 15px;
+	clear: both; /* What does this mean? Who knows? */
+}
+.message {
 	margin: 5px 0; /* Sets 5px margins at top & bottom */
 	max-width: 60%;
 	clear: both;
@@ -63,7 +76,6 @@ h3 { /* Style for recipName */
     position: relative;
 	min-width: 60px;
 	width: auto;
-
 }
 code {
 	font-family: "Consolas", Courier, monospace;
