@@ -33,7 +33,8 @@ recipientName = outputDir = ""
 # RegEx patterns
 prefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (\w+): (.+)?")
 attachmentPattern = re.compile(r"<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$")
-linkPattern = re.compile(r"(https?://)?(\w{3,}\.)?([^.\s]+\.[^.\s]+)(\.html?)?")
+linkPattern = re.compile(r"(https?://)?(\w{3,}\.)?([ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" +
+                         r"._~:/?#\[\]@!$&'()*+,;=-]+)(\.html?)?")
 
 
 class Message:
