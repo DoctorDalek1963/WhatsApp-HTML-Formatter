@@ -63,7 +63,8 @@ class Message:
             self.time = self.time.replace("0", "", 1)
 
     def __repr__(self):
-        return f'<Message object with name="{self.name}", date="{self.date}", and time="{self.time}">'
+        return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self.name}", ' + \
+               f'date="{self.date}", and time="{self.time}" at {hex(id(self))}>'
 
     def create_html(self) -> str:
         """Create HTML code from Message object."""
@@ -196,7 +197,7 @@ def add_attachments(message_content: str) -> str:
 def extract_zip(file_dir: str):
     """MUST BE RUN BEFORE write_to_file().
 
-    Extract the given zip file into the temp directory."""
+Extract the given zip file into the temp directory."""
     zip_file_object = ZipFile(file_dir)
     zip_file_object.extractall("temp")
     zip_file_object.close()
@@ -205,7 +206,7 @@ def extract_zip(file_dir: str):
 def write_to_file(name: str, output_dir: str):
     """MUST RUN extract_zip() FIRST.
 
-    Go through _chat.txt, format every message, and write them all to output_dir/name.html."""
+Go through _chat.txt, format every message, and write them all to output_dir/name.html."""
     global recipientName, outputDir
     recipientName = name
     outputDir = output_dir
