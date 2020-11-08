@@ -69,12 +69,17 @@ class Message:
     def create_html(self) -> str:
         """Create HTML code from Message object."""
         if self.name == recipientName:
-            start_string = f'<div class="message recipient">'
+            sender_type = 'recipient'
         else:
-            start_string = f'<div class="message sender">'
+            sender_type = 'sender'
 
-        return f'{start_string}\n<span class="message-info time">{self.time}</span>' + \
-               f'\n<span class="message-info date">{self.date}</span>\n\t{self.content}\n</div>\n\n'
+        return f'''<div class="message {sender_type}">\n
+               \t<span class="message-info time">{self.time}</span>\n
+               \t<span class="message-info date">{self.date}</span>\n
+               \t<p>\n
+               \t\t{self.content}\n
+               \t</p>\n
+               </div>\n\n'''
 
 
 def clean_html(string: str) -> str:
