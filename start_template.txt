@@ -10,5 +10,7 @@
 </head>
 
 <body>
+
+<!-- START message block -->
 <div class="message-block">
 

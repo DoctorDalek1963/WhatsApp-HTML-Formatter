@@ -1,3 +1,5 @@
-</div> <!-- End of message block -->
+</div>
+<!-- END message block -->
+
 </body>
 </html>

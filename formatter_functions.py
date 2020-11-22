@@ -73,11 +73,8 @@ class Message:
         else:
             sender_type = 'sender'
 
-        return f'''<div class="message {sender_type}">\n
-               \t<span class="message-info time">{self.time}</span>\n
-               \t<span class="message-info date">{self.date}</span>\n
-               \t{self.content}\n
-               </div>\n\n'''
+        return f'<div class="message {sender_type}">\n\t<span class="message-info time">{self.time}</span>\n\t' + \
+               f'<span class="message-info date">{self.date}</span>\n\t\t{self.content}\n</div>\n\n'
 
 
 def clean_html(string: str) -> str:
@@ -154,7 +151,7 @@ def format_content(string: str) -> str:
     string = clean_html(string)
     string = replace_tags(string)
     string = format_links(string)
-    string = string.replace("\n", "<br>\n\t")
+    string = string.replace("\n", "<br>\n\t\t")
     return string
 
 
@@ -170,8 +167,8 @@ def add_attachments(message_content: str) -> str:
     if file_type == "AUDIO":
         for ext, html_format in htmlAudioFormats.items():
             if extension == ext:
-                message_content = f'<audio controls>\n\t' + \
-                                  f'<source src="{recipientName}/{filename}" type="audio/{html_format}">\n</audio>'
+                message_content = f'<audio controls>\n\t\t\t' + \
+                                  f'<source src="{recipientName}/{filename}" type="audio/{html_format}">\n\t\t</audio>'
                 break
 
         else:  # If none of the standard html audio formats broke out of the for loop, convert to .mp3
@@ -180,14 +177,14 @@ def add_attachments(message_content: str) -> str:
                 f"temp/{filename_no_extension}.mp3", format="mp3")
             os.remove(f"temp/{filename}")
             filename = filename_no_extension + ".mp3"
-            message_content = f'<audio controls>\n\t' + \
-                              f'<source src="{recipientName}/{filename}" type="audio/mpeg">\n</audio>'
+            message_content = f'<audio controls>\n\t\t\t' + \
+                              f'<source src="{recipientName}/{filename}" type="audio/mpeg">\n\t\t</audio>'
 
     elif file_type == "VIDEO":
-        message_content = f'<video controls>\n\t<source src="{recipientName}/{filename}">\n</video>'
+        message_content = f'<video controls>\n\t\t\t<source src="{recipientName}/{filename}">\n\t\t</video>'
 
     elif file_type == "PHOTO" or "GIF":
-        message_content = f'<img src="{recipientName}/{filename}" alt="Image" width="30%" height="30%">'
+        message_content = f'<img src="{recipientName}/{filename}" alt="Image">'
     else:
         message_content = f'UNKNOWN ATTACHMENT "{filename}"'
 
