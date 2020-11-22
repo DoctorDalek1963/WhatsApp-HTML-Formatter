@@ -33,7 +33,7 @@ recipientName = outputDir = ""
 # RegEx patterns
 prefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (\w+): (.+)?")
 attachmentPattern = re.compile(r"<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$")
-linkPattern = re.compile(r"(https?://)?(\w{3,}\.)?([^.\s]+(\.[^.\s])+)?)(\.html?)?")
+linkPattern = re.compile(r"(https?://)?(\w{3,}\.)?([^.\s]+\.[^.\s]+)(\.html?)?")
 
 
 class Message:
@@ -76,9 +76,7 @@ class Message:
         return f'''<div class="message {sender_type}">\n
                \t<span class="message-info time">{self.time}</span>\n
                \t<span class="message-info date">{self.date}</span>\n
-               \t<p>\n
-               \t\t{self.content}\n
-               \t</p>\n
+               \t{self.content}\n
                </div>\n\n'''
 
 
