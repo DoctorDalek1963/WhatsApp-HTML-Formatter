@@ -35,7 +35,8 @@ descriptionText = """Steps:\n
 4. Click the format button\n
 5. The format button will be greyed out\n
 6. Wait until the 'Formatting...' text disappears\n
-7. If the zip file is big, this may take some time\n
+7. If there are many audio messages in the exported chat,
+they must all be converted and this may take some time\n
 8. Choose a new zip to format or exit the program"""
 
 default_x_padding = 10
