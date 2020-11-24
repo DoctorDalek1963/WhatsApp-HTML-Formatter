@@ -25,7 +25,7 @@ A program to convert WhatsApp chats exported as zip files into formatted HTML fi
 3. Enter the name of the zip file
 4. Enter a full output directory
 5. Enter the name of the recipient
-6. Wait until the program tells you that the process is complete (If the zip file is large, this may take quite a while)
+6. Wait until the program tells you that the process is complete (If there are many audio messages in the exported chat, they must all be converted and this may take some time)
 7. You can continue and format another zip file, or you can exit
 
 ## Steps (GUI):
@@ -35,7 +35,7 @@ A program to convert WhatsApp chats exported as zip files into formatted HTML fi
 4. Select an export directory from the directory selection dialog
 5. Enter the name of the recipient
 6. Click the `Format` button
-7. Wait for the `Formatting...` text to disappear (If the zip file is large, this may take quite a while)
+7. Wait for the `Formatting...` text to disappear (If there are many audio messages in the exported chat, they must all be converted and this may take some time)
 8. Select another zip file to format or click `Exit` to close the program
 
 ---
