@@ -21,11 +21,15 @@ from datetime import datetime
 from zipfile import ZipFile
 from shutil import copytree
 from glob import glob
+import threading
 import re
 import os
 
 htmlAudioFormats = {".mp3": "mpeg", ".ogg": "ogg", ".wav": "wav"}  # Dict of html accepted audio formats
 formatDict = {"_": "em", "*": "strong", "~": "del"}  # Dict of format chars with their html tags
+
+# Tuple of extensions that can be moved without being converted
+nonConversionExtensions = ("jpg", "png", "webp", "gif", "mp4", "mp3", "ogg", "wav")
 
 cwd = os.getcwd()
 recipientName = outputDir = ""
@@ -172,51 +176,29 @@ def add_attachments(message_content: str) -> str:
                 break
 
         else:  # If none of the standard html audio formats broke out of the for loop, convert to .mp3
-            # Convert audio file to .mp3
             AudioSegment.from_file(f"temp/{filename}").export(
                 f"temp/{filename_no_extension}.mp3", format="mp3")
             os.remove(f"temp/{filename}")
             filename = filename_no_extension + ".mp3"
             message_content = f'<audio controls>\n\t\t\t' + \
                               f'<source src="{recipientName}/{filename}" type="audio/mpeg">\n\t\t</audio>'
+            os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/{recipientName}/{filename}")
 
     elif file_type == "VIDEO":
         message_content = f'<video controls>\n\t\t\t<source src="{recipientName}/{filename}">\n\t\t</video>'
 
     elif file_type == "PHOTO" or "GIF":
-        message_content = f'<img src="{recipientName}/{filename}" alt="Image">'
+        message_content = f'<img src="{recipientName}/{filename}" alt="IMAGE ATTACHMENT">'
     else:
         message_content = f'UNKNOWN ATTACHMENT "{filename}"'
-
-    # Move file to new directory
-    os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/{recipientName}/{filename}")
 
     return message_content
 
 
-def extract_zip(file_dir: str):
-    """MUST BE RUN BEFORE write_to_file().
-
-Extract the given zip file into the temp directory."""
-    zip_file_object = ZipFile(file_dir)
-    zip_file_object.extractall("temp")
-    zip_file_object.close()
-
-
-def write_to_file(name: str, output_dir: str):
-    """MUST RUN extract_zip() FIRST.
-
-Go through _chat.txt, format every message, and write them all to output_dir/name.html."""
-    global recipientName, outputDir
-    recipientName = name
-    outputDir = output_dir
+def write_text():
+    """Write all text in _chat.txt to HTML file.
+Convert all non-recognised audio files and move them."""
     date_separator = ""
-
-    if not os.path.isdir(f"{outputDir}/Library"):
-        copytree("Library", f"{outputDir}/Library")
-
-    if not os.path.isdir(f"{outputDir}/{recipientName}"):
-        os.mkdir(f"{outputDir}/{recipientName}")
 
     with open("temp/_chat.txt", encoding="utf-8") as f:
         chat_txt = f.read().replace("\u200e", "")
@@ -259,10 +241,50 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
     html_file.close()
 
     os.remove("temp/_chat.txt")
+    os.rmdir("temp")
+
+
+def move_attachment_files():
+    """Move all attachment files that don't need to be converted.
+This allows for multithreading."""
     files = glob("temp/*")
 
-    if files:  # Clear up any left over files (probably attachments with weird names)
+    if files:
         for f in files:
-            os.remove(f)
+            f = f.replace("\\", "/")
+            filename = f.split("/")[-1]
+            extension = filename.split(".")[-1]
 
-    os.rmdir("temp")
+            if extension in nonConversionExtensions:
+                os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/{recipientName}/{filename}")
+
+
+def extract_zip(file_dir: str):
+    """MUST BE RUN BEFORE write_to_file().
+
+Extract the given zip file into the temp directory."""
+    zip_file_object = ZipFile(file_dir)
+    zip_file_object.extractall("temp")
+    zip_file_object.close()
+
+
+def write_to_file(name: str, output_dir: str):
+    """MUST RUN extract_zip() FIRST.
+
+Go through _chat.txt, format every message, and write them all to output_dir/name.html."""
+    global recipientName, outputDir
+    recipientName = name
+    outputDir = output_dir
+
+    if not os.path.isdir(f"{outputDir}/Library"):
+        copytree("Library", f"{outputDir}/Library")
+
+    if not os.path.isdir(f"{outputDir}/{recipientName}"):
+        os.mkdir(f"{outputDir}/{recipientName}")
+
+    text_thread = threading.Thread(target=write_text)
+    file_move_thread = threading.Thread(target=move_attachment_files)
+    text_thread.start()
+    file_move_thread.start()
+    text_thread.join()
+    file_move_thread.join()
