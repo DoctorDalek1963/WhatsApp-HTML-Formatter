@@ -67,6 +67,7 @@ class Message:
             self.time = self.time.replace("0", "", 1)
 
     def __repr__(self):
+        # Use hex here at end to give memory location of Message object
         return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self.name}", ' + \
                f'date="{self.date}", and time="{self.time}" at {hex(id(self))}>'
 
