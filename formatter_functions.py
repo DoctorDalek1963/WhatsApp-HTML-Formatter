@@ -298,5 +298,10 @@ chat_list is a list of lists.
 Each list contains the input file, the recipient name, and the output directory.
 It should look like [[inputFile, name, outputDir], [inputFile, name, outputDir], ...]"""
     for chat_data in chat_list:
-        extract_zip(chat_data[0])
+        try:
+            extract_zip(chat_data[0])
+        except OSError:
+            print("ERROR: " + chat_data[0] + " was not found. Skipping.")
+            continue
+
         write_to_file(chat_data[1], chat_data[2])
