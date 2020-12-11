@@ -289,3 +289,14 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
     file_move_thread.start()
     text_thread.join()
     file_move_thread.join()
+
+
+def process_list(chat_list: list):
+    """RUN TO PROCESS MULTIPLE CHATS. PASSED AS A LIST OF LISTS.
+
+chat_list is a list of lists.
+Each list contains the input file, the recipient name, and the output directory.
+It should look like [[inputFile, name, outputDir], [inputFile, name, outputDir], ...]"""
+    for chat_data in chat_list:
+        extract_zip(chat_data[0])
+        write_to_file(chat_data[1], chat_data[2])
