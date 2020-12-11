@@ -60,7 +60,12 @@ class Message:
 
         # Reformat date and time to be more readable
         date_obj = datetime.strptime(date_raw, "%d/%m/%Y, %I:%M:%S %p")
-        self.date = datetime.strftime(date_obj, "%a %d %B %Y")
+
+        day = datetime.strftime(date_obj, "%d")
+        if day.startswith("0"):
+            day = day.replace("0", "", 1)  # Remove a leading 0
+
+        self.date = datetime.strftime(date_obj, f"%a {day} %B %Y")
         self.time = datetime.strftime(date_obj, "%I:%M:%S %p")
 
         if self.time.startswith("0"):
