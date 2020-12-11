@@ -264,9 +264,14 @@ def extract_zip(file_dir: str):
     """MUST BE RUN BEFORE write_to_file().
 
 Extract the given zip file into the temp directory."""
-    zip_file_object = ZipFile(file_dir)
-    zip_file_object.extractall("temp")
-    zip_file_object.close()
+    try:
+        zip_file_object = ZipFile(file_dir)
+        zip_file_object.extractall("temp")
+        zip_file_object.close()
+        return True
+    except OSError:
+        print("ERROR: " + file_dir + " was not found. Skipping.")
+        return False
 
 
 def write_to_file(name: str, output_dir: str):
@@ -291,6 +296,12 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
     file_move_thread.join()
 
 
+def process_single_chat(input_file: str, name: str, output_dir: str):
+    """Process a single chat completely."""
+    if extract_zip(input_file):
+        write_to_file(name, output_dir)
+
+
 def process_list(chat_list: list):
     """RUN TO PROCESS MULTIPLE CHATS. PASSED AS A LIST OF LISTS.
 
@@ -298,10 +309,4 @@ chat_list is a list of lists.
 Each list contains the input file, the recipient name, and the output directory.
 It should look like [[inputFile, name, outputDir], [inputFile, name, outputDir], ...]"""
     for chat_data in chat_list:
-        try:
-            extract_zip(chat_data[0])
-        except OSError:
-            print("ERROR: " + chat_data[0] + " was not found. Skipping.")
-            continue
-
-        write_to_file(chat_data[1], chat_data[2])
+        process_single_chat(chat_data[0], chat_data[1], chat_data[2])
