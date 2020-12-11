@@ -40,6 +40,7 @@ descriptionText = """Steps:\n
 
 default_x_padding = 10
 default_y_padding = 5
+dedicated_y_padding = 15
 
 # ===== Functions to be used on tk buttons
 
