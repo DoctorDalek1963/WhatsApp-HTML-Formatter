@@ -44,14 +44,13 @@ while not processFlag:
 
     # Ask for another input
     processInput = input("Would you like to add another file (Y/n)? ")
-    print(processInput)
-    print(re.match(r"[yY]", processInput))
     if re.match(r"[yY]", processInput):
         processFlag = False
     else:
         processFlag = True
 
 # Process list of chats
+print()
 print("Processing all...")
 process_list(allChats)
 print("Processing complete!")
