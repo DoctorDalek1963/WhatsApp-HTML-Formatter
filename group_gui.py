@@ -25,6 +25,7 @@ import os
 cwd = os.getcwd()
 inputZip = outputDir = recipientName = ""
 formattingFlag = False
+allChatsList = []
 
 descriptionText = """Steps:\n
 1. Select an exported chat\n
