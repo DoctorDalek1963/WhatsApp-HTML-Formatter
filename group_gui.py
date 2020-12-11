@@ -16,6 +16,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""PLAN:
+- Button to add current data to list (clear data on press as well)
+- Button to process allChatsList (call process_list(allChatsList) in a separate thread;
+set startProcessingFlag; when thread is done, set endProcessingFlag)
+
+- if startProcessingFlag:
+    start new thread for process_all_chats()
+    startProcessingFlag = False
+    disable exit button
+    display 'Formatting...' text
+    clear allChatsList (disables format button because it's only enabled
+        when allChatsLists has data)
+
+- if endProcessingFlag:
+    endProcessingFlag = False
+    enable exit button
+    remove 'Formatting...' text
+"""
+
+
 from formatter_functions import process_list
 from tkinter import filedialog, StringVar
 import tkinter as tk
