@@ -79,5 +79,35 @@ root.resizable(False, False)
 
 selected_zip_var = StringVar()
 selected_output_var = StringVar()
+formatting_string_var = StringVar()
+
+
+# ===== Create widgets
+
+# Create padding widgets
+middle_column_padding = tk.LabelFrame(root)
+row_padding_1 = tk.LabelFrame(root)
+row_padding_2 = tk.LabelFrame(root)
+row_padding_3 = tk.LabelFrame(root)
+row_padding_4 = tk.LabelFrame(root)
+
+# Create input widgets
+select_zip_button = tk.Button(root, text="Select an exported chat", command=select_zip)
+selected_zip_label = tk.Label(root, textvariable=selected_zip_var)
+
+select_output_button = tk.Button(root, text="Select an output directory", command=select_output_dir)
+selected_output_label = tk.Label(root, textvariable=selected_output_var)
+
+name_box_label = tk.Label(root, text="Enter the name of the recipient:")
+enter_name_box = tk.Entry(root)
+
+# Instructions for use
+description_label = tk.Label(root, text=descriptionText)
+
+# Create special button widgets
+add_to_list_button = tk.Button(root, text="Add to list", command=add_to_list, state="disabled", bd=3)
+format_button = tk.Button(root, text="Format", command=start_processing, state="disabled", bd=3)
+formatting_string_label = tk.Label(root, textvariable=formatting_string_var)
+exit_button = tk.Button(root, text="Exit", command=root.destroy, bd=3)
 
 #
