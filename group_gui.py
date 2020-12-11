@@ -44,7 +44,7 @@ import os
 
 cwd = os.getcwd()
 inputZip = outputDir = recipientName = ""
-formattingFlag = False
+endProcessingFlag = startProcessingFlag = False
 allChatsList = []
 
 descriptionText = """Steps:\n
