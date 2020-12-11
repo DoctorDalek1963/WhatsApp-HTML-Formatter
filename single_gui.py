@@ -63,7 +63,6 @@ def start_export():
 
 
 def process():
-    global inputZip, recipName, outputDir
     global formattingFlag
     fixed_name_zip = inputZip
     fixed_name_recip = recipName
