@@ -54,6 +54,21 @@ def select_output_dir():
     outputDir = filedialog.askdirectory(initialdir="/", title="Select an output directory")
 
 
+def add_to_list():
+    allChatsList.append([inputZip, recipientName, outputDir])
+
+
+def start_processing():
+    global startProcessingFlag
+    startProcessingFlag = True
+
+
+def process_all_chats():
+    global endProcessingFlag
+    endProcessingFlag = True
+    process_list(allChatsList)
+
+
 # ===== Tkinter initialisation
 
 # Init window
