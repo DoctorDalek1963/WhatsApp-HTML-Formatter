@@ -10,12 +10,7 @@ body { /* Display style for background image & body */
 	background-attachment: fixed;
 	font-size: 100%;
 }
-img { /* Size of images */
-	max-height: 400px;
-	max-width: 800px;
-	width: auto;
-}
-video { /* Size of videos */
+img, video { /* Size of images */
 	max-height: 400px;
 	max-width: 800px;
 	width: auto;
