@@ -89,9 +89,11 @@ def start_processing():
 
 
 def process_all_chats():
-    global processingFlag
-    processingFlag = True
+    # global processingFlag
+    # processingFlag = True
+    global endProcessingFlag
     process_list(allChatsList)
+    endProcessingFlag = True
 
 
 # ===== Tkinter initialisation
@@ -196,6 +198,9 @@ def update_loop():
                 process_button.config(state="disabled")
 
             if startProcessingFlag:
+                startProcessingFlag = False
+                processingFlag = True
+
                 process_thread = threading.Thread(target=process_all_chats)
                 process_thread.start()
                 processing_string_var.set("Processing...")
@@ -212,11 +217,9 @@ def update_loop():
                 enter_name_box.config(state="disabled")
                 exit_button.config(state="disabled")
 
-                startProcessingFlag = False
-
-            if processingFlag and not os.path.isdir("temp"):
-                processingFlag = False
-                endProcessingFlag = True
+            # if processingFlag and not os.path.isdir("temp"):
+            #     processingFlag = False
+            #     endProcessingFlag = True
 
             if endProcessingFlag:
                 processing_string_var.set("")
