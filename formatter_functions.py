@@ -42,11 +42,11 @@ linkPattern = re.compile(r"(https?://)?(\w{3,}\.)?([^.\s]+\.[^.\s]+)(\.html?)?")
 
 class Message:
     def __init__(self, original_string: str):
-        self.original = original_string
-        self.prefix = re.match(prefixPattern, self.original).group(0)
+        original = original_string
+        self.prefix = re.match(prefixPattern, original).group(0)
 
         # Only split once to avoid breaking attachment messages
-        self.content = self.original.split(": ", 1)[1]
+        self.content = original.split(": ", 1)[1]
 
         if re.match(attachmentPattern, self.content):
             self.content = add_attachments(self.content)
