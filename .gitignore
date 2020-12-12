@@ -2,3 +2,9 @@
 __pycache__/
 temp/
 Java-Formatter/
+
+# Ignore all zip files
+*.zip
+
+# Except in Example/
+!Example/Example.zip
