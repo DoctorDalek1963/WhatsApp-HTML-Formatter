@@ -25,14 +25,14 @@ set startProcessingFlag; when thread is done, set endProcessingFlag)
     start new thread for process_all_chats()
     startProcessingFlag = False
     disable exit button
-    display 'Formatting...' text
-    clear allChatsList (disables format button because it's only enabled
+    display 'Processing...' text
+    clear allChatsList (disables process button because it's only enabled
         when allChatsLists has data)
 
 - if endProcessingFlag:
     endProcessingFlag = False
     enable exit button
-    remove 'Formatting...' text
+    remove 'Processing...' text
 """
 
 
@@ -53,8 +53,8 @@ descriptionText = """Steps:\n
 3. Enter the name of the recipient (case sensitive)\n
 4. Click the 'Add to list' button\n
 5. Repeat steps 1-4 until you have selected all your chats\n
-6. Click the 'Format' button\n
-7. Wait until the 'Formatting...' text disappears\n
+6. Click the 'Process' button\n
+7. Wait until the 'Processing...' text disappears\n
 8. This may take quite a while if you've selected several large chats\n
 9. Once the 'Exit' button is active, you can safely exit the program"""
 
@@ -99,7 +99,7 @@ root.resizable(False, False)
 
 selected_zip_var = StringVar()
 selected_output_var = StringVar()
-formatting_string_var = StringVar()
+processing_string_var = StringVar()
 
 
 # ===== Create widgets
@@ -126,16 +126,15 @@ description_label = tk.Label(root, text=descriptionText)
 
 # Create special button widgets
 add_to_list_button = tk.Button(root, text="Add to list", command=add_to_list, state="disabled", bd=3)
-format_button = tk.Button(root, text="Format", command=start_processing, state="disabled", bd=3)
-formatting_string_label = tk.Label(root, textvariable=formatting_string_var)
+process_button = tk.Button(root, text="Process", command=start_processing, state="disabled", bd=3)
+processing_string_label = tk.Label(root, textvariable=processing_string_var)
 exit_button = tk.Button(root, text="Exit", command=root.destroy, bd=3)
 
 
 # ===== Place widgets
 
 # Instructions for use
-description_label.grid(row=0, rowspan=8, column=0, pady=default_y_padding,
-                       padx=(default_x_padding, 30))
+description_label.grid(row=1, rowspan=8, column=0, pady=15, padx=(default_x_padding, 30))
 
 # Select zip and display name
 select_zip_button.grid(row=0, column=2, padx=default_x_padding, pady=default_y_padding)
@@ -143,11 +142,15 @@ selected_zip_label.grid(row=1, column=2, padx=default_x_padding, pady=(default_y
 
 # Select output directory and display it
 select_output_button.grid(row=2, column=2, padx=default_x_padding, pady=default_y_padding)
-selected_output_label.grid(row=3, column=2, padx=default_x_padding, pady=(default_y_padding, 25))
+selected_output_label.grid(row=3, column=2, padx=default_x_padding, pady=(default_y_padding, 15))
+
+# Enter recipient name
+name_box_label.grid(row=4, column=2, padx=default_x_padding, pady=default_y_padding)
+enter_name_box.grid(row=5, column=2, padx=default_x_padding, pady=(default_y_padding, 25))
 
 # Place special button widgets
-add_to_list_button.grid(row=4, column=2, padx=default_x_padding, pady=default_y_padding)
-format_button.grid(row=5, column=2, padx=default_x_padding, pady=default_y_padding)
-formatting_string_label.grid(row=6, column=2, padx=default_x_padding, pady=default_y_padding)
-exit_button.grid(row=7, column=2, padx=default_x_padding, pady=default_y_padding)
+add_to_list_button.grid(row=6, column=2, padx=default_x_padding, pady=default_y_padding)
+process_button.grid(row=7, column=2, padx=default_x_padding, pady=default_y_padding)
+processing_string_label.grid(row=8, column=2, padx=default_x_padding, pady=default_y_padding)
+exit_button.grid(row=9, column=2, padx=default_x_padding, pady=default_y_padding)
 #
