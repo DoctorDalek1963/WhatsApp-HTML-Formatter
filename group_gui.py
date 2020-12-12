@@ -39,16 +39,18 @@ set startProcessingFlag; when thread is done, set endProcessingFlag)
 from formatter_functions import process_list
 from tkinter import filedialog, StringVar
 import tkinter as tk
+import _tkinter
 import threading
 import os
 
 cwd = os.getcwd()
 inputZip = outputDir = recipientName = ""
-endProcessingFlag = startProcessingFlag = False
+startProcessingFlag = processingFlag = endProcessingFlag = addToListFlag = False
 allChatsList = []
 
 descriptionText = """Steps:\n
-1. Select an exported chat\n
+1. Select a single exported chat
+(Do not select multiple. This will crash and may corrupt files.)\n
 2. Select an export directory\n
 3. Enter the name of the recipient (case sensitive)\n
 4. Click the 'Add to list' button\n
@@ -76,6 +78,8 @@ def select_output_dir():
 
 
 def add_to_list():
+    global addToListFlag
+    addToListFlag = True
     allChatsList.append([inputZip, recipientName, outputDir])
 
 
@@ -85,8 +89,8 @@ def start_processing():
 
 
 def process_all_chats():
-    global endProcessingFlag
-    endProcessingFlag = True
+    global processingFlag
+    processingFlag = True
     process_list(allChatsList)
 
 
@@ -153,4 +157,83 @@ add_to_list_button.grid(row=6, column=2, padx=default_x_padding, pady=default_y_
 process_button.grid(row=7, column=2, padx=default_x_padding, pady=default_y_padding)
 processing_string_label.grid(row=8, column=2, padx=default_x_padding, pady=default_y_padding)
 exit_button.grid(row=9, column=2, padx=default_x_padding, pady=default_y_padding)
+
+# ===== Loop to sustain window
+
+# Infinite loop to update tk window and check for conditions to activate or deactivate buttons
+
+
+def update_loop():
+    global inputZip, recipientName, outputDir, allChatsList
+    global startProcessingFlag, processingFlag, endProcessingFlag, addToListFlag
+
+    # CHECKS HERE
+
+    while True:
+        try:
+            if enter_name_box.get():
+                recipientName = enter_name_box.get()
+
+            truncated_input_zip = inputZip.split("/")[-1]
+            selected_zip_var.set(f"Selected: \n{truncated_input_zip}")
+
+            selected_output_var.set(f"Selected: \n{outputDir}")
+
+            if inputZip and recipientName and outputDir:
+                add_to_list_button.config(state="normal")
+            else:
+                add_to_list_button.config(state="disabled")
+
+            if addToListFlag:
+                addToListFlag = False
+                inputZip = ""
+                enter_name_box.delete(0, tk.END)  # Clear entry box
+                recipientName = ""
+
+            if allChatsList:
+                process_button.config(state="normal")
+            else:
+                process_button.config(state="disabled")
+
+            if startProcessingFlag:
+                process_thread = threading.Thread(target=process_all_chats)
+                process_thread.start()
+                processing_string_var.set("Processing...")
+
+                # Allow process button to be greyed out
+                allChatsList = []
+                inputZip = ""
+                outputDir = ""
+                enter_name_box.delete(0, tk.END)  # Clear entry box
+                recipientName = ""
+
+                select_zip_button.config(state="disabled")
+                select_output_button.config(state="disabled")
+                enter_name_box.config(state="disabled")
+                exit_button.config(state="disabled")
+
+                startProcessingFlag = False
+
+            if processingFlag and not os.path.isdir("temp"):
+                processingFlag = False
+                endProcessingFlag = True
+
+            if endProcessingFlag:
+                processing_string_var.set("")
+
+                select_zip_button.config(state="normal")
+                select_output_button.config(state="normal")
+                enter_name_box.config(state="normal")
+                exit_button.config(state="normal")
+
+                endProcessingFlag = False
+
+            root.update()
+
+        except _tkinter.TclError:
+            return
+
+
+update_loop()
+
 #
