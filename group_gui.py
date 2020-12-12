@@ -50,7 +50,7 @@ allChatsList = []
 
 descriptionText = """Steps:\n
 1. Select a single exported chat
-(Do not select multiple. This will crash and may corrupt files.)\n
+(Do not select multiple at the same time. This will crash and may corrupt files.)\n
 2. Select an export directory\n
 3. Enter the name of the recipient (case sensitive)\n
 4. Click the 'Add to list' button\n
