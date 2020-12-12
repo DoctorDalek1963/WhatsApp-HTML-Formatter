@@ -16,26 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""PLAN:
-- Button to add current data to list (clear data on press as well)
-- Button to process allChatsList (call process_list(allChatsList) in a separate thread;
-set startProcessingFlag; when thread is done, set endProcessingFlag)
-
-- if startProcessingFlag:
-    start new thread for process_all_chats()
-    startProcessingFlag = False
-    disable exit button
-    display 'Processing...' text
-    clear allChatsList (disables process button because it's only enabled
-        when allChatsLists has data)
-
-- if endProcessingFlag:
-    endProcessingFlag = False
-    enable exit button
-    remove 'Processing...' text
-"""
-
-
 from formatter_functions import process_list
 from tkinter import filedialog, StringVar
 import tkinter as tk
@@ -89,8 +69,6 @@ def start_processing():
 
 
 def process_all_chats():
-    # global processingFlag
-    # processingFlag = True
     global endProcessingFlag
     process_list(allChatsList)
     endProcessingFlag = True
@@ -109,13 +87,6 @@ processing_string_var = StringVar()
 
 
 # ===== Create widgets
-
-# Create padding widgets
-# middle_column_padding = tk.LabelFrame(root)
-# row_padding_1 = tk.LabelFrame(root)
-# row_padding_2 = tk.LabelFrame(root)
-# row_padding_3 = tk.LabelFrame(root)
-# row_padding_4 = tk.LabelFrame(root)
 
 # Create input widgets
 select_zip_button = tk.Button(root, text="Select an exported chat", command=select_zip)
@@ -169,8 +140,6 @@ def update_loop():
     global inputZip, recipientName, outputDir, allChatsList
     global startProcessingFlag, processingFlag, endProcessingFlag, addToListFlag
 
-    # CHECKS HERE
-
     while True:
         try:
             if enter_name_box.get():
@@ -217,10 +186,6 @@ def update_loop():
                 enter_name_box.config(state="disabled")
                 exit_button.config(state="disabled")
 
-            # if processingFlag and not os.path.isdir("temp"):
-            #     processingFlag = False
-            #     endProcessingFlag = True
-
             if endProcessingFlag:
                 processing_string_var.set("")
 
@@ -238,5 +203,3 @@ def update_loop():
 
 
 update_loop()
-
-#
