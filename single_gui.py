@@ -19,6 +19,7 @@
 from formatter_functions import extract_zip, write_to_file
 from tkinter import filedialog, StringVar
 import tkinter as tk
+import _tkinter
 import threading
 import os
 
@@ -157,47 +158,51 @@ def update_loop():
     global startExportFlag, finishExportFlag, formattingFlag
 
     while True:
-        if enter_name_box.get():
-            recipName = enter_name_box.get()
+        try:
+            if enter_name_box.get():
+                recipName = enter_name_box.get()
 
-        truncated_input_zip = inputZip.split("/")[-1]
-        selected_zip_var.set(f"Selected: \n{truncated_input_zip}")
+            truncated_input_zip = inputZip.split("/")[-1]
+            selected_zip_var.set(f"Selected: \n{truncated_input_zip}")
 
-        selected_output_var.set(f"Selected: \n{outputDir}")
+            selected_output_var.set(f"Selected: \n{outputDir}")
 
-        if inputZip and outputDir and recipName:
-            format_button.config(state="normal")
-        else:
-            format_button.config(state="disabled")
+            if inputZip and outputDir and recipName:
+                format_button.config(state="normal")
+            else:
+                format_button.config(state="disabled")
 
-        if startExportFlag:
-            process_thread = threading.Thread(target=process)
-            process_thread.start()
-            formatting_string_var.set("Formatting...")
+            if startExportFlag:
+                process_thread = threading.Thread(target=process)
+                process_thread.start()
+                formatting_string_var.set("Formatting...")
 
-            # Allow format button to be greyed out
-            inputZip = ""
-            enter_name_box.delete(0, tk.END)  # Clear entry box
+                # Allow format button to be greyed out
+                inputZip = ""
+                enter_name_box.delete(0, tk.END)  # Clear entry box
 
-            select_zip_button.config(state="disabled")
-            select_output_button.config(state="disabled")
-            enter_name_box.config(state="disabled")
-            exit_button.config(state="disabled")
-            startExportFlag = False
+                select_zip_button.config(state="disabled")
+                select_output_button.config(state="disabled")
+                enter_name_box.config(state="disabled")
+                exit_button.config(state="disabled")
+                startExportFlag = False
 
-        if formattingFlag and not os.path.isdir("temp"):
-            finishExportFlag = True
-            formattingFlag = False
+            if formattingFlag and not os.path.isdir("temp"):
+                finishExportFlag = True
+                formattingFlag = False
 
-        if finishExportFlag:
-            formatting_string_var.set("")
-            select_zip_button.config(state="normal")
-            select_output_button.config(state="normal")
-            enter_name_box.config(state="normal")
-            exit_button.config(state="normal")
-            finishExportFlag = False
+            if finishExportFlag:
+                formatting_string_var.set("")
+                select_zip_button.config(state="normal")
+                select_output_button.config(state="normal")
+                enter_name_box.config(state="normal")
+                exit_button.config(state="normal")
+                finishExportFlag = False
 
-        root.update()
+            root.update()
+
+        except _tkinter.TclError:
+            return
 
 
 update_loop()
