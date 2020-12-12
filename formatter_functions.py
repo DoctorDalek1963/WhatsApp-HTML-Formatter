@@ -39,6 +39,10 @@ prefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (
 attachmentPattern = re.compile(r"<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$")
 linkPattern = re.compile(r"(https?://)?(\w{3,}\.)?([^.\s]+\.[^.\s]+)(\.html?)?")
 
+# A number to increment if the user chooses to process several chats with the same name
+# Produces `name.html, name (1).html, name (2).html ...`
+sameNameNumber = 1
+
 
 class Message:
     def __init__(self, original_string: str):
@@ -204,12 +208,20 @@ def add_attachments(message_content: str) -> str:
 def write_text():
     """Write all text in _chat.txt to HTML file.
 Convert all non-recognised audio files and move them."""
+    global sameNameNumber
     date_separator = ""
 
     with open("temp/_chat.txt", encoding="utf-8") as f:
         chat_txt = f.read().replace("\u200e", "")
 
-    html_file = open(f"{outputDir}/{recipientName}.html", "w+", encoding="utf-8")
+    # Add number to end of file if the file already exists
+    if not os.path.isfile(f"{outputDir}/{recipientName}.html"):
+        html_file = open(f"{outputDir}/{recipientName}.html", "w+", encoding="utf-8")
+    else:
+        while os.path.isfile(f"{outputDir}/{recipientName} ({sameNameNumber}).html"):
+            sameNameNumber += 1
+        html_file = open(f"{outputDir}/{recipientName} ({sameNameNumber}).html", "w+", encoding="utf-8")
+        sameNameNumber += 1
 
     with open("start_template.txt", encoding="utf-8") as f:
         start_template = f.readlines()  # f.readlines() preserves \n characters
@@ -313,5 +325,7 @@ def process_list(chat_list: list):
 chat_list is a list of lists.
 Each list contains the input file, the recipient name, and the output directory.
 It should look like [[inputFile, name, outputDir], [inputFile, name, outputDir], ...]"""
+    global sameNameNumber
     for chat_data in chat_list:
         process_single_chat(chat_data[0], chat_data[1], chat_data[2])
+    sameNameNumber = 1
