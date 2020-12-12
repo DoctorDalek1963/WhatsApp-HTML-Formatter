@@ -20,8 +20,8 @@ from pydub import AudioSegment
 from datetime import datetime
 from zipfile import ZipFile
 from shutil import copytree
+import multiprocessing
 from glob import glob
-import threading
 import re
 import os
 
@@ -293,12 +293,12 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
     if not os.path.isdir(f"{outputDir}/{recipientName}"):
         os.mkdir(f"{outputDir}/{recipientName}")
 
-    text_thread = threading.Thread(target=write_text)
-    file_move_thread = threading.Thread(target=move_attachment_files)
-    text_thread.start()
-    file_move_thread.start()
-    text_thread.join()
-    file_move_thread.join()
+    text_process = multiprocessing.Process(target=write_text)
+    file_move_process = multiprocessing.Process(target=move_attachment_files)
+    text_process.start()
+    file_move_process.start()
+    text_process.join()
+    file_move_process.join()
 
 
 def process_single_chat(input_file: str, name: str, output_dir: str):
