@@ -150,6 +150,8 @@ exit_button.grid(row=13, column=2, padx=default_x_padding, pady=default_y_paddin
 # ===== Loop to sustain window
 
 # Infinite loop to update tk window and check for conditions to activate or deactivate buttons
+
+
 def update_loop():
     global recipName, inputZip
     global startExportFlag, finishExportFlag, formattingFlag
