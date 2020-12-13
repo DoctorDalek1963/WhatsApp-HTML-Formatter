@@ -34,7 +34,7 @@ descriptionText = """Steps:\n
 3. Enter the name of the recipient (case sensitive)\n
 4. Click the 'Add to list' button\n
 5. Repeat steps 1-4 until you have selected all your chats\n
-6. Click the 'Process' button\n
+6. Click the 'Process all' button\n
 7. Wait until the 'Processing...' text disappears\n
 8. This may take quite a while if you've selected several large chats\n
 9. Once the 'Exit' button is active, you can safely exit the program"""
@@ -102,7 +102,7 @@ description_label = tk.Label(root, text=descriptionText)
 
 # Create special button widgets
 add_to_list_button = tk.Button(root, text="Add to list", command=add_to_list, state="disabled", bd=3)
-process_button = tk.Button(root, text="Process", command=start_processing, state="disabled", bd=3)
+process_all_button = tk.Button(root, text="Process all", command=start_processing, state="disabled", bd=3)
 processing_string_label = tk.Label(root, textvariable=processing_string_var)
 exit_button = tk.Button(root, text="Exit", command=root.destroy, bd=3)
 
@@ -126,7 +126,7 @@ enter_name_box.grid(row=5, column=2, padx=default_x_padding, pady=(default_y_pad
 
 # Place special button widgets
 add_to_list_button.grid(row=6, column=2, padx=default_x_padding, pady=default_y_padding)
-process_button.grid(row=7, column=2, padx=default_x_padding, pady=default_y_padding)
+process_all_button.grid(row=7, column=2, padx=default_x_padding, pady=default_y_padding)
 processing_string_label.grid(row=8, column=2, padx=default_x_padding, pady=default_y_padding)
 exit_button.grid(row=9, column=2, padx=default_x_padding, pady=default_y_padding)
 
@@ -161,9 +161,9 @@ def update_loop():
                 recipientName = ""
 
             if allChatsList:
-                process_button.config(state="normal")
+                process_all_button.config(state="normal")
             else:
-                process_button.config(state="disabled")
+                process_all_button.config(state="disabled")
 
             if startProcessingFlag:
                 startProcessingFlag = False
@@ -173,7 +173,7 @@ def update_loop():
                 process_thread.start()
                 processing_string_var.set("Processing...")
 
-                # Allow process button to be greyed out
+                # Allow 'process all' button to be greyed out
                 allChatsList = []
                 inputZip = ""
                 outputDir = ""
