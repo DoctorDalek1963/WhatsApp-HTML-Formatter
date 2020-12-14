@@ -4,7 +4,7 @@
 // The original image will stay in the same place at the same size
 
 $('img.small').click(function() {
-    $(this).after('<img class="large" src="' + $(this).attr('src') + '"');
+    $(this).after('<img class="large" src="' + $(this).attr('src') + '" alt="ENLARGED IMAGE">');
 });
 
 $('img.large').click(function() {
