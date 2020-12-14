@@ -57,6 +57,8 @@ class Message:
         else:
             self.content = format_content(self.content)
 
+        # TODO: Break words that are over 100 characters onto a new line
+
         message_info_match = re.match(prefixPattern, self.prefix)
 
         date_raw = message_info_match.group(1)
