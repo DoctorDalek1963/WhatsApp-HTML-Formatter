@@ -16,7 +16,7 @@ img.small, video { /* Size of images */
     width: auto;
 }
 img.large {
-    max-height: 80vw;
+    max-height: 40vw;
     max-width: 80vw;
 }
 audio {
