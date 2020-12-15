@@ -15,10 +15,6 @@ img.small, video { /* Size of images */
     max-width: 800px;
     width: auto;
 }
-img.large {
-    max-height: 40vw;
-    max-width: 80vw;
-}
 audio {
     width: 400px;
 }
