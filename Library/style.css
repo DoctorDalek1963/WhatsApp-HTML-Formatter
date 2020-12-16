@@ -76,6 +76,7 @@ h3 { /* Style for name at top */
     position: relative;
     min-width: 60px;
     width: auto;
+    word-wrap: break-word;
 }
 code { /* Monospaced code blocks in messages */
     font-family: "Consolas", Courier, monospace;
