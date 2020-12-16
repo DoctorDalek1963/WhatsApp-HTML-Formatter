@@ -198,7 +198,7 @@ def add_attachments(message_content: str) -> str:
         message_content = f'<video controls>\n\t\t\t<source src="{recipientName}/{filename}">\n\t\t</video>'
 
     elif file_type == "PHOTO" or "GIF":
-        message_content = f'<img class="small" src="{recipientName}/{filename}" alt="IMAGE ATTACHMENT" ' \
+        message_content = f'<img class="small" src="{recipientName}/{filename}" alt="IMAGE ATTACHMENT" ' + \
                            'style="max-height: 400px; max-width: 800px; display: inline-block;">'
     else:
         message_content = f'UNKNOWN ATTACHMENT "{filename}"'
