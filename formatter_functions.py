@@ -146,8 +146,8 @@ def format_links(string: str) -> str:
 
     if link_matches:
         for link in link_matches:
-            if re.match(r"\d+\.\d+", link):
-                continue  # If decimal, ignore it
+            if re.match(r"[^A-Za-z]+(\.[^A-Za-z])+", link) and not re.match(r"(\d+\.){3}\d", link):
+                continue  # If not proper link but also not IP address, skip
 
             if not link.startswith("http"):
                 working_link = f"http://{link}"  # Create URLs from non URL links
