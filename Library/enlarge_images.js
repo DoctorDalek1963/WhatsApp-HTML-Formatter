@@ -1,5 +1,5 @@
 $(function () {
-    $('img').click(function() {
+    $('img').on('click', function() {
         if ($(this).hasClass('small')) {
             $(this).removeClass('small').addClass('large');
             $(this).animate({'max-height': '40vw', 'max-width': '80vw'}, 200);
