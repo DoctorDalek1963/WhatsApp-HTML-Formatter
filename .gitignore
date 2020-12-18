@@ -8,3 +8,6 @@ Java-Formatter/
 
 # Except in Example/
 !Example/Example.zip
+
+# Ignore jsconfig.json, which simply adds jQuery intellisense and autocomplete to VS Code
+Library/jsconfig.json
