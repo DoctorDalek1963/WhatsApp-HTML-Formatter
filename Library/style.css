@@ -35,6 +35,10 @@ h3 { /* Style for name at top */
     font-size: 40px;
 }
 
+.recipient-name { /* The recipient's name in the case of a group chat */
+    color: red; /* TO BE FIXED. This is temporary and needs to be improved before release. */
+}
+
 .time { /* The timestamp in the bottom right of messages */
     bottom: 2px;
 }
