@@ -32,7 +32,7 @@ formatDict = {"_": "em", "*": "strong", "~": "del"}  # Dict of format chars with
 nonConversionExtensions = ("jpg", "png", "webp", "gif", "mp4", "mp3", "ogg", "wav")
 
 cwd = os.getcwd()
-recipientName = outputDir = ""
+senderName = htmlFileName = outputDir = ""
 
 # RegEx patterns
 prefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (\w+): (.+)?")
@@ -73,17 +73,17 @@ class Message:
 
     def __repr__(self):
         # Use hex here at end to give memory location of Message object
-        return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self.name}", ' + \
+        return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self.name}", ' \
                f'date="{self.date}", and time="{self.time}" at {hex(id(self))}>'
 
     def create_html(self) -> str:
         """Create HTML code from Message object."""
-        if self.name == recipientName:
-            sender_type = 'recipient'
-        else:
+        if self.name == senderName:
             sender_type = 'sender'
+        else:
+            sender_type = 'recipient'
 
-        return f'<div class="message {sender_type}">\n\t<span class="message-info time">{self.time}</span>\n\t' + \
+        return f'<div class="message {sender_type}">\n\t<span class="message-info time">{self.time}</span>\n\t' \
                f'<span class="message-info date">{self.date}</span>\n\t\t{self.content}\n</div>\n\n'
 
 
@@ -177,8 +177,8 @@ def add_attachments(message_content: str) -> str:
     if file_type == "AUDIO":
         for ext, html_format in htmlAudioFormats.items():
             if extension == ext:
-                message_content = f'<audio controls>\n\t\t\t' + \
-                                  f'<source src="{recipientName}/{filename}" type="audio/{html_format}">\n\t\t</audio>'
+                message_content = f'<audio controls>\n\t\t\t<source src="Attachments/{htmlFileName}/{filename}" ' \
+                                  f'type="audio/{html_format}">\n\t\t</audio>'
                 break
 
         else:  # If none of the standard html audio formats broke out of the for loop, convert to .mp3
@@ -186,15 +186,15 @@ def add_attachments(message_content: str) -> str:
                 f"temp/{filename_no_extension}.mp3", format="mp3")
             os.remove(f"temp/{filename}")
             filename = filename_no_extension + ".mp3"
-            message_content = f'<audio controls>\n\t\t\t' + \
-                              f'<source src="{recipientName}/{filename}" type="audio/mpeg">\n\t\t</audio>'
-            os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/{recipientName}/{filename}")
+            message_content = f'<audio controls>\n\t\t\t' \
+                              f'<source src="Attachments/{htmlFileName}/{filename}" type="audio/mpeg">\n\t\t</audio>'
+            os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/Attachments/{htmlFileName}/{filename}")
 
     elif file_type == "VIDEO":
-        message_content = f'<video controls>\n\t\t\t<source src="{recipientName}/{filename}">\n\t\t</video>'
+        message_content = f'<video controls>\n\t\t\t<source src="Attachments/{htmlFileName}/{filename}">\n\t\t</video>'
 
     elif file_type == "PHOTO" or "GIF":
-        message_content = f'<img class="small" src="{recipientName}/{filename}" alt="IMAGE ATTACHMENT" ' + \
+        message_content = f'<img class="small" src="Attachments/{htmlFileName}/{filename}" alt="IMAGE ATTACHMENT" ' \
                            'style="max-height: 400px; max-width: 800px; display: inline-block;">'
     else:
         message_content = f'UNKNOWN ATTACHMENT "{filename}"'
@@ -202,7 +202,7 @@ def add_attachments(message_content: str) -> str:
     return message_content
 
 
-def write_text():
+def write_text(recipient_name: str):
     """Write all text in _chat.txt to HTML file.
 Convert all non-recognised audio files and move them."""
     date_separator = ""
@@ -211,22 +211,22 @@ Convert all non-recognised audio files and move them."""
         chat_txt = f.read().replace("\u200e", "")
 
     # Add number to end of file if the file already exists
-    if not os.path.isfile(f"{outputDir}/{recipientName}.html"):
-        html_file = open(f"{outputDir}/{recipientName}.html", "w+", encoding="utf-8")
+    if not os.path.isfile(f"{outputDir}/{htmlFileName}.html"):
+        html_file = open(f"{outputDir}/{htmlFileName}.html", "w+", encoding="utf-8")
     else:
         same_name_number = 1
-        while os.path.isfile(f"{outputDir}/{recipientName} ({same_name_number}).html"):
+        while os.path.isfile(f"{outputDir}/{htmlFileName} ({same_name_number}).html"):
             same_name_number += 1
-        html_file = open(f"{outputDir}/{recipientName} ({same_name_number}).html", "w+", encoding="utf-8")
+        html_file = open(f"{outputDir}/{htmlFileName} ({same_name_number}).html", "w+", encoding="utf-8")
 
     with open("start_template.txt", encoding="utf-8") as f:
         start_template = f.readlines()  # f.readlines() preserves \n characters
 
-    # Replace recipientName in start_template
+    # Replace recipient_name in start_template
     for i, line in enumerate(start_template):
         pos = line.find("%recipName%")
         if pos != -1:  # If "recipName" is found
-            start_template[i] = line.replace("%recipName%", recipientName)
+            start_template[i] = line.replace("%recipName%", recipient_name)
 
     for line in start_template:
         html_file.write(line)
@@ -255,7 +255,6 @@ Convert all non-recognised audio files and move them."""
     html_file.close()
 
     os.remove("temp/_chat.txt")
-    # os.rmdir("temp")
 
 
 def move_attachment_files():
@@ -270,7 +269,7 @@ This allows for multithreading."""
             extension = filename.split(".")[-1]
 
             if extension in nonConversionExtensions:
-                os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/{recipientName}/{filename}")
+                os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/Attachments/{htmlFileName}/{filename}")
 
 
 def extract_zip(file_dir: str):
@@ -287,21 +286,23 @@ Extract the given zip file into the temp directory."""
         return False
 
 
-def write_to_file(name: str, output_dir: str):
+def write_to_file(sender_name: str, recipient_name: str, html_file_name: str, output_dir: str):
     """MUST RUN extract_zip() FIRST.
 
 Go through _chat.txt, format every message, and write them all to output_dir/name.html."""
-    global recipientName, outputDir
-    recipientName = name
+    global senderName, htmlFileName, outputDir
+
+    senderName = sender_name
+    htmlFileName = html_file_name
     outputDir = output_dir
 
     if not os.path.isdir(f"{outputDir}/Library"):
         copytree("Library", f"{outputDir}/Library")
 
-    if not os.path.isdir(f"{outputDir}/{recipientName}"):
-        os.mkdir(f"{outputDir}/{recipientName}")
+    if not os.path.isdir(f"{outputDir}/Attachments/{htmlFileName}"):
+        os.mkdir(f"{outputDir}/Attachments/{htmlFileName}")
 
-    text_thread = threading.Thread(target=write_text)
+    text_thread = threading.Thread(target=write_text, args=[recipient_name])
     file_move_thread = threading.Thread(target=move_attachment_files)
     text_thread.start()
     file_move_thread.start()
@@ -309,10 +310,10 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
     file_move_thread.join()
 
 
-def process_single_chat(input_file: str, name: str, output_dir: str):
+def process_single_chat(input_file: str, sender_name: str, recipient_name: str, html_file_name: str, output_dir: str):
     """Process a single chat completely."""
     if extract_zip(input_file):
-        write_to_file(name, output_dir)
+        write_to_file(sender_name, recipient_name, html_file_name, output_dir)
 
 
 def process_list(chat_list: list):
@@ -320,6 +321,10 @@ def process_list(chat_list: list):
 
 chat_list is a list of lists.
 Each list contains the input file, the recipient name, and the output directory.
-It should look like [[inputFile, name, outputDir], [inputFile, name, outputDir], ...]"""
+
+It should look like [[inputFile, senderName, recipientName, fileName, outputDir],
+[inputFile, senderName, recipientName, fileName, outputDir],
+[inputFile, senderName, recipientName, fileName, outputDir], ...]"""
+
     for chat_data in chat_list:
-        process_single_chat(chat_data[0], chat_data[1], chat_data[2])
+        process_single_chat(chat_data[0], chat_data[1], chat_data[2], chat_data[3], chat_data[4])
