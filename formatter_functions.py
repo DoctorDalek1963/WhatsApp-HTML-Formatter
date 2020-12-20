@@ -41,7 +41,9 @@ linkPattern = re.compile(r"(https?://)?(\w{3,}\.)?([^.\s]+\.[^.\s]+)(\.html?)?")
 
 
 class Message:
-    def __init__(self, original_string: str):
+    def __init__(self, original_string: str, group_chat_flag: bool):
+        self.group_chat_flag = group_chat_flag
+
         original = original_string
         self.prefix = re.match(prefixPattern, original).group(0)
 
@@ -83,7 +85,13 @@ class Message:
         else:
             sender_type = 'recipient'
 
-        return f'<div class="message {sender_type}">\n\t<span class="message-info time">{self.time}</span>\n\t' \
+        # If this is a group chat and this isn't the sender, add the recipient's name
+        if self.group_chat_flag and self.name != senderName:
+            recipient_name = f'<span class="recipient-name">{self.name}</span>\n\t'
+        else:
+            recipient_name = ''
+
+        return f'<div class="message {sender_type}">\n\t{recipient_name}<span class="message-info time">{self.time}</span>\n\t' \
                f'<span class="message-info date">{self.date}</span>\n\t\t{self.content}\n</div>\n\n'
 
 
