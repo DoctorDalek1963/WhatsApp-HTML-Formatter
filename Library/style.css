@@ -3,6 +3,7 @@
     font-size: 20px;
     color: white;
 }
+
 body { /* Display style for background image & body */
     background-image: url('background_image.jpg');
     background-repeat: no-repeat;
@@ -10,37 +11,45 @@ body { /* Display style for background image & body */
     background-attachment: fixed;
     font-size: 100%;
 }
+
 video { /* Size of images */
     max-height: 400px;
     max-width: 800px;
     width: auto;
 }
+
 audio {
     width: 400px;
 }
+
 .message-block { /* Positions all messages */
     margin-top: 110px;
     margin-left: 10px;
     margin-right: 10px;
 }
+
 h3 { /* Style for name at top */
     text-align: center;
     margin-top: 25px;
     vertical-align: middle;
     font-size: 40px;
 }
+
 .time { /* The timestamp in the bottom right of messages */
     bottom: 2px;
 }
+
 .date { /* The datestamp in the top right of messages */
     top: 2px;
 }
+
 .message-info { /* The message information at the right of messages */
     color: #7f7f84;
     font-size: 50%;
     position: absolute;
     right: 2px;
 }
+
 .ui { /* The black bar at the top containing the recipient name */
     background-color: #171717;
     position: fixed;
@@ -50,6 +59,7 @@ h3 { /* Style for name at top */
     height: 90px;
     z-index: 100;
 }
+
 .date-separator { /* The floating divs marking different days */
     border-radius: 5px;
     background-color: #7f7f84;
@@ -63,6 +73,7 @@ h3 { /* Style for name at top */
     margin-bottom: 15px;
     clear: both; /* What does this mean? Who knows? But it makes it work */
 }
+
 .message { /* Style for all messages */
     margin: 5px 0; /* Sets 5px margins at top & bottom */
     max-width: 60%;
@@ -78,15 +89,20 @@ h3 { /* Style for name at top */
     width: auto;
     word-wrap: break-word;
 }
+
 code { /* Monospaced code blocks in messages */
     font-family: "Consolas", Courier, monospace;
 }
+
 div span { /* Sets brightness of message-info span inside div */
     filter: brightness(120%);
 }
+
 .recipient { /* Style for the recipient */
     background-color: #3c3c3e;
 }
+
 .sender { /* Style for the sender */
     background-color: #0f5247;
 }
+
