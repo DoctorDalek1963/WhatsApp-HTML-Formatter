@@ -80,6 +80,7 @@ def process():
 root = tk.Tk()
 root.title("WhatsApp Formatter")
 root.resizable(False, False)
+root.iconbitmap("Library/favicon.ico")
 
 selected_zip_var = StringVar()
 selected_output_var = StringVar()
