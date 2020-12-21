@@ -30,12 +30,16 @@ audio {
 
 h3 { /* Style for name at top */
     text-align: center;
+    font-size: 40px;
+
     margin-top: 25px;
     vertical-align: middle;
-    font-size: 40px;
 }
 
 .recipient-name { /* The recipient's name in the case of a group chat */
+    font-size: 70%;
+
+    font-weight: bold;
     color: red; /* TO BE FIXED. This is temporary and needs to be improved before release. */
 }
 
@@ -50,48 +54,68 @@ h3 { /* Style for name at top */
 .message-info { /* The message information at the right of messages */
     color: #7f7f84;
     font-size: 50%;
-    position: absolute;
-    right: 2px;
+
+    text-align: right;
+    width: 100%;
+
+    display: block;
 }
 
 .ui { /* The black bar at the top containing the recipient name */
     background-color: #171717;
     position: fixed;
+
     margin: -10px;
     margin-top: -110px;
+
     width: 100%;
     height: 90px;
+
     z-index: 100;
 }
 
 .date-separator { /* The floating divs marking different days */
     border-radius: 5px;
+
     background-color: #7f7f84;
     opacity: 0.8;
+
     text-align: center;
+
     padding: 3px;
     border: 10px;
+
     position: relative;
+    clear: both;
+
     width: 20%;
+
     margin: auto;
     margin-bottom: 15px;
-    clear: both; /* What does this mean? Who knows? But it makes it work */
+
 }
 
 .message { /* Style for all messages */
     margin: 5px 0; /* Sets 5px margins at top & bottom */
+
     max-width: 60%;
+    min-width: 60px;
+    width: auto;
+
     clear: both;
     float: left;
+
     padding: 5px;
-    padding-right: 67px;
-    padding-top: 13px;
+
     border-radius: 5px;
     font-size: 1em;
     position: relative;
-    min-width: 60px;
-    width: auto;
+
     word-wrap: break-word;
+}
+
+.message p { /* Remove margins on p tags in messages */
+    margin: 0;
 }
 
 code { /* Monospaced code blocks in messages */
