@@ -1,0 +1,6 @@
+/* This is a file to allow you to add different colors to different names in
+a group chat. 'John Doe' is an example of how the names should be formatted. */
+
+.John-Doe {
+    color: pink;
+}

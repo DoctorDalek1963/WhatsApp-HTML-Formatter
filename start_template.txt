@@ -4,6 +4,8 @@
 	<title>%chat_title% - WhatsApp</title>
 
 	<link rel="stylesheet" type="text/css" href="Library/style.css">
+	<link rel="stylesheet" type="text/css" href="Library/group_chat_names.css">
+
 	<link rel="icon" type="image/ico" href="Library/favicon.ico">
 
 	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
