@@ -102,20 +102,26 @@ and a boolean representing whether it's a message from a group chat."""
 
     def create_html(self) -> str:
         """Create HTML from Message object."""
-        if self.__name == senderName:
-            sender_type = 'sender'
-        else:
-            sender_type = 'recipient'
+        if not self.__group_chat_meta:
+            if self.__name == senderName:
+                sender_type = 'sender'
+            else:
+                sender_type = 'recipient'
 
-        # If this is a group chat and this isn't the sender, add the recipient's name
-        if self.__group_chat and self.__name != senderName:
-            css_formatted_name = '.' + self.__name.replace(' ', '-')
-            recipient_name = f'<span class="recipient-name {css_formatted_name}">{self.__name}</span>\n\t'
-        else:
-            recipient_name = ''
+            # If this is a group chat and this isn't the sender, add the recipient's name
+            if self.__group_chat and self.__name != senderName:
+                css_formatted_name = self.__name.replace(' ', '-')
+                recipient_name = f'<span class="recipient-name {css_formatted_name}">{self.__name}</span>'
+            else:
+                recipient_name = ''
 
-        return f'<div class="message {sender_type}">\n\t{recipient_name}<span class="message-info time">{self.__time}' \
-               f'</span>\n\t<span class="message-info date">{self.__date}</span>\n\t\t{self.__content}\n</div>\n\n'
+            return f'<div class="message {sender_type}">\n\t{recipient_name}\n\t<span class="message-info date">' \
+                   f'{self.__date}</span>\n\t\t<p>{self.__content}</p>\n\t<span class="message-info time">' \
+                   f'{self.__time}</span>\n</div>\n\n'
+
+        else:  # If a meta message in a group chat
+            return f'<div class="group-chat-meta">\n\t<span class="message-info date">{self.__date}</span>\n\t\t' \
+                   f'<p>{self.__content}</p>\n\t<span class="message-info time">{self.__time}</span>\n</div>\n\n'
 
 
 def clean_html(string: str) -> str:
