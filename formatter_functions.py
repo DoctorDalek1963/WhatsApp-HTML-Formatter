@@ -268,7 +268,7 @@ def write_text(chat_title: str, group_chat: bool):
         html_file.write(line)
 
     # Use a re.sub to place LRMs between each message and then create a list by splitting by LRM
-    chat_txt = re.sub(r"\n\[(?=\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m] \w+: )", "\u200e[", chat_txt)
+    chat_txt = re.sub(r"\n\[(?=\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m])", "\u200e[", chat_txt)
     chat_txt_list = chat_txt.split("\u200e")
 
     # ===== MAIN WRITE LOOP
