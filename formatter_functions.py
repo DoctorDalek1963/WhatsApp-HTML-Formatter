@@ -42,7 +42,11 @@ linkPattern = re.compile(r"(https?://)?(\w{3,}\.)?([^.\s]+\.[^.\s]+)(\.html?)?")
 
 class Message:
     def __init__(self, original_string: str, group_chat_flag: bool):
-        self.group_chat_flag = group_chat_flag
+        """Create a Message object.
+
+It takes two arguments, a string representing the original message,
+and a boolean representing whether it's a message from a group chat."""
+        self.group_chat = group_chat_flag
 
         original = original_string
         self.prefix = re.match(prefixPattern, original).group(0)
@@ -79,14 +83,14 @@ class Message:
                f'date="{self.date}", and time="{self.time}" at {hex(id(self))}>'
 
     def create_html(self) -> str:
-        """Create HTML code from Message object."""
+        """Create HTML from Message object."""
         if self.name == senderName:
             sender_type = 'sender'
         else:
             sender_type = 'recipient'
 
         # If this is a group chat and this isn't the sender, add the recipient's name
-        if self.group_chat_flag and self.name != senderName:
+        if self.group_chat and self.name != senderName:
             recipient_name = f'<span class="recipient-name">{self.name}</span>\n\t'
         else:
             recipient_name = ''
@@ -210,9 +214,8 @@ def add_attachments(message_content: str) -> str:
     return message_content
 
 
-def write_text(recipient_name: str):
-    """Write all text in _chat.txt to HTML file.
-Convert all non-recognised audio files and move them."""
+def write_text(recipient_name: str, group_chat: bool):
+    """Write all text in _chat.txt to HTML file."""
     date_separator = ""
 
     with open("temp/_chat.txt", encoding="utf-8") as f:
@@ -246,7 +249,7 @@ Convert all non-recognised audio files and move them."""
     # ===== MAIN WRITE LOOP
 
     for string in chat_txt_list:
-        msg = Message(string)
+        msg = Message(string, group_chat)
 
         if msg.date != date_separator:
             date_separator = msg.date
@@ -294,7 +297,7 @@ Extract the given zip file into the temp directory."""
         return False
 
 
-def write_to_file(sender_name: str, recipient_name: str, html_file_name: str, output_dir: str):
+def write_to_file(group_chat: bool, sender_name: str, recipient_name: str, html_file_name: str, output_dir: str):
     """MUST RUN extract_zip() FIRST.
 
 Go through _chat.txt, format every message, and write them all to output_dir/name.html."""
@@ -310,7 +313,7 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
     if not os.path.isdir(f"{outputDir}/Attachments/{htmlFileName}"):
         os.mkdir(f"{outputDir}/Attachments/{htmlFileName}")
 
-    text_thread = threading.Thread(target=write_text, args=[recipient_name])
+    text_thread = threading.Thread(target=write_text, args=[recipient_name, group_chat])
     file_move_thread = threading.Thread(target=move_attachment_files)
     text_thread.start()
     file_move_thread.start()
@@ -318,21 +321,22 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
     file_move_thread.join()
 
 
-def process_single_chat(input_file: str, sender_name: str, recipient_name: str, html_file_name: str, output_dir: str):
+def process_single_chat(input_file: str, group_chat: bool, sender_name: str, recipient_name: str, html_file_name: str, output_dir: str):
     """Process a single chat completely."""
     if extract_zip(input_file):
-        write_to_file(sender_name, recipient_name, html_file_name, output_dir)
+        write_to_file(group_chat, sender_name, recipient_name, html_file_name, output_dir)
 
 
 def process_list(chat_list: list):
     """RUN TO PROCESS MULTIPLE CHATS. PASSED AS A LIST OF LISTS.
 
 chat_list is a list of lists.
-Each list contains the input file, the recipient name, and the output directory.
+Each list contains the input file, a group chat boolean, the sender name, the recipient name,
+the file name, and the output directory.
 
-It should look like [[inputFile, senderName, recipientName, fileName, outputDir],
-[inputFile, senderName, recipientName, fileName, outputDir],
-[inputFile, senderName, recipientName, fileName, outputDir], ...]"""
+It should look like [[inputFile, groupChat, senderName, recipientName, fileName, outputDir],
+[inputFile, groupChat, senderName, recipientName, fileName, outputDir],
+[inputFile, groupChat, senderName, recipientName, fileName, outputDir], ...]"""
 
     for chat_data in chat_list:
-        process_single_chat(chat_data[0], chat_data[1], chat_data[2], chat_data[3], chat_data[4])
+        process_single_chat(chat_data[0], chat_data[1], chat_data[2], chat_data[3], chat_data[4], chat_data[5])
