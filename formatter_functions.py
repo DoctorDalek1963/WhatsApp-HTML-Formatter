@@ -89,8 +89,13 @@ and a boolean representing whether it's a message from a group chat."""
 
     def __repr__(self):
         # Use hex here at end to give memory location of Message object
-        return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self.__name}", ' \
-               f'date="{self.__date}", and time="{self.__time}" at {hex(id(self))}>'
+        if not self.__group_chat_meta:
+            return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self.__name}", ' \
+                   f'date="{self.__date}", time="{self.__time}", and group_chat={self.__group_chat} at {hex(id(self))}>'
+        else:
+            return f'<{self.__class__.__module__}.{self.__class__.__name__} object with date="{self.__date}", ' \
+                   f'time="{self.__time}", and group_chat={self.__group_chat}, which is a meta message at ' \
+                   f'{hex(id(self))}>'
 
     def get_date(self):
         return self.__date
