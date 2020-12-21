@@ -218,7 +218,7 @@ def add_attachments(message_content: str) -> str:
     return message_content
 
 
-def write_text(recipient_name: str, group_chat: bool):
+def write_text(chat_title: str, group_chat: bool):
     """Write all text in _chat.txt to HTML file."""
     date_separator = ""
 
@@ -237,11 +237,11 @@ def write_text(recipient_name: str, group_chat: bool):
     with open("start_template.txt", encoding="utf-8") as f:
         start_template = f.readlines()  # f.readlines() preserves \n characters
 
-    # Replace recipient_name in start_template
+    # Replace chat_title in start_template
     for i, line in enumerate(start_template):
-        pos = line.find("%recipName%")
-        if pos != -1:  # If "recipName" is found
-            start_template[i] = line.replace("%recipName%", recipient_name)
+        pos = line.find("%chat_title%")
+        if pos != -1:  # If "chat_title" is found
+            start_template[i] = line.replace("%chat_title%", chat_title)
 
     for line in start_template:
         html_file.write(line)
@@ -301,7 +301,7 @@ Extract the given zip file into the temp directory."""
         return False
 
 
-def write_to_file(group_chat: bool, sender_name: str, recipient_name: str, html_file_name: str, output_dir: str):
+def write_to_file(group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str):
     """MUST RUN extract_zip() FIRST.
 
 Go through _chat.txt, format every message, and write them all to output_dir/name.html."""
@@ -315,9 +315,10 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
         copytree("Library", f"{outputDir}/Library")
 
     if not os.path.isdir(f"{outputDir}/Attachments/{htmlFileName}"):
+        os.mkdir(f"{outputDir}/Attachments")
         os.mkdir(f"{outputDir}/Attachments/{htmlFileName}")
 
-    text_thread = threading.Thread(target=write_text, args=[recipient_name, group_chat])
+    text_thread = threading.Thread(target=write_text, args=[chat_title, group_chat])
     file_move_thread = threading.Thread(target=move_attachment_files)
     text_thread.start()
     file_move_thread.start()
@@ -325,23 +326,23 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
     file_move_thread.join()
 
 
-def process_single_chat(input_file: str, group_chat: bool, sender_name: str, recipient_name: str, html_file_name: str,
+def process_single_chat(input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str,
                         output_dir: str):
     """Process a single chat completely."""
     if extract_zip(input_file):
-        write_to_file(group_chat, sender_name, recipient_name, html_file_name, output_dir)
+        write_to_file(group_chat, sender_name, chat_title, html_file_name, output_dir)
 
 
 def process_list(chat_list: list):
     """RUN TO PROCESS MULTIPLE CHATS. PASSED AS A LIST OF LISTS.
 
 chat_list is a list of lists.
-Each list contains the input file, a group chat boolean, the sender name, the recipient name,
+Each list contains the input file, a group chat boolean, the sender name, the title of the chat,
 the file name, and the output directory.
 
-It should look like [[inputFile, groupChat, senderName, recipientName, fileName, outputDir],
-[inputFile, groupChat, senderName, recipientName, fileName, outputDir],
-[inputFile, groupChat, senderName, recipientName, fileName, outputDir], ...]"""
+It should look like [[inputFile, groupChat, senderName, chatTitle, fileName, outputDir],
+[inputFile, groupChat, senderName, chatTitle, fileName, outputDir],
+[inputFile, groupChat, senderName, chatTitle, fileName, outputDir], ...]"""
 
     for chat_data in chat_list:
         process_single_chat(chat_data[0], chat_data[1], chat_data[2], chat_data[3], chat_data[4], chat_data[5])

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>%recipName% - WhatsApp</title>
+	<title>%chat_title% - WhatsApp</title>
 
 	<link rel="stylesheet" type="text/css" href="Library/style.css">
 	<link rel="icon" type="image/ico" href="Library/favicon.ico">
@@ -9,7 +9,7 @@
 	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 	<script src="Library/enlarge_images.js"></script>
 
-	<div class="ui" width="100%" height="90px"><h3>%recipName%</h3></div>
+	<div class="ui" width="100%" height="90px"><h3>%chat_title%</h3></div>
 </head>
 
 <body>
