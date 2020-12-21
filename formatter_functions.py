@@ -46,23 +46,23 @@ class Message:
 
 It takes two arguments, a string representing the original message,
 and a boolean representing whether it's a message from a group chat."""
-        self.group_chat = group_chat_flag
+        self.__group_chat = group_chat_flag
 
         original = original_string
-        self.prefix = re.match(prefixPattern, original).group(0)
+        self.__prefix = re.match(prefixPattern, original).group(0)
 
         # Only split once to avoid breaking attachment messages
-        self.content = original.split(": ", 1)[1]
+        self.__content = original.split(": ", 1)[1]
 
-        if re.match(attachmentPattern, self.content):
-            self.content = add_attachments(self.content)
+        if re.match(attachmentPattern, self.__content):
+            self.__content = add_attachments(self.__content)
         else:
-            self.content = format_content(self.content)
+            self.__content = format_content(self.__content)
 
-        message_info_match = re.match(prefixPattern, self.prefix)
+        message_info_match = re.match(prefixPattern, self.__prefix)
 
         date_raw = message_info_match.group(1)
-        self.name = message_info_match.group(2)
+        self.__name = message_info_match.group(2)
 
         # Reformat date and time to be more readable
         date_obj = datetime.strptime(date_raw, "%d/%m/%Y, %I:%M:%S %p")
@@ -71,32 +71,35 @@ and a boolean representing whether it's a message from a group chat."""
         if day.startswith("0"):
             day = day.replace("0", "", 1)  # Remove a leading 0
 
-        self.date = datetime.strftime(date_obj, f"%a {day} %B %Y")
-        self.time = datetime.strftime(date_obj, "%I:%M:%S %p")
+        self.__date = datetime.strftime(date_obj, f"%a {day} %B %Y")
+        self.__time = datetime.strftime(date_obj, "%I:%M:%S %p")
 
-        if self.time.startswith("0"):
-            self.time = self.time.replace("0", "", 1)
+        if self.__time.startswith("0"):
+            self.__time = self.__time.replace("0", "", 1)
 
     def __repr__(self):
         # Use hex here at end to give memory location of Message object
-        return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self.name}", ' \
-               f'date="{self.date}", and time="{self.time}" at {hex(id(self))}>'
+        return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self.__name}", ' \
+               f'date="{self.__date}", and time="{self.__time}" at {hex(id(self))}>'
+
+    def get_date(self):
+        return self.__date
 
     def create_html(self) -> str:
         """Create HTML from Message object."""
-        if self.name == senderName:
+        if self.__name == senderName:
             sender_type = 'sender'
         else:
             sender_type = 'recipient'
 
         # If this is a group chat and this isn't the sender, add the recipient's name
-        if self.group_chat and self.name != senderName:
-            recipient_name = f'<span class="recipient-name">{self.name}</span>\n\t'
+        if self.__group_chat and self.__name != senderName:
+            recipient_name = f'<span class="recipient-name">{self.__name}</span>\n\t'
         else:
             recipient_name = ''
 
-        return f'<div class="message {sender_type}">\n\t{recipient_name}<span class="message-info time">{self.time}</span>\n\t' \
-               f'<span class="message-info date">{self.date}</span>\n\t\t{self.content}\n</div>\n\n'
+        return f'<div class="message {sender_type}">\n\t{recipient_name}<span class="message-info time">{self.__time}' \
+               f'</span>\n\t<span class="message-info date">{self.__date}</span>\n\t\t{self.__content}\n</div>\n\n'
 
 
 def clean_html(string: str) -> str:
@@ -251,8 +254,8 @@ def write_text(recipient_name: str, group_chat: bool):
     for string in chat_txt_list:
         msg = Message(string, group_chat)
 
-        if msg.date != date_separator:
-            date_separator = msg.date
+        if msg.get_date() != date_separator:
+            date_separator = msg.get_date()
             html_file.write(f'<div class="date-separator">{date_separator}</div>\n\n')
 
         html_file.write(msg.create_html())
@@ -321,7 +324,8 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
     file_move_thread.join()
 
 
-def process_single_chat(input_file: str, group_chat: bool, sender_name: str, recipient_name: str, html_file_name: str, output_dir: str):
+def process_single_chat(input_file: str, group_chat: bool, sender_name: str, recipient_name: str, html_file_name: str,
+                        output_dir: str):
     """Process a single chat completely."""
     if extract_zip(input_file):
         write_to_file(group_chat, sender_name, recipient_name, html_file_name, output_dir)
