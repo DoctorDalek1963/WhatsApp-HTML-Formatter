@@ -94,7 +94,8 @@ and a boolean representing whether it's a message from a group chat."""
 
         # If this is a group chat and this isn't the sender, add the recipient's name
         if self.__group_chat and self.__name != senderName:
-            recipient_name = f'<span class="recipient-name">{self.__name}</span>\n\t'
+            css_formatted_name = '.' + self.__name.replace(' ', '-')
+            recipient_name = f'<span class="recipient-name {css_formatted_name}">{self.__name}</span>\n\t'
         else:
             recipient_name = ''
 
