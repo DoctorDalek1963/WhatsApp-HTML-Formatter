@@ -48,23 +48,32 @@ class Message:
 It takes two arguments, a string representing the original message,
 and a boolean representing whether it's a message from a group chat."""
         self.__group_chat = group_chat_flag
-
         original = original_string
-        self.__prefix = re.match(prefixPattern, original).group(0)
 
-        # Only split once to avoid breaking attachment messages
-        self.__content = original.split(": ", 1)[1]
+        try:
+            self.__prefix_match = re.match(fullPrefixPattern, original)
+            self.__prefix = self.__prefix_match.group(1)
 
-        if re.match(attachmentPattern, self.__content):
-            self.__content = add_attachments(self.__content)
-        else:
-            self.__content = format_content(self.__content)
+            self.__name = self.__prefix_match.group(2)
+            self.__content = self.__prefix_match.group(3)
 
-        message_info_match = re.match(prefixPattern, self.__prefix)
+            if re.match(attachmentPattern, self.__content):
+                self.__content = add_attachments(self.__content)
+            else:
+                self.__content = format_content(self.__content)
 
-        date_raw = message_info_match.group(1)
-        self.__name = message_info_match.group(2)
+            self.__group_chat_meta = False
 
+        except AttributeError:
+            self.__prefix_match = re.match(groupMetaPrefixPattern, original)
+            self.__prefix = self.__prefix_match.group(1)
+
+            self.__name = ''
+            self.__content = self.__prefix_match.group(2)
+
+            self.__group_chat_meta = True
+
+        date_raw = self.__prefix_match.group(1)
         # Reformat date and time to be more readable
         date_obj = datetime.strptime(date_raw, "%d/%m/%Y, %I:%M:%S %p")
 
