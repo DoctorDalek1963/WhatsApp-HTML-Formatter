@@ -314,8 +314,10 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
     if not os.path.isdir(f"{outputDir}/Library"):
         copytree("Library", f"{outputDir}/Library")
 
-    if not os.path.isdir(f"{outputDir}/Attachments/{htmlFileName}"):
+    if not os.path.isdir(f"{outputDir}/Attachments"):
         os.mkdir(f"{outputDir}/Attachments")
+
+    if not os.path.isdir(f"{outputDir}/Attachments/{htmlFileName}"):
         os.mkdir(f"{outputDir}/Attachments/{htmlFileName}")
 
     text_thread = threading.Thread(target=write_text, args=[chat_title, group_chat])
