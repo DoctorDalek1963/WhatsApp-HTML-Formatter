@@ -1,7 +1,11 @@
+# Pycharm project directory
 .idea/
+
+# Python byte code
 __pycache__/
+
+# Temporary directory to extract zip files to
 temp/
-Java-Formatter/
 
 # Ignore all zip files
 *.zip
