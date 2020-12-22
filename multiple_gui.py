@@ -29,7 +29,7 @@ startProcessingFlag = endProcessingFlag = addToListFlag = False
 groupChat = False
 allChatsList = []
 
-descriptionText = """Steps:\n\n
+instructionsText = """Steps:\n\n
 1. Select a single exported chat\n
 2. Tick the box if the chat is a group chat\n
 3. Enter the name of the sender (this is your WhatsApp alias)\n
@@ -111,7 +111,7 @@ group_chat_checkbox_var = IntVar()
 # ===== Create widgets
 
 # Instructions for use
-description_label = tk.Label(root, text=descriptionText)
+instructions_label = tk.Label(root, text=instructionsText)
 
 # Create input widgets
 select_zip_button = tk.Button(root, text='Select an exported chat', command=select_zip)
@@ -142,7 +142,7 @@ exit_button = tk.Button(root, text='Exit', command=root.destroy, bd=3)
 # ===== Place widgets
 
 # Instructions for use
-description_label.grid(row=1, rowspan=13, column=0, pady=15, padx=(default_x_padding, 50))
+instructions_label.grid(row=1, rowspan=13, column=0, pady=15, padx=(default_x_padding, 50))
 
 # Place input widgets
 select_zip_button.grid(row=0, column=2, padx=default_x_padding, pady=(15, default_y_padding))
