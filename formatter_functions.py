@@ -374,9 +374,9 @@ Each list contains the input file, a group chat boolean, the sender name, the ti
 the file name, and the output directory.
 
 It should look like this:
-[[inputFile, groupChat, senderName, chatTitle, fileName, outputDir],
-[inputFile, groupChat, senderName, chatTitle, fileName, outputDir],
-[inputFile, groupChat, senderName, chatTitle, fileName, outputDir], ...]"""
+[[inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir],
+[inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir],
+[inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir], ...]"""
 
     for chat_data in chat_list:
         process_single_chat(chat_data[0], chat_data[1], chat_data[2], chat_data[3], chat_data[4], chat_data[5])
