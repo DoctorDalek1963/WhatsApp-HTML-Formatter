@@ -7,6 +7,9 @@ __pycache__/
 # Temporary directory to extract zip files to
 temp/
 
+# Compiled exe
+formatter.exe
+
 # Ignore all zip files
 *.zip
 
