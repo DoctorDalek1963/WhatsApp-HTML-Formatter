@@ -1,91 +1,156 @@
 * { /* Styles for everything */
-	font-family: "Helvetica Neue", Helvetica, sans-serif;
-	font-size: 20px;
-	color: white;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    font-size: 20px;
+    color: white;
 }
+
 body { /* Display style for background image & body */
-	background-image: url('background_image.jpg');
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-attachment: fixed;
-	font-size: 100%;
+    background-image: url('background_image.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    font-size: 100%;
 }
-img, video { /* Size of images */
-	max-height: 400px;
-	max-width: 800px;
-	width: auto;
+
+video { /* Size of images */
+    max-height: 400px;
+    max-width: 800px;
+    width: auto;
 }
+
 audio {
-	width: 400px;
+    width: 400px;
 }
+
 .message-block { /* Positions all messages */
-	margin-top: 110px;
-	margin-left: 10px;
-	margin-right: 10px;
+    margin-top: 110px;
+    margin-left: 10px;
+    margin-right: 10px;
+
+    display: flex;
+    flex-direction: column;
 }
+
 h3 { /* Style for name at top */
-	text-align: center;
-	margin-top: 25px;
-	vertical-align: middle;
-	font-size: 40px;
+    text-align: center;
+    font-size: 40px;
+
+    margin-top: 25px;
+    vertical-align: middle;
 }
+
+.recipient-name { /* The recipient's name in the case of a group chat */
+    font-size: 85%;
+
+    font-weight: bold;
+    color: #ff0000;
+}
+
 .time { /* The timestamp in the bottom right of messages */
-	bottom: 2px;
+    bottom: 2px;
 }
+
 .date { /* The datestamp in the top right of messages */
-	top: 2px;
+    top: 2px;
 }
+
 .message-info { /* The message information at the right of messages */
-	color: #7f7f84;
-	font-size: 50%;
-	position: absolute;
-	right: 2px;
+    color: #7f7f7f;
+    font-size: 50%;
+
+    text-align: right;
+    width: 100%;
+
+    display: block;
 }
+
 .ui { /* The black bar at the top containing the recipient name */
-	background-color: #171717;
-	position: fixed;
-	margin: -10px;
-	margin-top: -110px;
-	width: 100%;
-	height: 90px;
-	z-index: 100;
+    background-color: #171717;
+    position: fixed;
+
+    margin: -10px;
+    margin-top: -110px;
+
+    width: 100%;
+    height: 90px;
+
+    z-index: 100;
 }
+
 .date-separator { /* The floating divs marking different days */
-	border-radius: 5px;
-	background-color: #7f7f84;
-	opacity: 0.8;
-	text-align: center;
-	padding: 3px;
-	border: 10px;
-	position: relative;
-	width: 20%;
-	margin: auto;
-	margin-bottom: 15px;
-	clear: both; /* What does this mean? Who knows? But it makes it work */
+    border-radius: 5px;
+
+    background-color: #7f7f84;
+    opacity: 0.8;
+
+    text-align: center;
+
+    padding: 3px;
+    border: 10px;
+
+    width: 20%;
+
+    margin: auto;
+    margin-bottom: 15px;
 }
+
+.group-chat-meta { /* Rules for meta messages in group chats. Like 'Person A added Person B' */
+    border-radius: 5px;
+
+    background-color: #535353;
+    opacity: 0.8;
+
+    text-align: center;
+
+    padding: 3px;
+    border: 10px;
+
+    width: 20%;
+
+    margin: auto;
+    margin-bottom: 15px;
+}
+
+.group-chat-meta p {
+    margin: 0;
+}
+
+.group-chat-meta .message-info {
+    color: #aaaaaa;
+}
+
 .message { /* Style for all messages */
-	margin: 5px 0; /* Sets 5px margins at top & bottom */
-	max-width: 60%;
-	clear: both;
-	float: left;
-	padding: 5px;
-	padding-right: 67px;
-	padding-top: 13px;
-	border-radius: 5px;
-	font-size: 1em;
-    position: relative;
-	min-width: 60px;
-	width: auto;
+    margin: 5px 0; /* Sets 5px margins at top & bottom */
+
+    max-width: 60%;
+    min-width: 60px;
+
+    margin-right: auto;
+
+    padding: 5px;
+
+    border-radius: 5px;
+    font-size: 1em;
+
+    word-wrap: break-word;
 }
+
+.message p { /* Remove margins on p tags in messages */
+    margin: 0;
+}
+
 code { /* Monospaced code blocks in messages */
-	font-family: "Consolas", Courier, monospace;
+    font-family: "Consolas", Courier, monospace;
 }
+
 div span { /* Sets brightness of message-info span inside div */
-	filter: brightness(120%);
+    filter: brightness(120%);
 }
+
 .recipient { /* Style for the recipient */
-	background-color: #3c3c3e;
+    background-color: #3c3c3e;
 }
+
 .sender { /* Style for the sender */
-	background-color: #0f5247;
+    background-color: #0f5247;
 }
