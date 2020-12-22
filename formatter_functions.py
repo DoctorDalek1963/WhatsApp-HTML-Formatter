@@ -32,36 +32,48 @@ formatDict = {"_": "em", "*": "strong", "~": "del"}  # Dict of format chars with
 nonConversionExtensions = ("jpg", "png", "webp", "gif", "mp4", "mp3", "ogg", "wav")
 
 cwd = os.getcwd()
-recipientName = outputDir = ""
+senderName = htmlFileName = outputDir = ""
 
 # RegEx patterns
-prefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (\w+): (.+)?")
+fullPrefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (\w+): ((.|\n)+)")
+groupMetaPrefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (.+)")
 attachmentPattern = re.compile(r"<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$")
 linkPattern = re.compile(r"(https?://)?(\w{3,}\.)?([^.\s]+\.[^.\s]+)(\.html?)?")
 
-# A number to increment if the user chooses to process several chats with the same name
-# Produces `name.html, name (1).html, name (2).html ...`
-sameNameNumber = 1
-
 
 class Message:
-    def __init__(self, original_string: str):
+    def __init__(self, original_string: str, group_chat_flag: bool):
+        """Create a Message object.
+
+It takes two arguments, a string representing the original message,
+and a boolean representing whether it's a message from a group chat."""
+        self.__group_chat = group_chat_flag
         original = original_string
-        self.prefix = re.match(prefixPattern, original).group(0)
 
-        # Only split once to avoid breaking attachment messages
-        self.content = original.split(": ", 1)[1]
+        try:
+            self.__prefix_match = re.match(fullPrefixPattern, original)
+            self.__prefix = self.__prefix_match.group(1)
 
-        if re.match(attachmentPattern, self.content):
-            self.content = add_attachments(self.content)
-        else:
-            self.content = format_content(self.content)
+            self.__name = self.__prefix_match.group(2)
+            self.__content = self.__prefix_match.group(3)
 
-        message_info_match = re.match(prefixPattern, self.prefix)
+            if re.match(attachmentPattern, self.__content):
+                self.__content = add_attachments(self.__content)
+            else:
+                self.__content = format_content(self.__content)
 
-        date_raw = message_info_match.group(1)
-        self.name = message_info_match.group(2)
+            self.__group_chat_meta = False
 
+        except AttributeError:
+            self.__prefix_match = re.match(groupMetaPrefixPattern, original)
+            self.__prefix = self.__prefix_match.group(1)
+
+            self.__name = ''
+            self.__content = self.__prefix_match.group(2)
+
+            self.__group_chat_meta = True
+
+        date_raw = self.__prefix_match.group(1)
         # Reformat date and time to be more readable
         date_obj = datetime.strptime(date_raw, "%d/%m/%Y, %I:%M:%S %p")
 
@@ -69,26 +81,47 @@ class Message:
         if day.startswith("0"):
             day = day.replace("0", "", 1)  # Remove a leading 0
 
-        self.date = datetime.strftime(date_obj, f"%a {day} %B %Y")
-        self.time = datetime.strftime(date_obj, "%I:%M:%S %p")
+        self.__date = datetime.strftime(date_obj, f"%a {day} %B %Y")
+        self.__time = datetime.strftime(date_obj, "%I:%M:%S %p")
 
-        if self.time.startswith("0"):
-            self.time = self.time.replace("0", "", 1)
+        if self.__time.startswith("0"):
+            self.__time = self.__time.replace("0", "", 1)
 
     def __repr__(self):
         # Use hex here at end to give memory location of Message object
-        return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self.name}", ' + \
-               f'date="{self.date}", and time="{self.time}" at {hex(id(self))}>'
+        if not self.__group_chat_meta:
+            return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self.__name}", ' \
+                   f'date="{self.__date}", time="{self.__time}", and group_chat={self.__group_chat} at {hex(id(self))}>'
+        else:
+            return f'<{self.__class__.__module__}.{self.__class__.__name__} object with date="{self.__date}", ' \
+                   f'time="{self.__time}", and group_chat={self.__group_chat}, which is a meta message at ' \
+                   f'{hex(id(self))}>'
+
+    def get_date(self):
+        return self.__date
 
     def create_html(self) -> str:
-        """Create HTML code from Message object."""
-        if self.name == recipientName:
-            sender_type = 'recipient'
-        else:
-            sender_type = 'sender'
+        """Create HTML from Message object."""
+        if not self.__group_chat_meta:
+            if self.__name == senderName:
+                sender_type = 'sender'
+            else:
+                sender_type = 'recipient'
 
-        return f'<div class="message {sender_type}">\n\t<span class="message-info time">{self.time}</span>\n\t' + \
-               f'<span class="message-info date">{self.date}</span>\n\t\t{self.content}\n</div>\n\n'
+            # If this is a group chat and this isn't the sender, add the recipient's name
+            if self.__group_chat and self.__name != senderName:
+                css_formatted_name = self.__name.replace(' ', '-')
+                recipient_name = f'<span class="recipient-name {css_formatted_name}">{self.__name}</span>'
+            else:
+                recipient_name = ''
+
+            return f'<div class="message {sender_type}">\n\t{recipient_name}\n\t<span class="message-info date">' \
+                   f'{self.__date}</span>\n\t\t<p>{self.__content}</p>\n\t<span class="message-info time">' \
+                   f'{self.__time}</span>\n</div>\n\n'
+
+        else:  # If a meta message in a group chat
+            return f'<div class="group-chat-meta">\n\t<span class="message-info date">{self.__date}</span>\n\t\t' \
+                   f'<p>{self.__content}</p>\n\t<span class="message-info time">{self.__time}</span>\n</div>\n\n'
 
 
 def clean_html(string: str) -> str:
@@ -146,8 +179,8 @@ def format_links(string: str) -> str:
 
     if link_matches:
         for link in link_matches:
-            if re.match(r"\d+\.\d+", link):
-                continue  # If decimal, ignore it
+            if re.match(r"[^A-Za-z]+(\.[^A-Za-z])+", link) and not re.match(r"(\d+\.){3}\d", link):
+                continue  # If not proper link but also not IP address, skip
 
             if not link.startswith("http"):
                 working_link = f"http://{link}"  # Create URLs from non URL links
@@ -181,8 +214,8 @@ def add_attachments(message_content: str) -> str:
     if file_type == "AUDIO":
         for ext, html_format in htmlAudioFormats.items():
             if extension == ext:
-                message_content = f'<audio controls>\n\t\t\t' + \
-                                  f'<source src="{recipientName}/{filename}" type="audio/{html_format}">\n\t\t</audio>'
+                message_content = f'<audio controls>\n\t\t\t<source src="Attachments/{htmlFileName}/{filename}" ' \
+                                  f'type="audio/{html_format}">\n\t\t</audio>'
                 break
 
         else:  # If none of the standard html audio formats broke out of the for loop, convert to .mp3
@@ -190,62 +223,61 @@ def add_attachments(message_content: str) -> str:
                 f"temp/{filename_no_extension}.mp3", format="mp3")
             os.remove(f"temp/{filename}")
             filename = filename_no_extension + ".mp3"
-            message_content = f'<audio controls>\n\t\t\t' + \
-                              f'<source src="{recipientName}/{filename}" type="audio/mpeg">\n\t\t</audio>'
-            os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/{recipientName}/{filename}")
+            message_content = f'<audio controls>\n\t\t\t' \
+                              f'<source src="Attachments/{htmlFileName}/{filename}" type="audio/mpeg">\n\t\t</audio>'
+            os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/Attachments/{htmlFileName}/{filename}")
 
     elif file_type == "VIDEO":
-        message_content = f'<video controls>\n\t\t\t<source src="{recipientName}/{filename}">\n\t\t</video>'
+        message_content = f'<video controls>\n\t\t\t<source src="Attachments/{htmlFileName}/{filename}">\n\t\t</video>'
 
     elif file_type == "PHOTO" or "GIF":
-        message_content = f'<img src="{recipientName}/{filename}" alt="IMAGE ATTACHMENT">'
+        message_content = f'<img class="small" src="Attachments/{htmlFileName}/{filename}" alt="IMAGE ATTACHMENT" ' \
+                           'style="max-height: 400px; max-width: 800px; display: inline-block;">'
     else:
         message_content = f'UNKNOWN ATTACHMENT "{filename}"'
 
     return message_content
 
 
-def write_text():
-    """Write all text in _chat.txt to HTML file.
-Convert all non-recognised audio files and move them."""
-    global sameNameNumber
+def write_text(chat_title: str, group_chat: bool):
+    """Write all text in _chat.txt to HTML file."""
     date_separator = ""
 
     with open("temp/_chat.txt", encoding="utf-8") as f:
         chat_txt = f.read().replace("\u200e", "")
 
     # Add number to end of file if the file already exists
-    if not os.path.isfile(f"{outputDir}/{recipientName}.html"):
-        html_file = open(f"{outputDir}/{recipientName}.html", "w+", encoding="utf-8")
+    if not os.path.isfile(f"{outputDir}/{htmlFileName}.html"):
+        html_file = open(f"{outputDir}/{htmlFileName}.html", "w+", encoding="utf-8")
     else:
-        while os.path.isfile(f"{outputDir}/{recipientName} ({sameNameNumber}).html"):
-            sameNameNumber += 1
-        html_file = open(f"{outputDir}/{recipientName} ({sameNameNumber}).html", "w+", encoding="utf-8")
-        sameNameNumber += 1
+        same_name_number = 1
+        while os.path.isfile(f"{outputDir}/{htmlFileName} ({same_name_number}).html"):
+            same_name_number += 1
+        html_file = open(f"{outputDir}/{htmlFileName} ({same_name_number}).html", "w+", encoding="utf-8")
 
     with open("start_template.txt", encoding="utf-8") as f:
         start_template = f.readlines()  # f.readlines() preserves \n characters
 
-    # Replace recipientName in start_template
+    # Replace chat_title in start_template
     for i, line in enumerate(start_template):
-        pos = line.find("%recipName%")
-        if pos != -1:  # If "recipName" is found
-            start_template[i] = line.replace("%recipName%", recipientName)
+        pos = line.find("%chat_title%")
+        if pos != -1:  # If "chat_title" is found
+            start_template[i] = line.replace("%chat_title%", chat_title)
 
     for line in start_template:
         html_file.write(line)
 
     # Use a re.sub to place LRMs between each message and then create a list by splitting by LRM
-    chat_txt = re.sub(r"\n\[(?=\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m] \w+: )", "\u200e[", chat_txt)
+    chat_txt = re.sub(r"\n\[(?=\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m])", "\u200e[", chat_txt)
     chat_txt_list = chat_txt.split("\u200e")
 
     # ===== MAIN WRITE LOOP
 
     for string in chat_txt_list:
-        msg = Message(string)
+        msg = Message(string, group_chat)
 
-        if msg.date != date_separator:
-            date_separator = msg.date
+        if msg.get_date() != date_separator:
+            date_separator = msg.get_date()
             html_file.write(f'<div class="date-separator">{date_separator}</div>\n\n')
 
         html_file.write(msg.create_html())
@@ -259,7 +291,6 @@ Convert all non-recognised audio files and move them."""
     html_file.close()
 
     os.remove("temp/_chat.txt")
-    # os.rmdir("temp")
 
 
 def move_attachment_files():
@@ -274,7 +305,7 @@ This allows for multithreading."""
             extension = filename.split(".")[-1]
 
             if extension in nonConversionExtensions:
-                os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/{recipientName}/{filename}")
+                os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/Attachments/{htmlFileName}/{filename}")
 
 
 def extract_zip(file_dir: str):
@@ -291,21 +322,26 @@ Extract the given zip file into the temp directory."""
         return False
 
 
-def write_to_file(name: str, output_dir: str):
+def write_to_file(group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str):
     """MUST RUN extract_zip() FIRST.
 
 Go through _chat.txt, format every message, and write them all to output_dir/name.html."""
-    global recipientName, outputDir
-    recipientName = name
+    global senderName, htmlFileName, outputDir
+
+    senderName = sender_name
+    htmlFileName = html_file_name
     outputDir = output_dir
 
     if not os.path.isdir(f"{outputDir}/Library"):
         copytree("Library", f"{outputDir}/Library")
 
-    if not os.path.isdir(f"{outputDir}/{recipientName}"):
-        os.mkdir(f"{outputDir}/{recipientName}")
+    if not os.path.isdir(f"{outputDir}/Attachments"):
+        os.mkdir(f"{outputDir}/Attachments")
 
-    text_thread = threading.Thread(target=write_text)
+    if not os.path.isdir(f"{outputDir}/Attachments/{htmlFileName}"):
+        os.mkdir(f"{outputDir}/Attachments/{htmlFileName}")
+
+    text_thread = threading.Thread(target=write_text, args=[chat_title, group_chat])
     file_move_thread = threading.Thread(target=move_attachment_files)
     text_thread.start()
     file_move_thread.start()
@@ -313,19 +349,34 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
     file_move_thread.join()
 
 
-def process_single_chat(input_file: str, name: str, output_dir: str):
-    """Process a single chat completely."""
+def process_single_chat(input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str,
+                        output_dir: str):
+    """Process a single chat completely.
+
+This function takes six arguments. All except group_chat, which is a boolean, are strings.
+
+- input_file is the original zip file of the exported chat ('.zip' is necessary)
+- group_chat is True if the chat is a group chat and False if it's not
+- sender_name is the name of the sender (your WhatsApp alias)
+- chat_title is the title of the chat. This will be at the top of the page and in the title of the tab
+- html_file_name is the name of the html file to be produced ('.html' should not be part of this)
+- output_dir is the directory where the html file, Library directory, and Attachments directory should be generated"""
+
     if extract_zip(input_file):
-        write_to_file(name, output_dir)
+        write_to_file(group_chat, sender_name, chat_title, html_file_name, output_dir)
 
 
 def process_list(chat_list: list):
     """RUN TO PROCESS MULTIPLE CHATS. PASSED AS A LIST OF LISTS.
 
 chat_list is a list of lists.
-Each list contains the input file, the recipient name, and the output directory.
-It should look like [[inputFile, name, outputDir], [inputFile, name, outputDir], ...]"""
-    global sameNameNumber
+Each list contains the input file, a group chat boolean, the sender name, the title of the chat,
+the file name, and the output directory.
+
+It should look like this:
+[[inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir],
+[inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir],
+[inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir], ...]"""
+
     for chat_data in chat_list:
-        process_single_chat(chat_data[0], chat_data[1], chat_data[2])
-    sameNameNumber = 1
+        process_single_chat(chat_data[0], chat_data[1], chat_data[2], chat_data[3], chat_data[4], chat_data[5])
