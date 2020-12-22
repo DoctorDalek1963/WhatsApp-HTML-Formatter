@@ -123,7 +123,7 @@ group_chat_checkbox = tk.Checkbutton(root, text='Group chat', variable=group_cha
 sender_name_box_label = tk.Label(root, text='Enter the name of the sender (your WhatsApp alias):')
 enter_sender_name = tk.Entry(root)
 
-chat_title_label = tk.Label(root, text='Enter the title of the chat:')
+chat_title_label = tk.Label(root, text='Enter the desired title of the chat:')
 enter_chat_title = tk.Entry(root)
 
 html_file_name_label = tk.Label(root, text='Enter the desired name of the HTML file:')
