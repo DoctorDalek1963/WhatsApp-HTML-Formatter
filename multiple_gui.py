@@ -25,7 +25,7 @@ import os
 
 cwd = os.getcwd()
 inputFile = senderName = chatTitle = htmlFileName = outputDir = ''
-startProcessingFlag = processingFlag = endProcessingFlag = addToListFlag = False
+startProcessingFlag = endProcessingFlag = addToListFlag = False
 groupChat = False
 allChatsList = []
 
@@ -173,7 +173,7 @@ def update_loop():
     """Infinite loop to continually update the root tkinter window and check for conditions
 to activate/deactivate buttons."""
     global inputFile, senderName, outputDir, allChatsList
-    global startProcessingFlag, processingFlag, endProcessingFlag, addToListFlag
+    global startProcessingFlag, endProcessingFlag, addToListFlag
 
     while True:
         try:
@@ -203,7 +203,6 @@ to activate/deactivate buttons."""
 
             if startProcessingFlag:
                 startProcessingFlag = False
-                processingFlag = True
 
                 process_thread = threading.Thread(target=process_all_chats)
                 process_thread.start()
