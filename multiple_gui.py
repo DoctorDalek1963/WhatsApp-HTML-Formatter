@@ -24,7 +24,7 @@ import threading
 import os
 
 cwd = os.getcwd()
-inputFile = outputDir = recipientName = ''
+inputFile = senderName = chatTitle = htmlFileName = outputDir = ''
 startProcessingFlag = processingFlag = endProcessingFlag = addToListFlag = False
 groupChat = False
 allChatsList = []
@@ -73,7 +73,7 @@ def add_to_list():
     """Add the current data to the list 'allChatsList' to be processed later."""
     global addToListFlag
     addToListFlag = True
-    allChatsList.append([inputFile, recipientName, outputDir])
+    allChatsList.append([inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir])
 
 
 def start_processing():
@@ -178,14 +178,14 @@ to activate/deactivate buttons."""
     while True:
         try:
             if enter_sender_name.get():
-                recipientName = enter_sender_name.get()
+                senderName = enter_sender_name.get()
 
             truncated_input_zip = inputFile.split('/')[-1]
             selected_zip_var.set(f'Selected: \n{truncated_input_zip}')
 
             selected_output_var.set(f'Selected: \n{outputDir}')
 
-            if inputFile and recipientName and outputDir:
+            if inputFile and senderName and chatTitle and htmlFileName and outputDir:
                 add_to_list_button.config(state='normal')
             else:
                 add_to_list_button.config(state='disabled')
@@ -194,7 +194,7 @@ to activate/deactivate buttons."""
                 addToListFlag = False
                 inputFile = ''
                 enter_sender_name.delete(0, tk.END)  # Clear entry box
-                recipientName = ''
+                senderName = ''
 
             if allChatsList:
                 process_all_button.config(state='normal')
@@ -214,7 +214,7 @@ to activate/deactivate buttons."""
                 inputFile = ''
                 outputDir = ''
                 enter_sender_name.delete(0, tk.END)  # Clear entry box
-                recipientName = ''
+                senderName = ''
 
                 select_zip_button.config(state='disabled')
                 enter_sender_name.config(state='disabled')
