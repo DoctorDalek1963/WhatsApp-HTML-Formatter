@@ -5,7 +5,7 @@ $(function () {
             $(this).animate({'max-height': '80vh', 'max-width': '80vw'}, 200);
         } else {
             $(this).removeClass('large').addClass('small');
-            $(this).animate({'max-height': '400px', 'max-width': '800px', 'width': 'auto'}, 200);
+            $(this).animate({'max-height': '400px', 'max-width': '800px'}, 200);
         }
     });
 });
