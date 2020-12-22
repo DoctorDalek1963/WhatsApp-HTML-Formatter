@@ -24,8 +24,10 @@ import threading
 import os
 
 cwd = os.getcwd()
-inputZip = outputDir = recipientName = ""
-startProcessingFlag = processingFlag = endProcessingFlag = addToListFlag = False
+inputZip = outputDir = recipientName = ''
+startProcessingFlag = processingFlag = endProcessingFlag = False
+addToListFlag = False
+groupChat = False
 allChatsList = []
 
 descriptionText = """Steps:\n
@@ -41,19 +43,20 @@ descriptionText = """Steps:\n
 
 default_x_padding = 10
 default_y_padding = 5
+gap_y_padding = (5, 15)
 
 # ===== Functions to be used on tk buttons
 
 
 def select_zip():
     global inputZip
-    inputZip = filedialog.askopenfilename(initialdir=cwd, title="Select an exported chat",
-                                          filetypes=[("Zip files", "*.zip")])
+    inputZip = filedialog.askopenfilename(initialdir=cwd, title='Select an exported chat',
+                                          filetypes=[('Zip files', '*.zip')])
 
 
 def select_output_dir():
     global outputDir
-    outputDir = filedialog.askdirectory(initialdir="/", title="Select an output directory")
+    outputDir = filedialog.askdirectory(initialdir='/', title='Select an output directory')
 
 
 def add_to_list():
@@ -77,9 +80,9 @@ def process_all_chats():
 
 # Init window
 root = tk.Tk()
-root.title("WhatsApp Formatter")
+root.title('WhatsApp Formatter')
 root.resizable(False, False)
-root.iconbitmap("Library/favicon.ico")
+root.iconbitmap('Library/favicon.ico')
 
 selected_zip_var = StringVar()
 selected_output_var = StringVar()
@@ -88,24 +91,33 @@ processing_string_var = StringVar()
 
 # ===== Create widgets
 
-# Create input widgets
-select_zip_button = tk.Button(root, text="Select an exported chat", command=select_zip)
-selected_zip_label = tk.Label(root, textvariable=selected_zip_var)
-
-select_output_button = tk.Button(root, text="Select an output directory", command=select_output_dir)
-selected_output_label = tk.Label(root, textvariable=selected_output_var)
-
-name_box_label = tk.Label(root, text="Enter the name of the recipient:")
-enter_name_box = tk.Entry(root)
-
 # Instructions for use
 description_label = tk.Label(root, text=descriptionText)
 
+# Create input widgets
+select_zip_button = tk.Button(root, text='Select an exported chat', command=select_zip)
+selected_zip_label = tk.Label(root, textvariable=selected_zip_var)
+
+group_chat_checkbox = tk.Checkbutton(root, text='Group chat', variable=groupChat,
+                                     onvalue=True, offvalue=False)
+
+sender_name_box_label = tk.Label(root, text='Enter the name of the recipient:')
+enter_sender_name = tk.Entry(root)
+
+chat_title_label = tk.Label(root, text='Enter the title of the chat:')
+enter_chat_title = tk.Entry(root)
+
+html_file_name_label = tk.Label(root, text='Enter the desired name of the HTML file:')
+enter_html_file_name = tk.Entry(root)
+
+select_output_button = tk.Button(root, text='Select an output directory', command=select_output_dir)
+selected_output_label = tk.Label(root, textvariable=selected_output_var)
+
 # Create special button widgets
-add_to_list_button = tk.Button(root, text="Add to list", command=add_to_list, state="disabled", bd=3)
-process_all_button = tk.Button(root, text="Process all", command=start_processing, state="disabled", bd=3)
+add_to_list_button = tk.Button(root, text='Add to list', command=add_to_list, state='disabled', bd=3)
+process_all_button = tk.Button(root, text='Process all', command=start_processing, state='disabled', bd=3)
 processing_string_label = tk.Label(root, textvariable=processing_string_var)
-exit_button = tk.Button(root, text="Exit", command=root.destroy, bd=3)
+exit_button = tk.Button(root, text='Exit', command=root.destroy, bd=3)
 
 
 # ===== Place widgets
@@ -113,23 +125,29 @@ exit_button = tk.Button(root, text="Exit", command=root.destroy, bd=3)
 # Instructions for use
 description_label.grid(row=1, rowspan=8, column=0, pady=15, padx=(default_x_padding, 30))
 
-# Select zip and display name
+# Place input widgets
 select_zip_button.grid(row=0, column=2, padx=default_x_padding, pady=default_y_padding)
-selected_zip_label.grid(row=1, column=2, padx=default_x_padding, pady=(default_y_padding, 15))
+selected_zip_label.grid(row=1, column=2, padx=default_x_padding, pady=gap_y_padding)
 
-# Select output directory and display it
-select_output_button.grid(row=2, column=2, padx=default_x_padding, pady=default_y_padding)
-selected_output_label.grid(row=3, column=2, padx=default_x_padding, pady=(default_y_padding, 15))
+group_chat_checkbox.grid(row=2, column=2, padx=default_x_padding, pady=gap_y_padding)
 
-# Enter recipient name
-name_box_label.grid(row=4, column=2, padx=default_x_padding, pady=default_y_padding)
-enter_name_box.grid(row=5, column=2, padx=default_x_padding, pady=(default_y_padding, 25))
+sender_name_box_label.grid(row=3, column=2, padx=default_x_padding, pady=default_y_padding)
+enter_sender_name.grid(row=4, column=2, padx=default_x_padding, pady=gap_y_padding)
+
+chat_title_label.grid(row=5, column=2, padx=default_x_padding, pady=default_y_padding)
+enter_chat_title.grid(row=6, column=2, padx=default_x_padding, pady=gap_y_padding)
+
+html_file_name_label.grid(row=7, column=2, padx=default_x_padding, pady=default_y_padding)
+enter_html_file_name.grid(row=8, column=2, padx=default_x_padding, pady=gap_y_padding)
+
+select_output_button.grid(row=9, column=2, padx=default_x_padding, pady=default_y_padding)
+selected_output_label.grid(row=10, column=2, padx=default_x_padding, pady=(default_y_padding, 25))
 
 # Place special button widgets
-add_to_list_button.grid(row=6, column=2, padx=default_x_padding, pady=default_y_padding)
-process_all_button.grid(row=7, column=2, padx=default_x_padding, pady=default_y_padding)
-processing_string_label.grid(row=8, column=2, padx=default_x_padding, pady=default_y_padding)
-exit_button.grid(row=9, column=2, padx=default_x_padding, pady=default_y_padding)
+add_to_list_button.grid(row=11, column=2, padx=default_x_padding, pady=default_y_padding)
+process_all_button.grid(row=12, column=2, padx=default_x_padding, pady=default_y_padding)
+processing_string_label.grid(row=13, column=2, padx=default_x_padding, pady=default_y_padding)
+exit_button.grid(row=14, column=2, padx=default_x_padding, pady=default_y_padding)
 
 # ===== Loop to sustain window
 
@@ -142,29 +160,29 @@ def update_loop():
 
     while True:
         try:
-            if enter_name_box.get():
-                recipientName = enter_name_box.get()
+            if enter_sender_name.get():
+                recipientName = enter_sender_name.get()
 
-            truncated_input_zip = inputZip.split("/")[-1]
-            selected_zip_var.set(f"Selected: \n{truncated_input_zip}")
+            truncated_input_zip = inputZip.split('/')[-1]
+            selected_zip_var.set(f'Selected: \n{truncated_input_zip}')
 
-            selected_output_var.set(f"Selected: \n{outputDir}")
+            selected_output_var.set(f'Selected: \n{outputDir}')
 
             if inputZip and recipientName and outputDir:
-                add_to_list_button.config(state="normal")
+                add_to_list_button.config(state='normal')
             else:
-                add_to_list_button.config(state="disabled")
+                add_to_list_button.config(state='disabled')
 
             if addToListFlag:
                 addToListFlag = False
-                inputZip = ""
-                enter_name_box.delete(0, tk.END)  # Clear entry box
-                recipientName = ""
+                inputZip = ''
+                enter_sender_name.delete(0, tk.END)  # Clear entry box
+                recipientName = ''
 
             if allChatsList:
-                process_all_button.config(state="normal")
+                process_all_button.config(state='normal')
             else:
-                process_all_button.config(state="disabled")
+                process_all_button.config(state='disabled')
 
             if startProcessingFlag:
                 startProcessingFlag = False
@@ -172,27 +190,27 @@ def update_loop():
 
                 process_thread = threading.Thread(target=process_all_chats)
                 process_thread.start()
-                processing_string_var.set("Processing...")
+                processing_string_var.set('Processing...')
 
                 # Allow 'process all' button to be greyed out
                 allChatsList = []
-                inputZip = ""
-                outputDir = ""
-                enter_name_box.delete(0, tk.END)  # Clear entry box
-                recipientName = ""
+                inputZip = ''
+                outputDir = ''
+                enter_sender_name.delete(0, tk.END)  # Clear entry box
+                recipientName = ''
 
-                select_zip_button.config(state="disabled")
-                select_output_button.config(state="disabled")
-                enter_name_box.config(state="disabled")
-                exit_button.config(state="disabled")
+                select_zip_button.config(state='disabled')
+                select_output_button.config(state='disabled')
+                enter_sender_name.config(state='disabled')
+                exit_button.config(state='disabled')
 
             if endProcessingFlag:
-                processing_string_var.set("")
+                processing_string_var.set('')
 
-                select_zip_button.config(state="normal")
-                select_output_button.config(state="normal")
-                enter_name_box.config(state="normal")
-                exit_button.config(state="normal")
+                select_zip_button.config(state='normal')
+                select_output_button.config(state='normal')
+                enter_sender_name.config(state='normal')
+                exit_button.config(state='normal')
 
                 endProcessingFlag = False
 
