@@ -142,7 +142,7 @@ exit_button = tk.Button(root, text='Exit', command=root.destroy, bd=3)
 # ===== Place widgets
 
 # Instructions for use
-description_label.grid(row=1, rowspan=8, column=0, pady=15, padx=(default_x_padding, 50))
+description_label.grid(row=1, rowspan=13, column=0, pady=15, padx=(default_x_padding, 50))
 
 # Place input widgets
 select_zip_button.grid(row=0, column=2, padx=default_x_padding, pady=default_y_padding)
