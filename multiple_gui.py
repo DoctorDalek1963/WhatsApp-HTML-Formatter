@@ -62,7 +62,7 @@ def select_output_dir():
 def add_to_list():
     global addToListFlag
     addToListFlag = True
-    allChatsList.append([inputZip, recipientName, outputDir])
+    allChatsList.append([inputFile, recipientName, outputDir])
 
 
 def start_processing():
@@ -155,7 +155,7 @@ exit_button.grid(row=14, column=2, padx=default_x_padding, pady=default_y_paddin
 
 
 def update_loop():
-    global inputZip, recipientName, outputDir, allChatsList
+    global inputFile, recipientName, outputDir, allChatsList
     global startProcessingFlag, processingFlag, endProcessingFlag, addToListFlag
 
     while True:
@@ -163,19 +163,19 @@ def update_loop():
             if enter_sender_name.get():
                 recipientName = enter_sender_name.get()
 
-            truncated_input_zip = inputZip.split('/')[-1]
+            truncated_input_zip = inputFile.split('/')[-1]
             selected_zip_var.set(f'Selected: \n{truncated_input_zip}')
 
             selected_output_var.set(f'Selected: \n{outputDir}')
 
-            if inputZip and recipientName and outputDir:
+            if inputFile and recipientName and outputDir:
                 add_to_list_button.config(state='normal')
             else:
                 add_to_list_button.config(state='disabled')
 
             if addToListFlag:
                 addToListFlag = False
-                inputZip = ''
+                inputFile = ''
                 enter_sender_name.delete(0, tk.END)  # Clear entry box
                 recipientName = ''
 
@@ -194,7 +194,7 @@ def update_loop():
 
                 # Allow 'process all' button to be greyed out
                 allChatsList = []
-                inputZip = ''
+                inputFile = ''
                 outputDir = ''
                 enter_sender_name.delete(0, tk.END)  # Clear entry box
                 recipientName = ''

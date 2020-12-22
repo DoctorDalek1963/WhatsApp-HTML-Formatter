@@ -24,7 +24,7 @@ import threading
 import os
 
 cwd = os.getcwd()
-inputZip = ""
+inputFile = ""
 outputDir = ""
 recipName = ""
 finishExportFlag = startExportFlag = formattingFlag = False
@@ -48,7 +48,7 @@ dedicated_padding_y = 15
 
 
 def select_zip():
-    global inputZip
+    global inputFile
     inputZip = filedialog.askopenfilename(initialdir=cwd, title="Select an exported chat",
                                           filetypes=[("Zip files", "*.zip")])
 
@@ -65,7 +65,7 @@ def start_export():
 
 def process():
     global formattingFlag
-    fixed_name_zip = inputZip
+    fixed_name_zip = inputFile
     fixed_name_recip = recipName
     fixed_name_dir = outputDir
 
@@ -155,7 +155,7 @@ exit_button.grid(row=13, column=2, padx=default_x_padding, pady=default_y_paddin
 
 
 def update_loop():
-    global recipName, inputZip
+    global recipName, inputFile
     global startExportFlag, finishExportFlag, formattingFlag
 
     while True:
