@@ -145,7 +145,7 @@ exit_button = tk.Button(root, text='Exit', command=root.destroy, bd=3)
 description_label.grid(row=1, rowspan=13, column=0, pady=15, padx=(default_x_padding, 50))
 
 # Place input widgets
-select_zip_button.grid(row=0, column=2, padx=default_x_padding, pady=default_y_padding)
+select_zip_button.grid(row=0, column=2, padx=default_x_padding, pady=(15, default_y_padding))
 selected_zip_label.grid(row=1, column=2, padx=default_x_padding, pady=gap_y_padding)
 
 group_chat_checkbox.grid(row=2, column=2, padx=default_x_padding, pady=gap_y_padding)
@@ -166,7 +166,7 @@ selected_output_label.grid(row=10, column=2, padx=default_x_padding, pady=(defau
 add_to_list_button.grid(row=11, column=2, padx=default_x_padding, pady=default_y_padding)
 process_all_button.grid(row=12, column=2, padx=default_x_padding, pady=default_y_padding)
 processing_string_label.grid(row=13, column=2, padx=default_x_padding, pady=default_y_padding)
-exit_button.grid(row=14, column=2, padx=default_x_padding, pady=default_y_padding)
+exit_button.grid(row=14, column=2, padx=default_x_padding, pady=(default_y_padding, 15))
 
 
 # ===== Loop to sustain window
