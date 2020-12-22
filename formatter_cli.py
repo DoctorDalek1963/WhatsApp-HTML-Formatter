@@ -48,7 +48,7 @@ while not processFlag:
     senderName = input('Please enter the name of the sender (your WhatsApp alias): ')
     print()
 
-    chatTitle = input('Please enter the title of the chat: ')
+    chatTitle = input('Please enter the desired title of the chat: ')
     print()
 
     htmlFileName = input('Please enter the desired name of the output file: ')
@@ -72,4 +72,3 @@ print()
 print('Processing all...')
 process_list(allChats)
 print('Processing complete!')
-input()
