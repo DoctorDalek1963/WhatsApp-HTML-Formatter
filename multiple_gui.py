@@ -260,4 +260,5 @@ to activate/deactivate buttons."""
             return
 
 
-update_loop()
+if __name__ == '__main__':
+    update_loop()
