@@ -29,16 +29,20 @@ startProcessingFlag = endProcessingFlag = addToListFlag = False
 groupChat = False
 allChatsList = []
 
-descriptionText = """Steps:\n
+descriptionText = """Steps:\n\n
 1. Select a single exported chat\n
-2. Select an export directory\n
-3. Enter the name of the recipient (case sensitive)\n
-4. Click the 'Add to list' button\n
-5. Repeat steps 1-4 until you have selected all your chats\n
-6. Click the 'Process all' button\n
-7. Wait until the 'Processing...' text disappears\n
-8. This may take quite a while if you've selected several large chats\n
-9. Once the 'Exit' button is active, you can safely exit the program"""
+2. Tick the box if the chat is a group chat\n
+3. Enter the name of the sender (this is your WhatsApp alias)\n
+4. Enter the desired title of the chat (the title that will appear at
+the top of the page and in the tab title)\n
+5. Enter the desired name of the HTML file\n
+6. Select an output directory\n
+7. Click the 'Add to list' button\n
+8. Repeat steps 1-7 until you have selected all your chats\n
+9. Click the 'Process all' button\n
+10. Wait until the 'Processing...' text disappears
+(This may take quite a while if you've selected several large chats)\n
+11. Once the 'Exit' button is active, you can safely exit the program"""
 
 default_x_padding = 10
 default_y_padding = 5
