@@ -39,7 +39,7 @@ while not processFlag:
     print()
 
     groupChatRawInput = input('Is this a group chat? (Y/n) ')
-    if re.match(r'[Yy]', groupChatRawInput):
+    if re.match(r'[yY]', groupChatRawInput):
         groupChat = True
     else:
         groupChat = False
