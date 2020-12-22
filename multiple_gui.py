@@ -48,12 +48,14 @@ gap_y_padding = (5, 15)
 
 
 def select_zip():
+    """Open a file dialog to select a zip file to use as input."""
     global inputFile
     inputFile = filedialog.askopenfilename(initialdir=cwd, title='Select an exported chat',
                                            filetypes=[('Zip files', '*.zip')])
 
 
 def assign_group_chat_bool():
+    """Handle updating the groupChat boolean variable from the tkinter checkbox."""
     global groupChat
     if group_chat_checkbox_var.get() == 1:
         groupChat = True
@@ -62,22 +64,26 @@ def assign_group_chat_bool():
 
 
 def select_output_dir():
+    """Open a file dialog to select an output directory."""
     global outputDir
     outputDir = filedialog.askdirectory(initialdir='/', title='Select an output directory')
 
 
 def add_to_list():
+    """Add the current data to the list 'allChatsList' to be processed later."""
     global addToListFlag
     addToListFlag = True
     allChatsList.append([inputFile, recipientName, outputDir])
 
 
 def start_processing():
+    """Set the 'startProcessingFlag' boolean to True."""
     global startProcessingFlag
     startProcessingFlag = True
 
 
 def process_all_chats():
+    """Process every chat in 'allChatsList' and then set the 'endProcessingFlag' boolean to True."""
     global endProcessingFlag
     process_list(allChatsList)
     endProcessingFlag = True
@@ -164,7 +170,9 @@ exit_button.grid(row=14, column=2, padx=default_x_padding, pady=default_y_paddin
 
 
 def update_loop():
-    global inputFile, recipientName, outputDir, allChatsList
+    """Infinite loop to continually update the root tkinter window and check for conditions
+to activate/deactivate buttons."""
+    global inputFile, senderName, outputDir, allChatsList
     global startProcessingFlag, processingFlag, endProcessingFlag, addToListFlag
 
     while True:
