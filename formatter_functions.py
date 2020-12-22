@@ -351,7 +351,17 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
 
 def process_single_chat(input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str,
                         output_dir: str):
-    """Process a single chat completely."""
+    """Process a single chat completely.
+
+This function takes six arguments. All except group_chat, which is a boolean, are strings.
+
+- input_file is the original zip file of the exported chat ('.zip' is necessary)
+- group_chat is True if the chat is a group chat and False if it's not
+- sender_name is the name of the sender (your WhatsApp alias)
+- chat_title is the title of the chat. This will be at the top of the page and in the title of the tab
+- html_file_name is the name of the html file to be produced ('.html' should not be part of this)
+- output_dir is the directory where the html file, Library directory, and Attachments directory should be generated"""
+
     if extract_zip(input_file):
         write_to_file(group_chat, sender_name, chat_title, html_file_name, output_dir)
 
@@ -363,7 +373,8 @@ chat_list is a list of lists.
 Each list contains the input file, a group chat boolean, the sender name, the title of the chat,
 the file name, and the output directory.
 
-It should look like [[inputFile, groupChat, senderName, chatTitle, fileName, outputDir],
+It should look like this:
+[[inputFile, groupChat, senderName, chatTitle, fileName, outputDir],
 [inputFile, groupChat, senderName, chatTitle, fileName, outputDir],
 [inputFile, groupChat, senderName, chatTitle, fileName, outputDir], ...]"""
 
