@@ -164,21 +164,26 @@ process_all_button.grid(row=12, column=2, padx=default_x_padding, pady=default_y
 processing_string_label.grid(row=13, column=2, padx=default_x_padding, pady=default_y_padding)
 exit_button.grid(row=14, column=2, padx=default_x_padding, pady=default_y_padding)
 
-# ===== Loop to sustain window
 
-# Infinite loop to update tk window and check for conditions to activate or deactivate buttons
+# ===== Loop to sustain window
 
 
 def update_loop():
     """Infinite loop to continually update the root tkinter window and check for conditions
 to activate/deactivate buttons."""
-    global inputFile, senderName, outputDir, allChatsList
+    global inputFile, senderName, chatTitle, htmlFileName, outputDir, allChatsList
     global startProcessingFlag, endProcessingFlag, addToListFlag
 
     while True:
         try:
             if enter_sender_name.get():
                 senderName = enter_sender_name.get()
+
+            if enter_chat_title.get():
+                chatTitle = enter_chat_title.get()
+
+            if enter_html_file_name.get():
+                htmlFileName = enter_html_file_name.get()
 
             truncated_input_zip = inputFile.split('/')[-1]
             selected_zip_var.set(f'Selected: \n{truncated_input_zip}')
@@ -193,8 +198,16 @@ to activate/deactivate buttons."""
             if addToListFlag:
                 addToListFlag = False
                 inputFile = ''
+                group_chat_checkbox_var.set(0)  # Un-check group chat checkbox
+
                 enter_sender_name.delete(0, tk.END)  # Clear entry box
                 senderName = ''
+
+                enter_chat_title.delete(0, tk.END)
+                chatTitle = ''
+
+                enter_html_file_name.delete(0, tk.END)
+                htmlFileName = ''
 
             if allChatsList:
                 process_all_button.config(state='normal')
@@ -210,10 +223,21 @@ to activate/deactivate buttons."""
 
                 # Allow 'process all' button to be greyed out
                 allChatsList = []
+
+                # Clear all variables
                 inputFile = ''
-                outputDir = ''
+                group_chat_checkbox_var.set(0)  # Un-check group chat checkbox
+
                 enter_sender_name.delete(0, tk.END)  # Clear entry box
                 senderName = ''
+
+                enter_chat_title.delete(0, tk.END)
+                chatTitle = ''
+
+                enter_html_file_name.delete(0, tk.END)
+                htmlFileName = ''
+
+                outputDir = ''
 
                 select_zip_button.config(state='disabled')
                 enter_sender_name.config(state='disabled')
