@@ -116,7 +116,7 @@ selected_zip_label = tk.Label(root, textvariable=selected_zip_var)
 group_chat_checkbox = tk.Checkbutton(root, text='Group chat', variable=group_chat_checkbox_var,
                                      onvalue=1, offvalue=0, command=assign_group_chat_bool)
 
-sender_name_box_label = tk.Label(root, text='Enter the name of the recipient:')
+sender_name_box_label = tk.Label(root, text='Enter the name of the sender (your WhatsApp alias):')
 enter_sender_name = tk.Entry(root)
 
 chat_title_label = tk.Label(root, text='Enter the title of the chat:')
