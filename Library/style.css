@@ -43,7 +43,7 @@ h3 { /* Style for name at top */
     font-size: 85%;
 
     font-weight: bold;
-    color: red; /* TO BE FIXED. This is temporary and needs to be improved before release. */
+    color: #ff0000;
 }
 
 .time { /* The timestamp in the bottom right of messages */
