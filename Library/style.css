@@ -26,6 +26,9 @@ audio {
     margin-top: 110px;
     margin-left: 10px;
     margin-right: 10px;
+
+    display: flex;
+    flex-direction: column;
 }
 
 h3 { /* Style for name at top */
@@ -37,7 +40,7 @@ h3 { /* Style for name at top */
 }
 
 .recipient-name { /* The recipient's name in the case of a group chat */
-    font-size: 70%;
+    font-size: 85%;
 
     font-weight: bold;
     color: red; /* TO BE FIXED. This is temporary and needs to be improved before release. */
@@ -52,7 +55,7 @@ h3 { /* Style for name at top */
 }
 
 .message-info { /* The message information at the right of messages */
-    color: #7f7f84;
+    color: #7f7f7f;
     font-size: 50%;
 
     text-align: right;
@@ -85,14 +88,35 @@ h3 { /* Style for name at top */
     padding: 3px;
     border: 10px;
 
-    position: relative;
-    clear: both;
+    width: 20%;
+
+    margin: auto;
+    margin-bottom: 15px;
+}
+
+.group-chat-meta { /* Rules for meta messages in group chats. Like 'Person A added Person B' */
+    border-radius: 5px;
+
+    background-color: #535353;
+    opacity: 0.8;
+
+    text-align: center;
+
+    padding: 3px;
+    border: 10px;
 
     width: 20%;
 
     margin: auto;
     margin-bottom: 15px;
+}
 
+.group-chat-meta p {
+    margin: 0;
+}
+
+.group-chat-meta .message-info {
+    color: #aaaaaa;
 }
 
 .message { /* Style for all messages */
@@ -100,16 +124,13 @@ h3 { /* Style for name at top */
 
     max-width: 60%;
     min-width: 60px;
-    width: auto;
 
-    clear: both;
-    float: left;
+    margin-right: auto;
 
     padding: 5px;
 
     border-radius: 5px;
     font-size: 1em;
-    position: relative;
 
     word-wrap: break-word;
 }
