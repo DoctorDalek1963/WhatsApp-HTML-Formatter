@@ -21,6 +21,7 @@ from tkinter import filedialog, StringVar, IntVar
 import tkinter as tk
 import _tkinter
 import threading
+import shutil
 import os
 
 cwd = os.getcwd()
@@ -91,6 +92,7 @@ def process_all_chats():
     global endProcessingFlag
     process_list(allChatsList)
     endProcessingFlag = True
+    shutil.rmtree('temp')
 
 
 # ===== Tkinter initialisation

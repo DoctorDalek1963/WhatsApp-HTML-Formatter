@@ -18,6 +18,7 @@
 
 
 from formatter_functions import process_list
+import shutil
 import os
 import re
 
@@ -71,4 +72,5 @@ while not processFlag:
 print()
 print('Processing all...')
 process_list(allChats)
+shutil.rmtree('temp')
 print('Processing complete!')
