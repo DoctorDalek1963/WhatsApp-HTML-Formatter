@@ -6,6 +6,6 @@ a group chat. 'John Doe' is an example of how names should be formatted.
     color: #990e99;
 }
 
-span[class*="+44-07700-900461"] {
+.\+44-07700-900461 {
     color: #385cff;
 }
