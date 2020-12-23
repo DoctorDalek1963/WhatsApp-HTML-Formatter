@@ -7,6 +7,11 @@ __pycache__/
 # Temporary directory to extract zip files to
 temp/
 
+# pyinstaller stuff
+build/
+dist/
+*.spec
+
 # Compiled exe
 formatter.exe
 
