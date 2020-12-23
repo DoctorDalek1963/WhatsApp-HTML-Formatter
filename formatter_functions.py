@@ -35,7 +35,7 @@ cwd = os.getcwd()
 senderName = htmlFileName = outputDir = ""
 
 # RegEx patterns
-fullPrefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (\w+): ((.|\n)+)")
+fullPrefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] ([^:]+): ((.|\n)+)")
 groupMetaPrefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (.+)")
 attachmentPattern = re.compile(r"<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$")
 linkPattern = re.compile(r"(https?://)?(\w{3,}\.)?([^.\s]+\.[^.\s]+)(\.html?)?")
@@ -244,7 +244,7 @@ def write_text(chat_title: str, group_chat: bool):
     date_separator = ""
 
     with open("temp/_chat.txt", encoding="utf-8") as f:
-        chat_txt = f.read().replace("\u200e", "")
+        chat_txt = f.read().replace("\u200e", "").replace("\u202a", "")  # Remove LRM and LRE Unicode characters
 
     # Add number to end of file if the file already exists
     if not os.path.isfile(f"{outputDir}/{htmlFileName}.html"):
