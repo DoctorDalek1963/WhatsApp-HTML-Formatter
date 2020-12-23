@@ -13,6 +13,7 @@ A program to convert WhatsApp chats exported as zip files into formatted HTML fi
 
 ## Notices:
 - Feel free to change `Library/background-image.jpg` to whatever background image you'd like, just make sure it has the same name
+- If you're formatting a group chat, please add the participants' names to `Library/group_chat_names.css` with colours, following the examples given at the top of the file
 
 ## Dependencies:
 - [pydub](http://pydub.com/)
