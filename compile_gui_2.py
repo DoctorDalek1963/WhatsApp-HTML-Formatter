@@ -7,7 +7,7 @@ import os
 
 os.remove('WhatsApp_Formatter.spec')
 
-# Clear and remove the build director
+# Clear and remove the build directory
 shutil.rmtree('build')
 
 # Zip up compiled program with dependencies
