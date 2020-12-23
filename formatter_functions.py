@@ -110,7 +110,7 @@ and a boolean representing whether it's a message from a group chat."""
 
             # If this is a group chat and this isn't the sender, add the recipient's name
             if self.__group_chat and self.__name != senderName:
-                css_formatted_name = self.__name.replace(' ', '-')
+                css_formatted_name = self.__name.replace('\u00a0', '-')  # Replace no-break space with dash
                 recipient_name = f'<span class="recipient-name {css_formatted_name}">{self.__name}</span>'
             else:
                 recipient_name = ''
@@ -244,7 +244,7 @@ def write_text(chat_title: str, group_chat: bool):
     date_separator = ""
 
     with open("temp/_chat.txt", encoding="utf-8") as f:
-        chat_txt = f.read().replace("\u200e", "").replace("\u202a", "")  # Remove LRM and LRE Unicode characters
+        chat_txt = f.read().replace("\u200e", "").replace("\u202a", "").replace("\u202c", "")  # Remove LRM, LRE, and PDF Unicode characters
 
     # Add number to end of file if the file already exists
     if not os.path.isfile(f"{outputDir}/{htmlFileName}.html"):
