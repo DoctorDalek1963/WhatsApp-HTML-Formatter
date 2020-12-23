@@ -245,7 +245,8 @@ def write_text(chat_title: str, group_chat: bool):
     date_separator = ""
 
     with open("temp/_chat.txt", encoding="utf-8") as f:
-        chat_txt = f.read().replace("\u200e", "").replace("\u202a", "").replace("\u202c", "")  # Remove LRM, LRE, and PDF Unicode characters
+        # Read file and remove LRM, LRE, and PDF Unicode characters
+        chat_txt = f.read().replace("\u200e", "").replace("\u202a", "").replace("\u202c", "")
 
     # Add number to end of file if the file already exists
     if not os.path.isfile(f"{outputDir}/{htmlFileName}.html"):
