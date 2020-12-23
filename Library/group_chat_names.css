@@ -1,6 +1,11 @@
 /* This is a file to allow you to add different colors to different names in
-a group chat. 'John Doe' is an example of how the names should be formatted. */
+a group chat. 'John Doe' is an example of how names should be formatted.
+'+44 07700 900461' is an example of how phone numbers whould be formatted. */
 
 .John-Doe {
     color: #990e99;
+}
+
+span[class*="+44-07700-900461"] {
+    color: #385cff;
 }
