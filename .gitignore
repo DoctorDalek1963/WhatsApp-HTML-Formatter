@@ -12,10 +12,7 @@ build/
 dist/
 *.spec
 
-# Compiled exe
-formatter.exe
-
-# Ignore all zip files
+# Ignore all zip files (used for testing)
 *.zip
 
 # Except in Example/
