@@ -204,9 +204,6 @@ to activate/deactivate buttons."""
                 inputFile = ''
                 group_chat_checkbox_var.set(0)  # Un-check group chat checkbox
 
-                enter_sender_name.delete(0, tk.END)  # Clear entry box
-                senderName = ''
-
                 enter_chat_title.delete(0, tk.END)
                 chatTitle = ''
 
