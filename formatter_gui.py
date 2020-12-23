@@ -36,7 +36,7 @@ instructionsText = """Steps:\n\n
 3. Enter the name of the sender (this is your WhatsApp alias)\n
 4. Enter the desired title of the chat (the title that will appear at
 the top of the page and in the tab title)\n
-5. Enter the desired name of the HTML file\n
+5. Enter the desired name of the HTML file ('.html' should not be present)\n
 6. Select an output directory\n
 7. Click the 'Add to list' button\n
 8. Repeat steps 1-7 until you have selected all your chats\n
