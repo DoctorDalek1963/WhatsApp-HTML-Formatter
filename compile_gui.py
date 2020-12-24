@@ -17,6 +17,7 @@ try:
 except FileNotFoundError:
     pass
 
+# Run pyinstaller with correct flags from command prompt (I'm on Windows and haven't tested this on Linux or MacOS)
 os.system('cmd /c "pyinstaller formatter_gui.py -wF -n WhatsApp_Formatter --distpath ./compile_temp -i '
           'Library/favicon.ico"')
 
