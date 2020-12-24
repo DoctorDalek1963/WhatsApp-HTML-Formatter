@@ -15,3 +15,6 @@ shutil.make_archive('WhatsApp_Formatter', 'zip', 'compile_temp')
 
 # Clear and remove temporary directory
 shutil.rmtree('compile_temp')
+
+# Clear and remove __pycache__ byte code
+shutil.rmtree('__pycache__')
