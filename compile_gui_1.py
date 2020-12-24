@@ -12,3 +12,9 @@ os.mkdir('compile_temp')
 shutil.copy('start_template.txt', 'compile_temp/')
 shutil.copy('end_template.txt', 'compile_temp/')
 shutil.copytree('Library', 'compile_temp/Library')
+
+# Remove jsconfig file, which only exists on my machine
+try:
+    os.remove('compile_temp/Library/jsconfig.json')
+except FileNotFoundError:
+    pass
