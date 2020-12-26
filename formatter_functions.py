@@ -48,33 +48,33 @@ class Message:
 
 It takes two arguments, a string representing the original message,
 and a boolean representing whether it's a message from a group chat."""
-        self.__group_chat = group_chat_flag
+        self._group_chat = group_chat_flag
         original = original_string
 
         try:
-            self.__prefix_match = re.match(fullPrefixPattern, original)
-            self.__prefix = self.__prefix_match.group(1)
+            self._prefix_match = re.match(fullPrefixPattern, original)
+            self._prefix = self._prefix_match.group(1)
 
-            self.__name = self.__prefix_match.group(2)
-            self.__content = self.__prefix_match.group(3)
+            self._name = self._prefix_match.group(2)
+            self._content = self._prefix_match.group(3)
 
-            if re.match(attachmentPattern, self.__content):
-                self.__content = add_attachments(self.__content)
+            if re.match(attachmentPattern, self._content):
+                self._content = add_attachments(self._content)
             else:
-                self.__content = format_content(self.__content)
+                self._content = format_content(self._content)
 
-            self.__group_chat_meta = False
+            self._group_chat_meta = False
 
         except AttributeError:
-            self.__prefix_match = re.match(groupMetaPrefixPattern, original)
-            self.__prefix = self.__prefix_match.group(1)
+            self._prefix_match = re.match(groupMetaPrefixPattern, original)
+            self._prefix = self._prefix_match.group(1)
 
-            self.__name = ''
-            self.__content = self.__prefix_match.group(2)
+            self._name = ''
+            self._content = self._prefix_match.group(2)
 
-            self.__group_chat_meta = True
+            self._group_chat_meta = True
 
-        date_raw = self.__prefix_match.group(1)
+        date_raw = self._prefix_match.group(1)
         # Reformat date and time to be more readable
         date_obj = datetime.strptime(date_raw, "%d/%m/%Y, %I:%M:%S %p")
 
@@ -82,47 +82,47 @@ and a boolean representing whether it's a message from a group chat."""
         if day.startswith("0"):
             day = day.replace("0", "", 1)  # Remove a leading 0
 
-        self.__date = datetime.strftime(date_obj, f"%a {day} %B %Y")
-        self.__time = datetime.strftime(date_obj, "%I:%M:%S %p")
+        self._date = datetime.strftime(date_obj, f"%a {day} %B %Y")
+        self._time = datetime.strftime(date_obj, "%I:%M:%S %p")
 
-        if self.__time.startswith("0"):
-            self.__time = self.__time.replace("0", "", 1)
+        if self._time.startswith("0"):
+            self._time = self._time.replace("0", "", 1)
 
     def __repr__(self):
         # Use hex here at end to give memory location of Message object
-        if not self.__group_chat_meta:
-            return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self.__name}", ' \
-                   f'date="{self.__date}", time="{self.__time}", and group_chat={self.__group_chat} at {hex(id(self))}>'
+        if not self._group_chat_meta:
+            return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self._name}", ' \
+                   f'date="{self._date}", time="{self._time}", and group_chat={self._group_chat} at {hex(id(self))}>'
         else:
-            return f'<{self.__class__.__module__}.{self.__class__.__name__} object with date="{self.__date}", ' \
-                   f'time="{self.__time}", and group_chat={self.__group_chat}, which is a meta message at ' \
+            return f'<{self.__class__.__module__}.{self.__class__.__name__} object with date="{self._date}", ' \
+                   f'time="{self._time}", and group_chat={self._group_chat}, which is a meta message at ' \
                    f'{hex(id(self))}>'
 
     def get_date(self):
-        return self.__date
+        return self._date
 
     def create_html(self) -> str:
         """Create HTML from Message object."""
-        if not self.__group_chat_meta:
-            if self.__name == senderName:
+        if not self._group_chat_meta:
+            if self._name == senderName:
                 sender_type = 'sender'
             else:
                 sender_type = 'recipient'
 
             # If this is a group chat and this isn't the sender, add the recipient's name
-            if self.__group_chat and self.__name != senderName:
-                css_formatted_name = self.__name.replace('\u00a0', '-')  # Replace no-break space with dash
-                recipient_name = f'<span class="recipient-name {css_formatted_name}">{self.__name}</span>'
+            if self._group_chat and self._name != senderName:
+                css_formatted_name = self._name.replace('\u00a0', '-')  # Replace no-break space with dash
+                recipient_name = f'<span class="recipient-name {css_formatted_name}">{self._name}</span>'
             else:
                 recipient_name = ''
 
             return f'<div class="message {sender_type}">\n\t{recipient_name}\n\t<span class="message-info date">' \
-                   f'{self.__date}</span>\n\t\t<p>{self.__content}</p>\n\t<span class="message-info time">' \
-                   f'{self.__time}</span>\n</div>\n\n'
+                   f'{self._date}</span>\n\t\t<p>{self._content}</p>\n\t<span class="message-info time">' \
+                   f'{self._time}</span>\n</div>\n\n'
 
         else:  # If a meta message in a group chat
-            return f'<div class="group-chat-meta">\n\t<span class="message-info date">{self.__date}</span>\n\t\t' \
-                   f'<p>{self.__content}</p>\n\t<span class="message-info time">{self.__time}</span>\n</div>\n\n'
+            return f'<div class="group-chat-meta">\n\t<span class="message-info date">{self._date}</span>\n\t\t' \
+                   f'<p>{self._content}</p>\n\t<span class="message-info time">{self._time}</span>\n</div>\n\n'
 
 
 def clean_html(string: str) -> str:
