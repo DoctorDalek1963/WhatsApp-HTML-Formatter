@@ -70,7 +70,7 @@ and a boolean representing whether it's a message from a group chat."""
             self._prefix = self._prefix_match.group(1)
 
             self._name = ''
-            self._content = self._prefix_match.group(2)
+            self._content = clean_html(self._prefix_match.group(2))
 
             self._group_chat_meta = True
 
