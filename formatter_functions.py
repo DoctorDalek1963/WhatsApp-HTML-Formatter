@@ -43,6 +43,9 @@ linkPattern = re.compile(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0
 
 
 class Message:
+    """A class to hold and format a single WhatsApp message.
+
+It should have an instance made for each message in a chat."""
     def __init__(self, original_string: str, group_chat_flag: bool):
         """Create a Message object.
 
@@ -195,7 +198,10 @@ def format_links(string: str) -> str:
 
 
 def format_content(string: str) -> str:
-    """Take message content and format it properly."""
+    """Take message content and formats it properly.
+
+It cleans the HTML, adds HTML formatting tags for italics etc, creates
+<a> tags for links, and adds <br> tags."""
     string = clean_html(string)
     string = replace_tags(string)
     string = format_links(string)
@@ -204,7 +210,7 @@ def format_content(string: str) -> str:
 
 
 def add_attachments(message_content: str) -> str:
-    """Embed images, videos, GIFs, and audios."""
+    """Embed images, videos, GIFs, and audios, converting audio files when necessary."""
     attachment_match = re.match(attachmentPattern, message_content)
     filename_no_extension = attachment_match.group(1)
     file_type = attachment_match.group(2)
