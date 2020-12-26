@@ -68,7 +68,7 @@ and a boolean representing whether it's a message from a group chat."""
 
             self._group_chat_meta = False
 
-        except AttributeError:
+        except AttributeError:  # If no match was found for fullPrefixPattern, it's a group chat meta message
             self._prefix_match = re.match(groupMetaPrefixPattern, original)
             self._prefix = self._prefix_match.group(1)
 
