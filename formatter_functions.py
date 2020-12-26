@@ -25,8 +25,8 @@ import threading
 import re
 import os
 
-htmlAudioFormats = {".mp3": "mpeg", ".ogg": "ogg", ".wav": "wav"}  # Dict of html accepted audio formats
-formatDict = {"_": "em", "*": "strong", "~": "del"}  # Dict of format chars with their html tags
+htmlAudioFormats = {".mp3": "mpeg", ".ogg": "ogg", ".wav": "wav"}  # Dict of HTML accepted audio formats
+formatDict = {"_": "em", "*": "strong", "~": "del"}  # Dict of format chars with their HTML tags
 
 # Tuple of extensions that can be moved without being converted
 nonConversionExtensions = ("jpg", "png", "webp", "gif", "mp4", "mp3", "ogg", "wav")
@@ -126,14 +126,14 @@ and a boolean representing whether it's a message from a group chat."""
 
 
 def clean_html(string: str) -> str:
-    """Remove <> to avoid rogue html tags."""
+    """Remove <> to avoid rogue HTML tags."""
     string = string.replace("<", "&lt;").replace(">", "&gt;")
     string = string.replace('"', "&quot;").replace("'", "&apos;")
     return string
 
 
 def format_to_html(string: str) -> str:
-    """Replace format characters with their html tags."""
+    """Replace format characters with their HTML tags."""
     first_tag = True
     list_string = list(string)
 
@@ -152,7 +152,7 @@ def format_to_html(string: str) -> str:
 
 
 def replace_tags(string: str) -> str:
-    """Replace format characters with html tags in string."""
+    """Replace format characters with HTML tags in string."""
     first_tag = True
     if "```" in string:
         string = string.replace("```", "<code>")
@@ -219,7 +219,7 @@ def add_attachments(message_content: str) -> str:
                                   f'type="audio/{html_format}">\n\t\t</audio>'
                 break
 
-        else:  # If none of the standard html audio formats broke out of the for loop, convert to .mp3
+        else:  # If none of the standard HTML audio formats broke out of the for loop, convert to .mp3
             AudioSegment.from_file(f"temp/{filename}").export(
                 f"temp/{filename_no_extension}.mp3", format="mp3")
             os.remove(f"temp/{filename}")
@@ -361,8 +361,8 @@ This function takes six arguments. All except group_chat, which is a boolean, ar
 - group_chat is True if the chat is a group chat and False if it's not
 - sender_name is the name of the sender (your WhatsApp alias)
 - chat_title is the title of the chat. This will be at the top of the page and in the title of the tab
-- html_file_name is the name of the html file to be produced ('.html' should not be part of this)
-- output_dir is the directory where the html file, Library directory, and Attachments directory should be generated"""
+- html_file_name is the name of the HTML file to be produced ('.html' should not be part of this)
+- output_dir is the directory where the HTML file, Library directory, and Attachments directory should be generated"""
 
     if extract_zip(input_file):
         write_to_file(group_chat, sender_name, chat_title, html_file_name, output_dir)
