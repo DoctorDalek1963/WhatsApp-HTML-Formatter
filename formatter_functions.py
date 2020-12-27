@@ -372,6 +372,8 @@ This function takes six arguments. All except group_chat, which is a boolean, ar
 
     if extract_zip(input_file):
         write_to_file(group_chat, sender_name, chat_title, html_file_name, output_dir)
+    else:
+        raise OSError(f'Zip file "{input_file}" not found')
 
 
 def process_list(chat_list: list):
