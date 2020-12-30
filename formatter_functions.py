@@ -55,11 +55,11 @@ and a boolean representing whether it's a message from a group chat."""
         original = original_string
 
         try:
-            self._prefix_match = re.match(fullPrefixPattern, original)
-            self._prefix = self._prefix_match.group(1)
+            prefix_match = re.match(fullPrefixPattern, original)
+            self._prefix = prefix_match.group(1)
 
-            self._name = self._prefix_match.group(2)
-            self._content = self._prefix_match.group(3)
+            self._name = prefix_match.group(2)
+            self._content = prefix_match.group(3)
 
             if re.match(attachmentPattern, self._content):
                 self._content = add_attachments(self._content)
@@ -69,15 +69,15 @@ and a boolean representing whether it's a message from a group chat."""
             self._group_chat_meta = False
 
         except AttributeError:  # If no match was found for fullPrefixPattern, it's a group chat meta message
-            self._prefix_match = re.match(groupMetaPrefixPattern, original)
-            self._prefix = self._prefix_match.group(1)
+            prefix_match = re.match(groupMetaPrefixPattern, original)
+            self._prefix = prefix_match.group(1)
 
             self._name = ''
-            self._content = clean_html(self._prefix_match.group(2))
+            self._content = clean_html(prefix_match.group(2))
 
             self._group_chat_meta = True
 
-        date_raw = self._prefix_match.group(1)
+        date_raw = prefix_match.group(1)
         # Reformat date and time to be more readable
         date_obj = datetime.strptime(date_raw, "%d/%m/%Y, %I:%M:%S %p")
 
