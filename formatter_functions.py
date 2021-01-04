@@ -390,5 +390,3 @@ It should look like this:
 
     for chat_data in chat_list:
         process_single_chat(chat_data[0], chat_data[1], chat_data[2], chat_data[3], chat_data[4], chat_data[5])
-
-# Comment added in vim in WSL
