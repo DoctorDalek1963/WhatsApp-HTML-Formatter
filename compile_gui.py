@@ -30,4 +30,5 @@ shutil.make_archive('WhatsApp_Formatter', 'zip', 'compile_temp')
 # Clear and remove unnecessary directories
 shutil.rmtree('build')
 shutil.rmtree('compile_temp')
-shutil.rmtree('__pycache__')
+if os.path.isdir('__pycache__'):
+    shutil.rmtree('__pycache__')
