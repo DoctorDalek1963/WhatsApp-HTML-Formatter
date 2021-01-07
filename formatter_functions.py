@@ -234,10 +234,10 @@ def add_attachments(message_content: str) -> str:
                               f'<source src="Attachments/{htmlFileName}/{filename}" type="audio/mpeg">\n\t\t</audio>'
             os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/Attachments/{htmlFileName}/{filename}")
 
-    elif file_type == "VIDEO":
+    elif file_type == "VIDEO" or extension == ".mp4":  # Catch GIF files with mp4 extensions
         message_content = f'<video controls>\n\t\t\t<source src="Attachments/{htmlFileName}/{filename}">\n\t\t</video>'
 
-    elif file_type == "PHOTO" or "GIF":
+    elif (file_type == "PHOTO") or (file_type == "GIF" and extension == ".gif"):
         message_content = f'<img class="small" src="Attachments/{htmlFileName}/{filename}" alt="IMAGE ATTACHMENT" ' \
                            'style="max-height: 400px; max-width: 800px; display: inline-block;">'
     else:
