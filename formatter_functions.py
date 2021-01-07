@@ -18,6 +18,7 @@
 
 from pydub import AudioSegment
 from datetime import datetime
+import moviepy.editor as mpe
 from zipfile import ZipFile
 from shutil import copytree
 from glob import glob
@@ -240,6 +241,16 @@ def add_attachments(message_content: str) -> str:
     elif (file_type == "PHOTO") or (file_type == "GIF" and extension == ".gif"):
         message_content = f'<img class="small" src="Attachments/{htmlFileName}/{filename}" alt="IMAGE ATTACHMENT" ' \
                            'style="max-height: 400px; max-width: 800px; display: inline-block;">'
+
+    # TODO: Convert GIFs properly, or skip them if they're going to take a while
+    # elif file_type == "GIF" and extension != ".gif":
+        # clip = mpe.VideoFileClip(f'temp/{filename}')
+        # if clip.length < 3 seconds or clip.pixel_count < 90000:  # If short or small
+        #     convert clip
+        #     message_content = img version
+        # else:
+        #     message_content = video version
+
     else:
         message_content = f'UNKNOWN ATTACHMENT "{filename}"'
 
