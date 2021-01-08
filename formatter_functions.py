@@ -191,7 +191,7 @@ def format_links(string: str) -> str:
             else:
                 working_link = link
 
-            formatted_link = f'<a href='{working_link}' target='_blank'>{link}</a>'
+            formatted_link = f'<a href="{working_link}" target="_blank">{link}</a>'
             string = string.replace(link, formatted_link)
 
     return string
