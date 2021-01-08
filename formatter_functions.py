@@ -43,14 +43,14 @@ linkPattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0
 
 
 class Message:
-    """A class to hold and format a single WhatsApp message.
+    '''A class to hold and format a single WhatsApp message.
 
-It should have an instance made for each message in a chat."""
+It should have an instance made for each message in a chat.'''
     def __init__(self, original_string: str, group_chat_flag: bool):
-        """Create a Message object.
+        '''Create a Message object.
 
 It takes two arguments, a string representing the original message,
-and a boolean representing whether it's a message from a group chat."""
+and a boolean representing whether it's a message from a group chat.'''
         self._group_chat = group_chat_flag
         original = original_string
 
@@ -105,7 +105,7 @@ and a boolean representing whether it's a message from a group chat."""
         return self._date
 
     def create_html(self) -> str:
-        """Create HTML from Message object."""
+        '''Create HTML from Message object.'''
         if not self._group_chat_meta:
             if self._name == senderName:
                 sender_type = 'sender'
@@ -129,14 +129,14 @@ and a boolean representing whether it's a message from a group chat."""
 
 
 def clean_html(string: str) -> str:
-    """Remove <> to avoid rogue HTML tags."""
+    '''Remove <> to avoid rogue HTML tags.'''
     string = string.replace('<', '&lt;').replace('>', '&gt;')
     string = string.replace('\"', '&quot;').replace('\'', '&apos;')
     return string
 
 
 def format_to_html(string: str) -> str:
-    """Replace format characters with their HTML tags."""
+    '''Replace format characters with their HTML tags.'''
     first_tag = True
     list_string = list(string)
 
@@ -155,7 +155,7 @@ def format_to_html(string: str) -> str:
 
 
 def replace_tags(string: str) -> str:
-    """Replace format characters with HTML tags in string."""
+    '''Replace format characters with HTML tags in string.'''
     first_tag = True
     if '```' in string:
         string = string.replace('```', '<code>')
@@ -176,7 +176,7 @@ def replace_tags(string: str) -> str:
 
 
 def format_links(string: str) -> str:
-    """Find links in message and put them in <a> tags."""
+    '''Find links in message and put them in <a> tags.'''
     # Get links and concat the RegEx groups into a list of links
     link_match_list = re.findall(linkPattern, string)
     link_matches = [''.join(match) for match in link_match_list]
@@ -198,10 +198,10 @@ def format_links(string: str) -> str:
 
 
 def format_content(string: str) -> str:
-    """Take message content and formats it properly.
+    '''Take message content and formats it properly.
 
 It cleans the HTML, adds HTML formatting tags for italics etc, creates
-<a> tags for links, and adds <br> tags."""
+<a> tags for links, and adds <br> tags.'''
     string = clean_html(string)
     string = replace_tags(string)
     string = format_links(string)
@@ -210,7 +210,7 @@ It cleans the HTML, adds HTML formatting tags for italics etc, creates
 
 
 def add_attachments(message_content: str) -> str:
-    """Embed images, videos, GIFs, and audios, converting audio files when necessary."""
+    '''Embed images, videos, GIFs, and audios, converting audio files when necessary.'''
     attachment_match = re.match(attachmentPattern, message_content)
     filename_no_extension = attachment_match.group(1)
     file_type = attachment_match.group(2)
@@ -252,7 +252,7 @@ def add_attachments(message_content: str) -> str:
 
 
 def write_text(chat_title: str, group_chat: bool):
-    """Write all text in _chat.txt to HTML file."""
+    '''Write all text in _chat.txt to HTML file.'''
     date_separator = ''
 
     with open('temp/_chat.txt', encoding='utf-8') as f:
@@ -307,8 +307,8 @@ def write_text(chat_title: str, group_chat: bool):
 
 
 def move_attachment_files():
-    """Move all attachment files that don't need to be converted.
-This allows for multithreading."""
+    '''Move all attachment files that don't need to be converted.
+This allows for multithreading.'''
     files = glob('temp/*')
 
     if files:
@@ -322,9 +322,9 @@ This allows for multithreading."""
 
 
 def extract_zip(file_dir: str):
-    """MUST BE RUN BEFORE write_to_file().
+    '''MUST BE RUN BEFORE write_to_file().
 
-Extract the given zip file into the temp directory."""
+Extract the given zip file into the temp directory.'''
     try:
         zip_file_object = ZipFile(file_dir)
         zip_file_object.extractall('temp')
@@ -336,9 +336,9 @@ Extract the given zip file into the temp directory."""
 
 
 def write_to_file(group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str):
-    """MUST RUN extract_zip() FIRST.
+    '''MUST RUN extract_zip() FIRST.
 
-Go through _chat.txt, format every message, and write them all to output_dir/name.html."""
+Go through _chat.txt, format every message, and write them all to output_dir/name.html.'''
     global senderName, htmlFileName, outputDir
 
     senderName = sender_name
@@ -364,7 +364,7 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
 
 def process_single_chat(input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str,
                         output_dir: str):
-    """Process a single chat completely.
+    '''Process a single chat completely.
 
 This function takes six arguments. All except group_chat, which is a boolean, are strings.
 
@@ -373,7 +373,7 @@ This function takes six arguments. All except group_chat, which is a boolean, ar
 - sender_name is the name of the sender (your WhatsApp alias)
 - chat_title is the title of the chat. This will be at the top of the page and in the title of the tab
 - html_file_name is the name of the HTML file to be produced ('.html' should not be part of this)
-- output_dir is the directory where the HTML file, Library directory, and Attachments directory should be generated"""
+- output_dir is the directory where the HTML file, Library directory, and Attachments directory should be generated'''
 
     if extract_zip(input_file):
         write_to_file(group_chat, sender_name, chat_title, html_file_name, output_dir)
@@ -382,7 +382,7 @@ This function takes six arguments. All except group_chat, which is a boolean, ar
 
 
 def process_list(chat_list: list):
-    """RUN TO PROCESS MULTIPLE CHATS. PASSED AS A LIST OF LISTS.
+    '''RUN TO PROCESS MULTIPLE CHATS. PASSED AS A LIST OF LISTS.
 
 chat_list is a list of lists.
 Each list contains the input file, a group chat boolean, the sender name, the title of the chat,
@@ -391,7 +391,7 @@ the file name, and the output directory.
 It should look like this:
 [[inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir],
 [inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir],
-[inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir], ...]"""
+[inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir], ...]'''
 
     for chat_data in chat_list:
         process_single_chat(chat_data[0], chat_data[1], chat_data[2], chat_data[3], chat_data[4], chat_data[5])
