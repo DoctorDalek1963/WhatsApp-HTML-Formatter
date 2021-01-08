@@ -25,21 +25,21 @@ import threading
 import re
 import os
 
-htmlAudioFormats = {".mp3": "mpeg", ".ogg": "ogg", ".wav": "wav"}  # Dict of HTML accepted audio formats
-formatDict = {"_": "em", "*": "strong", "~": "del"}  # Dict of format chars with their HTML tags
+htmlAudioFormats = {'.mp3': 'mpeg', '.ogg': 'ogg', '.wav': 'wav'}  # Dict of HTML accepted audio formats
+formatDict = {'_': 'em', '*': 'strong', '~': 'del'}  # Dict of format chars with their HTML tags
 
 # Tuple of extensions that can be moved without being converted
-nonConversionExtensions = ("jpg", "png", "webp", "gif", "mp4", "mp3", "ogg", "wav")
+nonConversionExtensions = ('jpg', 'png', 'webp', 'gif', 'mp4', 'mp3', 'ogg', 'wav')
 
 cwd = os.getcwd()
-senderName = htmlFileName = outputDir = ""
+senderName = htmlFileName = outputDir = ''
 
 # RegEx patterns
-fullPrefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] ([^:]+): ((.|\n)+)")
-groupMetaPrefixPattern = re.compile(r"\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (.+)")
-attachmentPattern = re.compile(r"<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$")
+fullPrefixPattern = re.compile(r'\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] ([^:]+): ((.|\n)+)')
+groupMetaPrefixPattern = re.compile(r'\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (.+)')
+attachmentPattern = re.compile(r'<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$')
 # Link pattern taken from urlregex.com
-linkPattern = re.compile(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
+linkPattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 
 
 class Message:
@@ -79,17 +79,17 @@ and a boolean representing whether it's a message from a group chat."""
 
         date_raw = prefix_match.group(1)
         # Reformat date and time to be more readable
-        date_obj = datetime.strptime(date_raw, "%d/%m/%Y, %I:%M:%S %p")
+        date_obj = datetime.strptime(date_raw, '%d/%m/%Y, %I:%M:%S %p')
 
-        day = datetime.strftime(date_obj, "%d")
-        if day.startswith("0"):
-            day = day.replace("0", "", 1)  # Remove a leading 0
+        day = datetime.strftime(date_obj, '%d')
+        if day.startswith('0'):
+            day = day.replace('0', '', 1)  # Remove a leading 0
 
-        self._date = datetime.strftime(date_obj, f"%a {day} %B %Y")
-        self._time = datetime.strftime(date_obj, "%I:%M:%S %p")
+        self._date = datetime.strftime(date_obj, f'%a {day} %B %Y')
+        self._time = datetime.strftime(date_obj, '%I:%M:%S %p')
 
-        if self._time.startswith("0"):
-            self._time = self._time.replace("0", "", 1)
+        if self._time.startswith('0'):
+            self._time = self._time.replace('0', '', 1)
 
     def __repr__(self):
         # Use hex here at end to give memory location of Message object
@@ -130,8 +130,8 @@ and a boolean representing whether it's a message from a group chat."""
 
 def clean_html(string: str) -> str:
     """Remove <> to avoid rogue HTML tags."""
-    string = string.replace("<", "&lt;").replace(">", "&gt;")
-    string = string.replace('"', "&quot;").replace("'", "&apos;")
+    string = string.replace('<', '&lt;').replace('>', '&gt;')
+    string = string.replace('\"', '&quot;').replace('\'', '&apos;')
     return string
 
 
@@ -145,30 +145,30 @@ def format_to_html(string: str) -> str:
             for x, letter in enumerate(list_string):
                 if letter == char:
                     if first_tag:
-                        list_string[x] = f"<{tag}>"
+                        list_string[x] = f'<{tag}>'
                         first_tag = False
                     else:
-                        list_string[x] = f"</{tag}>"
+                        list_string[x] = f'</{tag}>'
                         first_tag = True
 
-    return "".join(list_string)
+    return ''.join(list_string)
 
 
 def replace_tags(string: str) -> str:
     """Replace format characters with HTML tags in string."""
     first_tag = True
-    if "```" in string:
-        string = string.replace("```", "<code>")
+    if '```' in string:
+        string = string.replace('```', '<code>')
         list_string = list(string)
         for x, letter in enumerate(list_string):
-            if letter == "<":
+            if letter == '<':
                 if first_tag:
                     first_tag = False
                 else:
-                    list_string[x] = "</"
+                    list_string[x] = '</'
                     first_tag = True
 
-        string = "".join(list_string)
+        string = ''.join(list_string)
     else:
         string = format_to_html(string)
 
@@ -179,19 +179,19 @@ def format_links(string: str) -> str:
     """Find links in message and put them in <a> tags."""
     # Get links and concat the RegEx groups into a list of links
     link_match_list = re.findall(linkPattern, string)
-    link_matches = ["".join(match) for match in link_match_list]
+    link_matches = [''.join(match) for match in link_match_list]
 
     if link_matches:
         for link in link_matches:
-            if re.match(r"[^A-Za-z]+(\.[^A-Za-z])+", link) and not re.match(r"(\d+\.){3}\d", link):
+            if re.match(r'[^A-Za-z]+(\.[^A-Za-z])+', link) and not re.match(r'(\d+\.){3}\d', link):
                 continue  # If not proper link but also not IP address, skip
 
-            if not link.startswith("http"):
-                working_link = f"http://{link}"  # Create URLs from non URL links
+            if not link.startswith('http'):
+                working_link = f'http://{link}'  # Create URLs from non URL links
             else:
                 working_link = link
 
-            formatted_link = f'<a href="{working_link}" target="_blank">{link}</a>'
+            formatted_link = f'<a href='{working_link}' target='_blank'>{link}</a>'
             string = string.replace(link, formatted_link)
 
     return string
@@ -205,7 +205,7 @@ It cleans the HTML, adds HTML formatting tags for italics etc, creates
     string = clean_html(string)
     string = replace_tags(string)
     string = format_links(string)
-    string = string.replace("\n", "<br>\n\t\t")
+    string = string.replace('\n', '<br>\n\t\t')
     return string
 
 
@@ -218,7 +218,7 @@ def add_attachments(message_content: str) -> str:
 
     filename = filename_no_extension + extension
 
-    if file_type == "AUDIO":
+    if file_type == 'AUDIO':
         for ext, html_format in htmlAudioFormats.items():
             if extension == ext:
                 message_content = f'<audio controls>\n\t\t\t<source src="Attachments/{htmlFileName}/{filename}" ' \
@@ -226,22 +226,22 @@ def add_attachments(message_content: str) -> str:
                 break
 
         else:  # If none of the standard HTML audio formats broke out of the for loop, convert to .mp3
-            AudioSegment.from_file(f"temp/{filename}").export(
-                f"temp/{filename_no_extension}.mp3", format="mp3")
-            os.remove(f"temp/{filename}")
-            filename = filename_no_extension + ".mp3"
+            AudioSegment.from_file(f'temp/{filename}').export(
+                f'temp/{filename_no_extension}.mp3', format='mp3')
+            os.remove(f'temp/{filename}')
+            filename = filename_no_extension + '.mp3'
             message_content = f'<audio controls>\n\t\t\t' \
                               f'<source src="Attachments/{htmlFileName}/{filename}" type="audio/mpeg">\n\t\t</audio>'
-            os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/Attachments/{htmlFileName}/{filename}")
+            os.rename(f'{cwd}/temp/{filename}', f'{outputDir}/Attachments/{htmlFileName}/{filename}')
 
-    elif file_type == "VIDEO":
+    elif file_type == 'VIDEO':
         message_content = f'<video controls>\n\t\t\t<source src="Attachments/{htmlFileName}/{filename}">\n\t\t</video>'
 
-    elif (file_type == "PHOTO") or (file_type == "GIF" and extension == ".gif"):
+    elif (file_type == 'PHOTO') or (file_type == 'GIF' and extension == '.gif'):
         message_content = f'<img class="small" src="Attachments/{htmlFileName}/{filename}" alt="IMAGE ATTACHMENT" ' \
                            'style="max-height: 400px; max-width: 800px; display: inline-block;">'
 
-    elif file_type == "GIF" and extension != ".gif":  # Add gif as video that autoplays and loops like a proper gif
+    elif file_type == 'GIF' and extension != '.gif':  # Add gif as video that autoplays and loops like a proper gif
         message_content = f'<video autoplay loop muted playsinline>\n\t\t\t<source src="Attachments/{htmlFileName}/' \
                           f'{filename}">\n\t\t</video>'
 
@@ -253,36 +253,36 @@ def add_attachments(message_content: str) -> str:
 
 def write_text(chat_title: str, group_chat: bool):
     """Write all text in _chat.txt to HTML file."""
-    date_separator = ""
+    date_separator = ''
 
-    with open("temp/_chat.txt", encoding="utf-8") as f:
+    with open('temp/_chat.txt', encoding='utf-8') as f:
         # Read file and remove LRM, LRE, and PDF Unicode characters
-        chat_txt = f.read().replace("\u200e", "").replace("\u202a", "").replace("\u202c", "")
+        chat_txt = f.read().replace('\u200e', '').replace('\u202a', '').replace('\u202c', '')
 
     # Add number to end of file if the file already exists
-    if not os.path.isfile(f"{outputDir}/{htmlFileName}.html"):
-        html_file = open(f"{outputDir}/{htmlFileName}.html", "w+", encoding="utf-8")
+    if not os.path.isfile(f'{outputDir}/{htmlFileName}.html'):
+        html_file = open(f'{outputDir}/{htmlFileName}.html', 'w+', encoding='utf-8')
     else:
         same_name_number = 1
-        while os.path.isfile(f"{outputDir}/{htmlFileName} ({same_name_number}).html"):
+        while os.path.isfile(f'{outputDir}/{htmlFileName} ({same_name_number}).html'):
             same_name_number += 1
-        html_file = open(f"{outputDir}/{htmlFileName} ({same_name_number}).html", "w+", encoding="utf-8")
+        html_file = open(f'{outputDir}/{htmlFileName} ({same_name_number}).html', 'w+', encoding='utf-8')
 
-    with open("start_template.txt", encoding="utf-8") as f:
+    with open('start_template.txt', encoding='utf-8') as f:
         start_template = f.readlines()  # f.readlines() preserves \n characters
 
     # Replace chat_title in start_template
     for i, line in enumerate(start_template):
-        pos = line.find("%chat_title%")
-        if pos != -1:  # If "chat_title" is found
-            start_template[i] = line.replace("%chat_title%", chat_title)
+        pos = line.find('%chat_title%')
+        if pos != -1:  # If 'chat_title' is found
+            start_template[i] = line.replace('%chat_title%', chat_title)
 
     for line in start_template:
         html_file.write(line)
 
     # Use a re.sub to place LRMs between each message and then create a list by splitting by LRM
-    chat_txt = re.sub(r"\n\[(?=\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m])", "\u200e[", chat_txt)
-    chat_txt_list = chat_txt.split("\u200e")
+    chat_txt = re.sub(r'\n\[(?=\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m])', '\u200e[', chat_txt)
+    chat_txt_list = chat_txt.split('\u200e')
 
     # ===== MAIN WRITE LOOP
 
@@ -295,7 +295,7 @@ def write_text(chat_title: str, group_chat: bool):
 
         html_file.write(msg.create_html())
 
-    with open("end_template.txt", encoding="utf-8") as f:
+    with open('end_template.txt', encoding='utf-8') as f:
         end_template = f.readlines()
 
     for line in end_template:
@@ -303,22 +303,22 @@ def write_text(chat_title: str, group_chat: bool):
 
     html_file.close()
 
-    os.remove("temp/_chat.txt")
+    os.remove('temp/_chat.txt')
 
 
 def move_attachment_files():
     """Move all attachment files that don't need to be converted.
 This allows for multithreading."""
-    files = glob("temp/*")
+    files = glob('temp/*')
 
     if files:
         for f in files:
-            f = f.replace("\\", "/")
-            filename = f.split("/")[-1]
-            extension = filename.split(".")[-1]
+            f = f.replace('\\', '/')
+            filename = f.split('/')[-1]
+            extension = filename.split('.')[-1]
 
             if extension in nonConversionExtensions:
-                os.rename(f"{cwd}/temp/{filename}", f"{outputDir}/Attachments/{htmlFileName}/{filename}")
+                os.rename(f'{cwd}/temp/{filename}', f'{outputDir}/Attachments/{htmlFileName}/{filename}')
 
 
 def extract_zip(file_dir: str):
@@ -327,11 +327,11 @@ def extract_zip(file_dir: str):
 Extract the given zip file into the temp directory."""
     try:
         zip_file_object = ZipFile(file_dir)
-        zip_file_object.extractall("temp")
+        zip_file_object.extractall('temp')
         zip_file_object.close()
         return True
     except OSError:
-        print("ERROR: " + file_dir + " was not found. Skipping.")
+        print(f'ERROR: {file_dir} was not found. Skipping.')
         return False
 
 
@@ -345,14 +345,14 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
     htmlFileName = html_file_name
     outputDir = output_dir
 
-    if not os.path.isdir(f"{outputDir}/Library"):
-        copytree("Library", f"{outputDir}/Library")
+    if not os.path.isdir(f'{outputDir}/Library'):
+        copytree('Library', f'{outputDir}/Library')
 
-    if not os.path.isdir(f"{outputDir}/Attachments"):
-        os.mkdir(f"{outputDir}/Attachments")
+    if not os.path.isdir(f'{outputDir}/Attachments'):
+        os.mkdir(f'{outputDir}/Attachments')
 
-    if not os.path.isdir(f"{outputDir}/Attachments/{htmlFileName}"):
-        os.mkdir(f"{outputDir}/Attachments/{htmlFileName}")
+    if not os.path.isdir(f'{outputDir}/Attachments/{htmlFileName}'):
+        os.mkdir(f'{outputDir}/Attachments/{htmlFileName}')
 
     text_thread = threading.Thread(target=write_text, args=[chat_title, group_chat])
     file_move_thread = threading.Thread(target=move_attachment_files)
