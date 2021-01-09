@@ -101,7 +101,11 @@ def process_all_chats():
 root = tk.Tk()
 root.title('WhatsApp Formatter')
 root.resizable(False, False)
-root.iconbitmap('Library/favicon.ico')
+# Some operating systems don't support this iconbitmap
+try:
+    root.iconbitmap('Library/favicon.ico')
+except _tkinter.TclError:
+    pass
 
 selected_zip_var = StringVar()
 selected_output_var = StringVar()
