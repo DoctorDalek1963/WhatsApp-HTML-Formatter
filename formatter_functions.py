@@ -237,7 +237,7 @@ def add_attachments(message_content: str) -> str:
     elif file_type == 'VIDEO':
         message_content = f'<video controls>\n\t\t\t<source src="Attachments/{htmlFileName}/{filename}">\n\t\t</video>'
 
-    elif (file_type == 'PHOTO') or (file_type == 'GIF' and extension == '.gif'):
+    elif (file_type == 'PHOTO') or (file_type == 'GIF' and extension == '.gif') or (file_type == 'STICKER'):
         message_content = f'<img class="small" src="Attachments/{htmlFileName}/{filename}" alt="IMAGE ATTACHMENT" ' \
                            'style="max-height: 400px; max-width: 800px; display: inline-block;">'
 
