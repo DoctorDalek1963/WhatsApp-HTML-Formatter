@@ -48,6 +48,10 @@ attachmentPattern = re.compile(r'<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}
 # Link pattern taken from urlregex.com
 linkPattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 
+encryptedMessagesNoticePattern = re.compile(r'\[(\d{2}/\d{2}/\d{4}, (\d{1,2}:\d{2}:\d{2} [ap]m|\d{2}:\d{2}:\d{2}))] '
+                                            r'([^:]+): Messages and calls are end-to-end encrypted. No one outside of'
+                                            r' this chat, not even WhatsApp, can read or listen to them.$')
+
 
 class Message:
     """A class to hold and format a single WhatsApp message.
@@ -305,6 +309,10 @@ def write_text(chat_title: str, group_chat: bool):
     # ===== MAIN WRITE LOOP
 
     for string in chat_txt_list:
+        # If it's the notice that messages are encrypted, skip it
+        if re.match(encryptedMessagesNoticePattern, string):
+            continue
+
         msg = Message(string, group_chat)
 
         if msg.get_date() != date_separator:
