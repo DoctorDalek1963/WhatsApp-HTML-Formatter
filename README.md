@@ -23,7 +23,7 @@ A program to convert WhatsApp chats exported as zip files into formatted HTML fi
 ## Steps:
 
 ### Command Line:
-1. Export the desired chat on your phone
+1. Export the desired chat on your phone (must be in 12-hour time format)
 2. Run formatter_cli.py
 3. Enter the name of the first zip file
 4. If it's a group chat, type anything beginning with a `y` or `Y`
@@ -37,7 +37,7 @@ A program to convert WhatsApp chats exported as zip files into formatted HTML fi
 12. The program will exit when all chats have been processed
 
 ### GUI:
-1. Export the desired chat on your phone
+1. Export the desired chat on your phone (must be in 12-hour time format)
 2. Run formatter_gui.py or formatter.exe
 3. Select the first zip file with the `Select an exported chat` button
 4. Tick the box if it's a group chat
