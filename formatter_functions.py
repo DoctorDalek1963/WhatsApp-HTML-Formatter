@@ -35,9 +35,16 @@ cwd = os.getcwd()
 senderName = htmlFileName = outputDir = ''
 
 # RegEx patterns
-fullPrefixPattern = re.compile(r'\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] ([^:]+): ((.|\n)+)')
-groupMetaPrefixPattern = re.compile(r'\[(\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m)] (.+)')
+
+fullPrefixPattern = re.compile(r'\[(\d{2}/\d{2}/\d{4}, (\d{1,2}:\d{2}:\d{2} [ap]m|\d{2}:\d{2}:\d{2}))] ([^:]+): ((.|\n)+)')
+# Groups: full prefix is 1, time is 2, name is 3, content is 4
+
+groupMetaPrefixPattern = re.compile(r'\[(\d{2}/\d{2}/\d{4}, (\d{1,2}:\d{2}:\d{2} [ap]m|\d{2}:\d{2}:\d{2}))] (.+)')
+# Groups: full prefix is 1, time is 2, content is 3
+
 attachmentPattern = re.compile(r'<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$')
+# Groups: filename without extension is 1, file type is 2, extension is 3
+
 # Link pattern taken from urlregex.com
 linkPattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 
@@ -58,8 +65,8 @@ and a boolean representing whether it's a message from a group chat."""
             prefix_match = re.match(fullPrefixPattern, original)
             self._prefix = prefix_match.group(1)
 
-            self._name = prefix_match.group(2)
-            self._content = prefix_match.group(3)
+            self._name = prefix_match.group(3)
+            self._content = prefix_match.group(4)
 
             if re.match(attachmentPattern, self._content):
                 self._content = add_attachments(self._content)
@@ -73,13 +80,24 @@ and a boolean representing whether it's a message from a group chat."""
             self._prefix = prefix_match.group(1)
 
             self._name = ''
-            self._content = clean_html(prefix_match.group(2))
+            self._content = clean_html(prefix_match.group(3))
 
             self._group_chat_meta = True
 
         date_raw = prefix_match.group(1)
+
+        # Check if the chat is 12 hour or 24 hour
+        time = prefix_match.group(2)
+        if ' am' in time or ' pm' in time:
+            twelve_hour = True
+        else:
+            twelve_hour = False
+
         # Reformat date and time to be more readable
-        date_obj = datetime.strptime(date_raw, '%d/%m/%Y, %I:%M:%S %p')
+        if twelve_hour:
+            date_obj = datetime.strptime(date_raw, '%d/%m/%Y, %I:%M:%S %p')
+        else:
+            date_obj = datetime.strptime(date_raw, '%d/%m/%Y, %H:%M:%S')
 
         day = datetime.strftime(date_obj, '%d')
         if day.startswith('0'):
@@ -281,7 +299,7 @@ def write_text(chat_title: str, group_chat: bool):
         html_file.write(line)
 
     # Use a re.sub to place LRMs between each message and then create a list by splitting by LRM
-    chat_txt = re.sub(r'\n\[(?=\d{2}/\d{2}/\d{4}, \d{1,2}:\d{2}:\d{2} [ap]m])', '\u200e[', chat_txt)
+    chat_txt = re.sub(r'\n\[(?=\d{2}/\d{2}/\d{4}, (\d{1,2}:\d{2}:\d{2} [ap]m|\d{2}:\d{2}:\d{2})])', '\u200e[', chat_txt)
     chat_txt_list = chat_txt.split('\u200e')
 
     # ===== MAIN WRITE LOOP
