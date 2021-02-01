@@ -420,4 +420,6 @@ It should look like this:
 [inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir], ...]"""
 
     for chat_data in chat_list:
-        process_single_chat(chat_data[0], chat_data[1], chat_data[2], chat_data[3], chat_data[4], chat_data[5])
+        # Check if chat_data is the right length and then unpack its values to pass to process_single_chat()
+        if len(chat_data) == 6:
+            process_single_chat(*chat_data)
