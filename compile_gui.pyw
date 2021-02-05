@@ -2,6 +2,7 @@
 
 import shutil
 import os
+import subprocess
 
 # Create temporary directory to hold everything
 os.mkdir('compile_temp')
@@ -16,8 +17,10 @@ if os.path.isfile('compile_temp/Library/jsconfig.json'):
     os.remove('compile_temp/Library/jsconfig.json')
 
 # Run pyinstaller with correct flags from command prompt (I'm on Windows and haven't tested this on Linux or MacOS)
-os.system('cmd /c "pyinstaller formatter_gui.py -wF -n WhatsApp_Formatter --distpath ./compile_temp -i '
-          'Library/favicon.ico"')
+# os.system('cmd /c "pyinstaller formatter_gui.py -wF -n WhatsApp_Formatter --distpath ./compile_temp -i '
+          # 'Library/favicon.ico"')
+
+subprocess.call('pyinstaller formatter_gui.py -wF -n WhatsApp_Formatter --distpath ./compile_temp -i Library/favicon.ico', shell=True)
 
 # Remove spec file (I don't think there's a flag to tell pyinstaller to not generate this)
 os.remove('WhatsApp_Formatter.spec')
