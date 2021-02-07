@@ -1,4 +1,4 @@
-#!/bin/python3.9
+#!/usr/bin/env python
 
 # WhatsApp-Formatter is a program that takes exported WhatsApp chats and
 # formats them into more readable HTML files, with embedded attachments.
