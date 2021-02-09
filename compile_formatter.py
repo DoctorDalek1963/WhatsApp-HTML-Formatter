@@ -14,6 +14,9 @@ This function takes one argument, gui, which is true by default. If it's true, t
     # Get filename from gui boolean
     filename = 'formatter_gui.py' if gui else 'formatter_cli.py'
 
+    if os.path.isfile('WhatsApp_Formatter.zip'):
+        os.remove('WhatsApp_Formatter.py')
+
     # Create temporary directory to hold everything
     os.mkdir('compile_temp')
 
@@ -43,4 +46,4 @@ This function takes one argument, gui, which is true by default. If it's true, t
 
 
 if __name__ == '__main__':
-    compile_formatter(gui=True)
+    compile_formatter()
