@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from formatter_functions import process_list
+from functions import process_list
 import shutil
 import os
 import re
@@ -27,55 +27,55 @@ import re
 def run_cli():
     """Run the command line version of the WhatsApp Formatter."""
     cwd = os.getcwd()
-    processFlag = False
+    process_flag = False
 
-    allChats = []  # List of all chat data lists to be processed
+    all_chats = []  # List of all chat data lists to be processed
 
     print('Welcome to the WhatsApp Formatter!')
 
-    while not processFlag:
+    while not process_flag:
         print()
         print(f'Please move the selected zip to {cwd}')
         print()
 
-        inputFile = input('Please enter the name of the input zip file: ')
-        if not inputFile.endswith('.zip'):
-            inputFile += '.zip'
+        input_file = input('Please enter the name of the input zip file: ')
+        if not input_file.endswith('.zip'):
+            input_file += '.zip'
         print()
 
-        groupChatRawInput = input('Is this a group chat? (Y/n) ')
-        if re.match(r'[yY]', groupChatRawInput):
-            groupChat = True
+        group_chat_raw_input = input('Is this a group chat? (Y/n) ')
+        if re.match(r'[yY]', group_chat_raw_input):
+            group_chat = True
         else:
-            groupChat = False
+            group_chat = False
         print()
 
-        senderName = input('Please enter the name of the sender (your WhatsApp alias): ')
+        sender_name = input('Please enter the name of the sender (your WhatsApp alias): ')
         print()
 
-        chatTitle = input('Please enter the desired title of the chat: ')
+        chat_title = input('Please enter the desired title of the chat: ')
         print()
 
-        htmlFileName = input('Please enter the desired name of the output file: ')
+        html_file_name = input('Please enter the desired name of the output file: ')
         print()
 
-        outputDir = input('Please enter a full output directory: ')
+        output_dir = input('Please enter a full output directory: ')
         print()
 
-        # Add selected chat with data to allChats
-        allChats.append([inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir])
+        # Add selected chat with data to all_chats
+        all_chats.append([input_file, group_chat, sender_name, chat_title, html_file_name, output_dir])
 
         # Ask for another input
-        processInput = input('Would you like to add another file (Y/n)? ')
-        if re.match(r'[yY]', processInput):
-            processFlag = False
+        process_input = input('Would you like to add another file (Y/n)? ')
+        if re.match(r'[yY]', process_input):
+            process_flag = False
         else:
-            processFlag = True
+            process_flag = True
 
     # Process list of chats
     print()
     print('Processing all...')
-    process_list(allChats)
+    process_list(all_chats)
     shutil.rmtree('temp')
     print('Processing complete!')
 
