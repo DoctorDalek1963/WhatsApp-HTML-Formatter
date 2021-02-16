@@ -51,6 +51,7 @@ the top of the page and in the tab title)\n
         self._group_chat = False
 
         self._selected_chat = ''
+        self._selected_chat_display = ''
         self._selected_output = ''
 
         self._sender_name = ''
@@ -68,7 +69,7 @@ the top of the page and in the tab title)\n
         self._select_chat_button.clicked.connect(self._select_chat_dialog)
 
         self._selected_chat_label = QtWidgets.QLabel(self)
-        self._selected_chat_label.setText('Selected: ')
+        self._selected_chat_label.setText('Selected:\n')
         self._selected_chat_label.setAlignment(QtCore.Qt.AlignCenter)
 
         self._group_chat_checkbox = QtWidgets.QCheckBox(self)
@@ -94,10 +95,10 @@ the top of the page and in the tab title)\n
 
         self._select_output_button = QtWidgets.QPushButton(self)
         self._select_output_button.setText('Select an output directory')
-        # TODO: Connect _select_output_button
+        self._select_output_button.clicked.connect(self._select_output_dialog)
 
         self._selected_output_label = QtWidgets.QLabel(self)
-        self._selected_output_label.setText('Selected: ')
+        self._selected_output_label.setText('Selected:\n')
         self._selected_output_label.setAlignment(QtCore.Qt.AlignCenter)
 
         self._add_to_list_button = QtWidgets.QPushButton(self)
@@ -160,13 +161,28 @@ the top of the page and in the tab title)\n
 
     def _select_chat_dialog(self):
         # This is a file select dialog to select a zip file
-        self._selected_chat_raw = QtWidgets.QFileDialog.getOpenFileName(self, caption='Select an exported chat', filter='Zip files (*.zip)')
+        self._selected_chat_raw = get_open_files_and_dirs(self, caption='Select an exported chat', filter='Zip files (*.zip)')
 
-        # We then need to trim the raw data down into just the name of the zip file
-        self._selected_chat = self._selected_chat_raw[0]
-        self._selected_chat_display = self._selected_chat.split('/')[-1]
+        try:
+            # We then need to trim the raw data down into just the name of the zip file
+            self._selected_chat = self._selected_chat_raw[0]
+            self._selected_chat_display = self._selected_chat.split('/')[-1]
+        except IndexError:
+            self._selected_chat = ''
+            self._selected_chat_display = ''
 
-        self._selected_chat_label.setText(f'Selected: {self._selected_chat_display}')
+        self._selected_chat_label.setText(f'Selected:\n{self._selected_chat_display}')
+
+    def _select_output_dialog(self):
+        self._selected_output_raw = get_open_files_and_dirs(self, caption='Select an output directory')
+
+        try:
+            # We then need to trim the raw data down into just the name of the zip file
+            self._selected_output = self._selected_output_raw[0]
+        except IndexError:
+            self._selected_output = ''
+
+        self._selected_output_label.setText(f'Selected:\n{self._selected_output}')
 
     def _get_textbox_values(self):
         self._sender_name = self._sender_name_textbox.text()
@@ -180,6 +196,52 @@ the top of the page and in the tab title)\n
     def _close_properly(self):
         self.close()
         self._exists = False
+
+
+# This is a function I copied from [StackOverflow](https://stackoverflow.com/questions/64336575/select-a-file-or-a-folder-in-qfiledialog-pyqt5)
+# It is a custom file selection dialog which also allows for the selection of directories
+def get_open_files_and_dirs(parent=None, caption='', directory='',
+                            filter='', initial_filter='', options=None):
+    def update_text():
+        # update the contents of the line edit widget with the selected files
+        selected = []
+        for index in view.selectionModel().selectedRows():
+            selected.append('"{}"'.format(index.data()))
+        line_edit.setText(' '.join(selected))
+
+    dialog = QtWidgets.QFileDialog(parent, windowTitle=caption)
+    dialog.setFileMode(dialog.ExistingFiles)
+    if options:
+        dialog.setOptions(options)
+    dialog.setOption(dialog.DontUseNativeDialog, True)
+    if directory:
+        dialog.setDirectory(directory)
+    if filter:
+        dialog.setNameFilter(filter)
+        if initial_filter:
+            dialog.selectNameFilter(initial_filter)
+
+    # by default, if a directory is opened in file listing mode,
+    # QFileDialog.accept() shows the contents of that directory, but we
+    # need to be able to "open" directories as we can do with files, so we
+    # just override accept() with the default QDialog implementation which
+    # will just return exec_()
+    dialog.accept = lambda: QtWidgets.QDialog.accept(dialog)
+
+    # there are many item views in a non-native dialog, but the ones displaying
+    # the actual contents are created inside a QStackedWidget; they are a
+    # QTreeView and a QListView, and the tree is only used when the
+    # viewMode is set to QFileDialog.Details, which is not this case
+    stacked_widget = dialog.findChild(QtWidgets.QStackedWidget)
+    view = stacked_widget.findChild(QtWidgets.QListView)
+    view.selectionModel().selectionChanged.connect(update_text)
+
+    line_edit = dialog.findChild(QtWidgets.QLineEdit)
+    # clear the line edit contents whenever the current directory changes
+    dialog.directoryEntered.connect(lambda: line_edit.setText(''))
+
+    dialog.exec_()
+    return dialog.selectedFiles()
 
 
 def show_window():
