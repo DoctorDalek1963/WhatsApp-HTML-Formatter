@@ -65,7 +65,7 @@ the top of the page and in the tab title)\n
 
         self._select_chat_button = QtWidgets.QPushButton(self)
         self._select_chat_button.setText('Select an exported chat')
-        # TODO: Connect _select_chat_button
+        self._select_chat_button.clicked.connect(self._select_chat_dialog)
 
         self._selected_chat_label = QtWidgets.QLabel(self)
         self._selected_chat_label.setText('Selected: ')
@@ -157,6 +157,16 @@ the top of the page and in the tab title)\n
         self._hbox.setSpacing(20)
 
         self._hbox.addLayout(self._vbox)
+
+    def _select_chat_dialog(self):
+        # This is a file select dialog to select a zip file
+        self._selected_chat_raw = QtWidgets.QFileDialog.getOpenFileName(self, caption='Select an exported chat', filter='Zip files (*.zip)')
+
+        # We then need to trim the raw data down into just the name of the zip file
+        self._selected_chat = self._selected_chat_raw[0]
+        self._selected_chat_display = self._selected_chat.split('/')[-1]
+
+        self._selected_chat_label.setText(f'Selected: {self._selected_chat_display}')
 
     def _get_textbox_values(self):
         self._sender_name = self._sender_name_textbox.text()
