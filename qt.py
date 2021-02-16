@@ -24,6 +24,52 @@ import sys
 import threading
 
 
+# This is a function I copied from [StackOverflow](https://stackoverflow.com/questions/64336575/select-a-file-or-a-folder-in-qfiledialog-pyqt5)
+# It is a custom file selection dialog which also allows for the selection of directories
+def get_open_files_and_dirs(parent=None, caption='', directory='',
+                            filter='', initial_filter='', options=None):
+    def update_text():
+        # update the contents of the line edit widget with the selected files
+        selected = []
+        for index in view.selectionModel().selectedRows():
+            selected.append('"{}"'.format(index.data()))
+        line_edit.setText(' '.join(selected))
+
+    dialog = QtWidgets.QFileDialog(parent, windowTitle=caption)
+    dialog.setFileMode(dialog.ExistingFiles)
+    if options:
+        dialog.setOptions(options)
+    dialog.setOption(dialog.DontUseNativeDialog, True)
+    if directory:
+        dialog.setDirectory(directory)
+    if filter:
+        dialog.setNameFilter(filter)
+        if initial_filter:
+            dialog.selectNameFilter(initial_filter)
+
+    # by default, if a directory is opened in file listing mode,
+    # QFileDialog.accept() shows the contents of that directory, but we
+    # need to be able to "open" directories as we can do with files, so we
+    # just override accept() with the default QDialog implementation which
+    # will just return exec_()
+    dialog.accept = lambda: QtWidgets.QDialog.accept(dialog)
+
+    # there are many item views in a non-native dialog, but the ones displaying
+    # the actual contents are created inside a QStackedWidget; they are a
+    # QTreeView and a QListView, and the tree is only used when the
+    # viewMode is set to QFileDialog.Details, which is not this case
+    stacked_widget = dialog.findChild(QtWidgets.QStackedWidget)
+    view = stacked_widget.findChild(QtWidgets.QListView)
+    view.selectionModel().selectionChanged.connect(update_text)
+
+    line_edit = dialog.findChild(QtWidgets.QLineEdit)
+    # clear the line edit contents whenever the current directory changes
+    dialog.directoryEntered.connect(lambda: line_edit.setText(''))
+
+    dialog.exec_()
+    return dialog.selectedFiles()
+
+
 class FormatterGUI(QMainWindow):
     def __init__(self):
         super(FormatterGUI, self).__init__()
@@ -198,52 +244,6 @@ the top of the page and in the tab title)\n
     def _close_properly(self):
         self.close()
         self._exists = False
-
-
-# This is a function I copied from [StackOverflow](https://stackoverflow.com/questions/64336575/select-a-file-or-a-folder-in-qfiledialog-pyqt5)
-# It is a custom file selection dialog which also allows for the selection of directories
-def get_open_files_and_dirs(parent=None, caption='', directory='',
-                            filter='', initial_filter='', options=None):
-    def update_text():
-        # update the contents of the line edit widget with the selected files
-        selected = []
-        for index in view.selectionModel().selectedRows():
-            selected.append('"{}"'.format(index.data()))
-        line_edit.setText(' '.join(selected))
-
-    dialog = QtWidgets.QFileDialog(parent, windowTitle=caption)
-    dialog.setFileMode(dialog.ExistingFiles)
-    if options:
-        dialog.setOptions(options)
-    dialog.setOption(dialog.DontUseNativeDialog, True)
-    if directory:
-        dialog.setDirectory(directory)
-    if filter:
-        dialog.setNameFilter(filter)
-        if initial_filter:
-            dialog.selectNameFilter(initial_filter)
-
-    # by default, if a directory is opened in file listing mode,
-    # QFileDialog.accept() shows the contents of that directory, but we
-    # need to be able to "open" directories as we can do with files, so we
-    # just override accept() with the default QDialog implementation which
-    # will just return exec_()
-    dialog.accept = lambda: QtWidgets.QDialog.accept(dialog)
-
-    # there are many item views in a non-native dialog, but the ones displaying
-    # the actual contents are created inside a QStackedWidget; they are a
-    # QTreeView and a QListView, and the tree is only used when the
-    # viewMode is set to QFileDialog.Details, which is not this case
-    stacked_widget = dialog.findChild(QtWidgets.QStackedWidget)
-    view = stacked_widget.findChild(QtWidgets.QListView)
-    view.selectionModel().selectionChanged.connect(update_text)
-
-    line_edit = dialog.findChild(QtWidgets.QLineEdit)
-    # clear the line edit contents whenever the current directory changes
-    dialog.directoryEntered.connect(lambda: line_edit.setText(''))
-
-    dialog.exec_()
-    return dialog.selectedFiles()
 
 
 def show_window():
