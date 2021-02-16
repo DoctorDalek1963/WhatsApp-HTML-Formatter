@@ -17,3 +17,25 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QMainWindow, QApplication
+import sys
+
+
+class FormatterGUI(QMainWindow):
+    def __init__(self):
+        super(FormatterGUI, self).__init__()
+
+        self.setWindowTitle('WhatsApp Formatter')
+
+
+def show_window():
+    app = QApplication(sys.argv)
+    window = FormatterGUI()
+    window.show()
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    show_window()
