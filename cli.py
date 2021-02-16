@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from formatter_functions import process_list
+from functions import process_list
 import shutil
 import os
 import re
