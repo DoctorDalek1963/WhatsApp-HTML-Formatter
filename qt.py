@@ -103,10 +103,12 @@ the top of the page and in the tab title)\n
 
         self._add_to_list_button = QtWidgets.QPushButton(self)
         self._add_to_list_button.setText('Add to list')
+        self._add_to_list_button.setEnabled(False)
         # TODO: Connect _add_to_list_button
 
         self._process_all_button = QtWidgets.QPushButton(self)
         self._process_all_button.setText('Process all')
+        self._process_all_button.setEnabled(False)
         # TODO: Connect _process_all_button
 
         self._exit_button = QtWidgets.QPushButton(self)
