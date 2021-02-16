@@ -21,11 +21,15 @@
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget
 import sys
+import threading
 
 
 class FormatterGUI(QMainWindow):
     def __init__(self):
         super(FormatterGUI, self).__init__()
+
+        # A boolean to see if the window exists. Used to close properly
+        self._exists = True
 
         self.setWindowTitle('WhatsApp Formatter')
 
@@ -48,6 +52,10 @@ the top of the page and in the tab title)\n
 
         self._selected_chat = ''
         self._selected_output = ''
+
+        self._sender_name = ''
+        self._chat_title = ''
+        self._filename = ''
 
         # ===== Create widgets
 
@@ -115,6 +123,11 @@ the top of the page and in the tab title)\n
         self._central_widget.setLayout(self._hbox)
         self.setCentralWidget(self._central_widget)
 
+        # ===== Create threads
+
+        self._get_textbox_values_thread = threading.Thread(target=self._loop_get_textbox_values)
+        self._get_textbox_values_thread.start()
+
     def _arrange_widgets(self):
         self._hbox.addWidget(self._instructions_label)
         # The margins are around the edges of the window and the spacing is between widgets
@@ -145,8 +158,17 @@ the top of the page and in the tab title)\n
 
         self._hbox.addLayout(self._vbox)
 
+    def _get_textbox_values(self):
+        self._sender_name = self._sender_name_textbox.text()
+        self._chat_title = self._chat_title_textbox.text()
+        self._filename = self._filename_textbox.text()
+
+    def _loop_get_textbox_values(self):
+        while self._exists:
+            self._get_textbox_values()
+
     def _close_properly(self):
-        # TODO: Kill threads before closing
+        self._exists = False
         self.close()
 
 
