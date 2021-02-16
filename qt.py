@@ -46,16 +46,69 @@ the top of the page and in the tab title)\n
         self._all_chats_list = []
         self._group_chat = False
 
+        self._selected_chat = ''
+        self._selected_output = ''
+
         # ===== Create widgets
 
         self._instructions_label = QtWidgets.QLabel(self)
         self._instructions_label.setText(self._instructions_text)
         self._instructions_label.setAlignment(QtCore.Qt.AlignCenter)
 
+        self._select_chat_button = QtWidgets.QPushButton(self)
+        self._select_chat_button.setText('Select an exported chat')
+        # TODO: Connect _select_chat_button
+
+        self._selected_chat_label = QtWidgets.QLabel(self)
+        self._selected_chat_label.setText('Selected: ')
+        self._selected_chat_label.setAlignment(QtCore.Qt.AlignCenter)
+
+        self._group_chat_checkbox = QtWidgets.QCheckBox(self)
+        self._group_chat_checkbox.setText('Group chat')
+
+        self._sender_name_label = QtWidgets.QLabel(self)
+        self._sender_name_label.setText('Enter the name of the sender (your WhatsApp alias):')
+        self._sender_name_label.setAlignment(QtCore.Qt.AlignCenter)
+
+        self._sender_name_textbox = QtWidgets.QLineEdit(self)
+
+        self._chat_title_label = QtWidgets.QLabel(self)
+        self._chat_title_label.setText('Enter the desired title of the chat:')
+        self._chat_title_label.setAlignment(QtCore.Qt.AlignCenter)
+
+        self._chat_title_textbox = QtWidgets.QLineEdit(self)
+
+        self._filename_label = QtWidgets.QLabel(self)
+        self._filename_label.setText('Enter the desired name of the HTML file:')
+        self._filename_label.setAlignment(QtCore.Qt.AlignCenter)
+
+        self._filename_textbox = QtWidgets.QLineEdit(self)
+
+        self._select_output_button = QtWidgets.QPushButton(self)
+        self._select_output_button.setText('Select an output directory')
+        # TODO: Connect _select_output_button
+
+        self._selected_output_label = QtWidgets.QLabel(self)
+        self._selected_output_label.setText('Selected: ')
+        self._selected_output_label.setAlignment(QtCore.Qt.AlignCenter)
+
+        self._add_to_list_button = QtWidgets.QPushButton(self)
+        self._add_to_list_button.setText('Add to list')
+        # TODO: Connect _add_to_list_button
+
+        self._process_all_button = QtWidgets.QPushButton(self)
+        self._process_all_button.setText('Process all')
+        # TODO: Connect _process_all_button
+
+        self._exit_button = QtWidgets.QPushButton(self)
+        self._exit_button.setText('Exit')
+        self._exit_button.clicked.connect(self._close_properly)
+
         # ===== Arrange widgets properly
 
         self._vbox = QVBoxLayout()
         self._hbox = QHBoxLayout()
+        self._hbox_checkbox = QHBoxLayout()
         self._arrange_widgets()
 
         self._central_widget = QWidget()
@@ -66,9 +119,35 @@ the top of the page and in the tab title)\n
         self._hbox.addWidget(self._instructions_label)
         # The margins are around the edges of the window and the spacing is between widgets
         self.setContentsMargins(10, 10, 10, 10)
-        self._vbox.setSpacing(20)
+        self._hbox.setSpacing(20)
+
+        self._vbox.addWidget(self._select_chat_button)
+        self._vbox.addWidget(self._selected_chat_label)
+
+        # Add spacing either side of the checkbox to center it
+        self._hbox_checkbox.addStretch(1)
+        self._hbox_checkbox.addWidget(self._group_chat_checkbox)
+        self._hbox_checkbox.addStretch(1)
+        self._vbox.addLayout(self._hbox_checkbox)
+
+        self._vbox.addWidget(self._sender_name_label)
+        self._vbox.addWidget(self._sender_name_textbox)
+        self._vbox.addWidget(self._chat_title_label)
+        self._vbox.addWidget(self._chat_title_textbox)
+        self._vbox.addWidget(self._filename_label)
+        self._vbox.addWidget(self._filename_textbox)
+        self._vbox.addWidget(self._select_output_button)
+        self._vbox.addWidget(self._selected_output_label)
+        self._vbox.addWidget(self._add_to_list_button)
+        self._vbox.addWidget(self._process_all_button)
+        self._vbox.addWidget(self._exit_button)
+        self._hbox.setSpacing(20)
 
         self._hbox.addLayout(self._vbox)
+
+    def _close_properly(self):
+        # TODO: Kill threads before closing
+        self.close()
 
 
 def show_window():
