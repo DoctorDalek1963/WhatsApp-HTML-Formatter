@@ -8,7 +8,7 @@ import subprocess
 
 
 def compile_formatter(gui=True):
-    """Compile the WhatsApp Formatter using pyinsyaller.
+    """Compile the WhatsApp Formatter using pyinstaller.
 
 This function takes one argument, gui, which is true by default. If it's true, this function will compile the GUI version of the formatter, if false, it will compile the command line version."""
     # Get filename from gui boolean
