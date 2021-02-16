@@ -178,8 +178,8 @@ the top of the page and in the tab title)\n
             self._get_textbox_values()
 
     def _close_properly(self):
-        self._exists = False
         self.close()
+        self._exists = False
 
 
 def show_window():
