@@ -120,6 +120,7 @@ the top of the page and in the tab title)\n
 
         self._group_chat_checkbox = QtWidgets.QCheckBox(self)
         self._group_chat_checkbox.setText('Group chat')
+        self._group_chat_checkbox.stateChanged.connect(self._group_chat_check_box_changed_state)
 
         self._sender_name_label = QtWidgets.QLabel(self)
         self._sender_name_label.setText('Enter the name of the sender (your WhatsApp alias):')
@@ -231,6 +232,12 @@ the top of the page and in the tab title)\n
             self._selected_output = ''
 
         self._selected_output_label.setText(f'Selected:\n{self._selected_output}')
+
+    def _group_chat_check_box_changed_state(self, state):
+        if state:  # If checked
+            self._group_chat = True
+        else:
+            self._group_chat = False
 
     def _get_textbox_values(self):
         self._sender_name = self._sender_name_textbox.text()
