@@ -151,6 +151,9 @@ the top of the page and in the tab title)\n
         self._selected_output_label.setText('Selected:\n')
         self._selected_output_label.setAlignment(QtCore.Qt.AlignCenter)
 
+        self._spacer_label = QtWidgets.QLabel(self)
+        self._spacer_label.setText('')
+
         self._add_to_list_button = QtWidgets.QPushButton(self)
         self._add_to_list_button.setText('Add to list')
         self._add_to_list_button.setEnabled(False)
@@ -208,6 +211,7 @@ the top of the page and in the tab title)\n
         self._vbox.addWidget(self._filename_textbox)
         self._vbox.addWidget(self._select_output_button)
         self._vbox.addWidget(self._selected_output_label)
+        self._vbox.addWidget(self._spacer_label)
         self._vbox.addWidget(self._add_to_list_button)
         self._vbox.addWidget(self._process_all_button)
         self._vbox.addWidget(self._processing_label)
