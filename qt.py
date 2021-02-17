@@ -151,7 +151,7 @@ the top of the page and in the tab title)\n
         self._add_to_list_button = QtWidgets.QPushButton(self)
         self._add_to_list_button.setText('Add to list')
         self._add_to_list_button.setEnabled(False)
-        # TODO: Connect _add_to_list_button
+        self._add_to_list_button.clicked.connect(self._add_to_list)
 
         self._process_all_button = QtWidgets.QPushButton(self)
         self._process_all_button.setText('Process all')
@@ -238,6 +238,19 @@ the top of the page and in the tab title)\n
             self._group_chat = True
         else:
             self._group_chat = False
+
+    def _add_to_list(self):
+        data = [self._selected_chat, self._group_chat, self._sender_name, self._chat_title, self._filename, self._selected_output]
+        self._all_chats_list.append(data)
+
+        # Clear everything
+        # This doesn't actually clear the selected chat but it clears the label, prompting the user to choose a new one
+        self._selected_chat_label.setText('Selected:\n')
+        self._group_chat_checkbox.setChecked(False)
+        self._sender_name_textbox.setText('')
+        self._chat_title_textbox.setText('')
+        self._filename_textbox.setText('')
+        # But don't clear the output directory, because the user will probably want to keep that the same
 
     def _get_textbox_values(self):
         self._sender_name = self._sender_name_textbox.text()
