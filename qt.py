@@ -23,6 +23,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout,
 import sys
 import threading
 import functions
+from shutil import rmtree
 
 
 # This is a function I copied from [StackOverflow](https://stackoverflow.com/questions/64336575/select-a-file-or-a-folder-in-qfiledialog-pyqt5)
@@ -161,6 +162,7 @@ the top of the page and in the tab title)\n
 
         self._processing_label = QtWidgets.QLabel(self)
         self._processing_label.setText('')
+        self._processing_label.setAlignment(QtCore.Qt.AlignCenter)
 
         self._exit_button = QtWidgets.QPushButton(self)
         self._exit_button.setText('Exit')
@@ -264,6 +266,9 @@ the top of the page and in the tab title)\n
         functions.process_list(self._all_chats_list)
         self._processing_label.setText('')
         self._exit_button.setEnabled(True)
+
+        # Remove temporary directory
+        rmtree('temp')
 
     def _process_all(self):
         self._process_all_thread = threading.Thread(target=self._process_all_chats)
