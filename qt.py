@@ -22,6 +22,7 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget
 import sys
 import threading
+import functions
 
 
 # This is a function I copied from [StackOverflow](https://stackoverflow.com/questions/64336575/select-a-file-or-a-folder-in-qfiledialog-pyqt5)
@@ -156,7 +157,7 @@ the top of the page and in the tab title)\n
         self._process_all_button = QtWidgets.QPushButton(self)
         self._process_all_button.setText('Process all')
         self._process_all_button.setEnabled(False)
-        # TODO: Connect _process_all_button
+        self._process_all_button.clicked.connect(self._process_all)
 
         self._exit_button = QtWidgets.QPushButton(self)
         self._exit_button.setText('Exit')
@@ -251,6 +252,16 @@ the top of the page and in the tab title)\n
         self._chat_title_textbox.setText('')
         self._filename_textbox.setText('')
         # But don't clear the output directory, because the user will probably want to keep that the same
+
+    def _process_all_chats(self):
+        # Disable the exit button until the process_all function returns
+        self._exit_button.setEnabled(False)
+        functions.process_list(self._all_chats_list)
+        self._exit_button.setEnabled(True)
+
+    def _process_all(self):
+        self._process_all_thread = threading.Thread(target=self._process_all_chats)
+        self._process_all_thread.start()
 
     def _get_textbox_values(self):
         self._sender_name = self._sender_name_textbox.text()
