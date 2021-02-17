@@ -24,6 +24,7 @@ import sys
 import threading
 import functions
 from shutil import rmtree
+import os
 
 
 # This is a function I copied from [StackOverflow](https://stackoverflow.com/questions/64336575/select-a-file-or-a-folder-in-qfiledialog-pyqt5)
@@ -263,12 +264,18 @@ the top of the page and in the tab title)\n
         # Disable the exit button until the process_all function returns
         self._exit_button.setEnabled(False)
         self._processing_label.setText('Processing...')
-        functions.process_list(self._all_chats_list)
+
+        # Assign all chats to temporary variable to allow the process_all button to be disabled
+        all_chats = self._all_chats_list.copy()
+        self._all_chats_list.clear()
+        functions.process_list(all_chats)
+
         self._processing_label.setText('')
         self._exit_button.setEnabled(True)
 
         # Remove temporary directory
-        rmtree('temp')
+        if os.path.isdir('temp'):
+            rmtree('temp')
 
     def _process_all(self):
         self._process_all_thread = threading.Thread(target=self._process_all_chats)
