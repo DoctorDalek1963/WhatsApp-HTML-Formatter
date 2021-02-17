@@ -18,21 +18,71 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from functions import process_list
-from tkinter import filedialog, StringVar, IntVar
-import tkinter as tk
-import _tkinter
+from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget
+import sys
 import threading
-import shutil
+import functions
+from shutil import rmtree
 import os
 
-cwd = os.getcwd()
-inputFile = senderName = chatTitle = htmlFileName = outputDir = ''
-startProcessingFlag = endProcessingFlag = addToListFlag = False
-groupChat = False
-allChatsList = []
 
-instructionsText = """Steps:\n\n
+# This is a function I copied from [StackOverflow](https://stackoverflow.com/questions/64336575/select-a-file-or-a-folder-in-qfiledialog-pyqt5)
+# It is a custom file selection dialog which also allows for the selection of directories
+def get_open_files_and_dirs(parent=None, caption='', directory='',
+                            filter='', initial_filter='', options=None):
+    def update_text():
+        # update the contents of the line edit widget with the selected files
+        selected = []
+        for index in view.selectionModel().selectedRows():
+            selected.append('"{}"'.format(index.data()))
+        line_edit.setText(' '.join(selected))
+
+    dialog = QtWidgets.QFileDialog(parent, windowTitle=caption)
+    dialog.setFileMode(dialog.ExistingFiles)
+    if options:
+        dialog.setOptions(options)
+    dialog.setOption(dialog.DontUseNativeDialog, True)
+    if directory:
+        dialog.setDirectory(directory)
+    if filter:
+        dialog.setNameFilter(filter)
+        if initial_filter:
+            dialog.selectNameFilter(initial_filter)
+
+    # by default, if a directory is opened in file listing mode,
+    # QFileDialog.accept() shows the contents of that directory, but we
+    # need to be able to "open" directories as we can do with files, so we
+    # just override accept() with the default QDialog implementation which
+    # will just return exec_()
+    dialog.accept = lambda: QtWidgets.QDialog.accept(dialog)
+
+    # there are many item views in a non-native dialog, but the ones displaying
+    # the actual contents are created inside a QStackedWidget; they are a
+    # QTreeView and a QListView, and the tree is only used when the
+    # viewMode is set to QFileDialog.Details, which is not this case
+    stacked_widget = dialog.findChild(QtWidgets.QStackedWidget)
+    view = stacked_widget.findChild(QtWidgets.QListView)
+    view.selectionModel().selectionChanged.connect(update_text)
+
+    line_edit = dialog.findChild(QtWidgets.QLineEdit)
+    # clear the line edit contents whenever the current directory changes
+    dialog.directoryEntered.connect(lambda: line_edit.setText(''))
+
+    dialog.exec_()
+    return dialog.selectedFiles()
+
+
+class FormatterGUI(QMainWindow):
+    def __init__(self):
+        super(FormatterGUI, self).__init__()
+
+        # A boolean to see if the window exists. Used to close properly
+        self._exists = True
+
+        self.setWindowTitle('WhatsApp Formatter')
+
+        self._instructions_text = """Steps:\n\n
 1. Select a single exported chat\n
 2. Tick the box if the chat is a group chat\n
 3. Enter the name of the sender (this is your WhatsApp alias)\n
@@ -46,228 +96,231 @@ the top of the page and in the tab title)\n
 10. Wait until the 'Processing...' text disappears
 (This may take quite a while if you've selected several large chats)\n
 11. Once the 'Exit' button is active, you can safely exit the program"""
+        self._all_chats_list = []
+        self._group_chat = False
 
-default_x_padding = 10
-default_y_padding = 5
-gap_y_padding = (5, 15)
+        self._selected_chat = ''
+        self._selected_chat_display = ''
+        self._selected_output = ''
 
-# ===== Functions to be used on tk buttons
+        self._sender_name = ''
+        self._chat_title = ''
+        self._filename = ''
 
+        # ===== Create widgets
 
-def select_zip():
-    """Open a file dialog to select a zip file to use as input."""
-    global inputFile
-    inputFile = filedialog.askopenfilename(initialdir=cwd, title='Select an exported chat',
-                                           filetypes=[('Zip files', '*.zip')])
+        self._instructions_label = QtWidgets.QLabel(self)
+        self._instructions_label.setText(self._instructions_text)
+        self._instructions_label.setAlignment(QtCore.Qt.AlignCenter)
 
+        self._select_chat_button = QtWidgets.QPushButton(self)
+        self._select_chat_button.setText('Select an exported chat')
+        self._select_chat_button.clicked.connect(self._select_chat_dialog)
 
-def assign_group_chat_bool():
-    """Handle updating the groupChat boolean variable from the tkinter checkbox."""
-    global groupChat
-    if group_chat_checkbox_var.get() == 1:
-        groupChat = True
-    else:
-        groupChat = False
+        self._selected_chat_label = QtWidgets.QLabel(self)
+        self._selected_chat_label.setText('Selected:\n')
+        self._selected_chat_label.setAlignment(QtCore.Qt.AlignCenter)
 
+        self._group_chat_checkbox = QtWidgets.QCheckBox(self)
+        self._group_chat_checkbox.setText('Group chat')
+        self._group_chat_checkbox.stateChanged.connect(self._group_chat_checkbox_changed_state)
 
-def select_output_dir():
-    """Open a file dialog to select an output directory."""
-    global outputDir
-    outputDir = filedialog.askdirectory(initialdir='/', title='Select an output directory')
+        self._sender_name_label = QtWidgets.QLabel(self)
+        self._sender_name_label.setText('Enter the name of the sender (your WhatsApp alias):')
+        self._sender_name_label.setAlignment(QtCore.Qt.AlignCenter)
 
+        self._sender_name_textbox = QtWidgets.QLineEdit(self)
 
-def add_to_list():
-    """Add the current data to the list 'allChatsList' to be processed later."""
-    global addToListFlag
-    addToListFlag = True
-    allChatsList.append([inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir])
+        self._chat_title_label = QtWidgets.QLabel(self)
+        self._chat_title_label.setText('Enter the desired title of the chat:')
+        self._chat_title_label.setAlignment(QtCore.Qt.AlignCenter)
 
+        self._chat_title_textbox = QtWidgets.QLineEdit(self)
 
-def start_processing():
-    """Set the 'startProcessingFlag' boolean to True."""
-    global startProcessingFlag
-    startProcessingFlag = True
+        self._filename_label = QtWidgets.QLabel(self)
+        self._filename_label.setText('Enter the desired name of the HTML file:')
+        self._filename_label.setAlignment(QtCore.Qt.AlignCenter)
 
+        self._filename_textbox = QtWidgets.QLineEdit(self)
 
-def process_all_chats():
-    """Process every chat in 'allChatsList' and then set the 'endProcessingFlag' boolean to True."""
-    global endProcessingFlag
-    process_list(allChatsList)
-    endProcessingFlag = True
-    shutil.rmtree('temp')
+        self._select_output_button = QtWidgets.QPushButton(self)
+        self._select_output_button.setText('Select an output directory')
+        self._select_output_button.clicked.connect(self._select_output_dialog)
 
+        self._selected_output_label = QtWidgets.QLabel(self)
+        self._selected_output_label.setText('Selected:\n')
+        self._selected_output_label.setAlignment(QtCore.Qt.AlignCenter)
 
-# ===== Tkinter initialisation
+        self._spacer_label = QtWidgets.QLabel(self)
+        self._spacer_label.setText('')
 
-# Init window
-root = tk.Tk()
-root.title('WhatsApp Formatter')
-root.resizable(False, False)
-# Some operating systems don't support this iconbitmap
-try:
-    root.iconbitmap('Library/favicon.ico')
-except _tkinter.TclError:
-    pass
+        self._add_to_list_button = QtWidgets.QPushButton(self)
+        self._add_to_list_button.setText('Add to list')
+        self._add_to_list_button.setEnabled(False)
+        self._add_to_list_button.clicked.connect(self._add_to_list)
 
-selected_zip_var = StringVar()
-selected_output_var = StringVar()
-processing_string_var = StringVar()
+        self._process_all_button = QtWidgets.QPushButton(self)
+        self._process_all_button.setText('Process all')
+        self._process_all_button.setEnabled(False)
+        self._process_all_button.clicked.connect(self._process_all)
 
-group_chat_checkbox_var = IntVar()
+        self._processing_label = QtWidgets.QLabel(self)
+        self._processing_label.setText('')
+        self._processing_label.setAlignment(QtCore.Qt.AlignCenter)
 
+        self._exit_button = QtWidgets.QPushButton(self)
+        self._exit_button.setText('Exit')
+        self._exit_button.clicked.connect(self._close_properly)
 
-# ===== Create widgets
+        # ===== Arrange widgets properly
 
-# Instructions for use
-instructions_label = tk.Label(root, text=instructionsText)
+        self._vbox = QVBoxLayout()
+        self._hbox = QHBoxLayout()
+        self._hbox_checkbox = QHBoxLayout()
+        self._arrange_widgets()
 
-# Create input widgets
-select_zip_button = tk.Button(root, text='Select an exported chat', command=select_zip)
-selected_zip_label = tk.Label(root, textvariable=selected_zip_var)
+        self._central_widget = QWidget()
+        self._central_widget.setLayout(self._hbox)
+        self.setCentralWidget(self._central_widget)
 
-group_chat_checkbox = tk.Checkbutton(root, text='Group chat', variable=group_chat_checkbox_var,
-                                     onvalue=1, offvalue=0, command=assign_group_chat_bool)
+        # ===== Create threads
 
-sender_name_box_label = tk.Label(root, text='Enter the name of the sender (your WhatsApp alias):')
-enter_sender_name = tk.Entry(root)
+        self._check_everything_thread = threading.Thread(target=self._loop_check_everything)
+        self._check_everything_thread.start()
 
-chat_title_label = tk.Label(root, text='Enter the desired title of the chat:')
-enter_chat_title = tk.Entry(root)
+    def _arrange_widgets(self):
+        self._hbox.addWidget(self._instructions_label)
+        # The margins are around the edges of the window and the spacing is between widgets
+        self.setContentsMargins(10, 10, 10, 10)
+        self._hbox.setSpacing(20)
 
-html_file_name_label = tk.Label(root, text='Enter the desired name of the HTML file:')
-enter_html_file_name = tk.Entry(root)
+        self._vbox.addWidget(self._select_chat_button)
+        self._vbox.addWidget(self._selected_chat_label)
 
-select_output_button = tk.Button(root, text='Select an output directory', command=select_output_dir)
-selected_output_label = tk.Label(root, textvariable=selected_output_var)
+        # Add spacing either side of the checkbox to center it
+        self._hbox_checkbox.addStretch(1)
+        self._hbox_checkbox.addWidget(self._group_chat_checkbox)
+        self._hbox_checkbox.addStretch(1)
+        self._vbox.addLayout(self._hbox_checkbox)
 
-# Create special button widgets
-add_to_list_button = tk.Button(root, text='Add to list', command=add_to_list, state='disabled', bd=3)
-process_all_button = tk.Button(root, text='Process all', command=start_processing, state='disabled', bd=3)
-processing_string_label = tk.Label(root, textvariable=processing_string_var)
-exit_button = tk.Button(root, text='Exit', command=root.destroy, bd=3)
+        self._vbox.addWidget(self._sender_name_label)
+        self._vbox.addWidget(self._sender_name_textbox)
+        self._vbox.addWidget(self._chat_title_label)
+        self._vbox.addWidget(self._chat_title_textbox)
+        self._vbox.addWidget(self._filename_label)
+        self._vbox.addWidget(self._filename_textbox)
+        self._vbox.addWidget(self._select_output_button)
+        self._vbox.addWidget(self._selected_output_label)
+        self._vbox.addWidget(self._spacer_label)
+        self._vbox.addWidget(self._add_to_list_button)
+        self._vbox.addWidget(self._process_all_button)
+        self._vbox.addWidget(self._processing_label)
+        self._vbox.addWidget(self._exit_button)
+        self._hbox.setSpacing(20)
 
+        self._hbox.addLayout(self._vbox)
 
-# ===== Place widgets
+    def _select_chat_dialog(self):
+        # This is a file select dialog to select a zip file
+        self._selected_chat_raw = get_open_files_and_dirs(self, caption='Select an exported chat', filter='Zip files (*.zip)')
 
-# Instructions for use
-instructions_label.grid(row=1, rowspan=13, column=0, pady=15, padx=(default_x_padding, 50))
-
-# Place input widgets
-select_zip_button.grid(row=0, column=2, padx=default_x_padding, pady=(15, default_y_padding))
-selected_zip_label.grid(row=1, column=2, padx=default_x_padding, pady=gap_y_padding)
-
-group_chat_checkbox.grid(row=2, column=2, padx=default_x_padding, pady=gap_y_padding)
-
-sender_name_box_label.grid(row=3, column=2, padx=default_x_padding, pady=default_y_padding)
-enter_sender_name.grid(row=4, column=2, padx=default_x_padding, pady=gap_y_padding)
-
-chat_title_label.grid(row=5, column=2, padx=default_x_padding, pady=default_y_padding)
-enter_chat_title.grid(row=6, column=2, padx=default_x_padding, pady=gap_y_padding)
-
-html_file_name_label.grid(row=7, column=2, padx=default_x_padding, pady=default_y_padding)
-enter_html_file_name.grid(row=8, column=2, padx=default_x_padding, pady=gap_y_padding)
-
-select_output_button.grid(row=9, column=2, padx=default_x_padding, pady=default_y_padding)
-selected_output_label.grid(row=10, column=2, padx=default_x_padding, pady=(default_y_padding, 25))
-
-# Place special button widgets
-add_to_list_button.grid(row=11, column=2, padx=default_x_padding, pady=default_y_padding)
-process_all_button.grid(row=12, column=2, padx=default_x_padding, pady=default_y_padding)
-processing_string_label.grid(row=13, column=2, padx=default_x_padding, pady=default_y_padding)
-exit_button.grid(row=14, column=2, padx=default_x_padding, pady=(default_y_padding, 15))
-
-
-# ===== Loop to sustain window
-
-
-def update_loop():
-    """Infinite loop to continually update the root tkinter window and check for conditions
-to activate/deactivate buttons."""
-    global inputFile, senderName, chatTitle, htmlFileName, outputDir, allChatsList
-    global startProcessingFlag, endProcessingFlag, addToListFlag
-
-    while True:
         try:
-            if enter_sender_name.get():
-                senderName = enter_sender_name.get()
+            # We then need to trim the raw data down into just the name of the zip file
+            self._selected_chat = self._selected_chat_raw[0]
+            self._selected_chat_display = self._selected_chat.split('/')[-1]
+        except IndexError:
+            self._selected_chat = ''
+            self._selected_chat_display = ''
 
-            if enter_chat_title.get():
-                chatTitle = enter_chat_title.get()
+        self._selected_chat_label.setText(f'Selected:\n{self._selected_chat_display}')
 
-            if enter_html_file_name.get():
-                htmlFileName = enter_html_file_name.get()
+    def _select_output_dialog(self):
+        self._selected_output_raw = get_open_files_and_dirs(self, caption='Select an output directory')
 
-            truncated_input_zip = inputFile.split('/')[-1]
-            selected_zip_var.set(f'Selected: \n{truncated_input_zip}')
+        try:
+            # We then need to trim the raw data down into just the name of the zip file
+            self._selected_output = self._selected_output_raw[0]
+        except IndexError:
+            self._selected_output = ''
 
-            selected_output_var.set(f'Selected: \n{outputDir}')
+        self._selected_output_label.setText(f'Selected:\n{self._selected_output}')
 
-            if inputFile and senderName and chatTitle and htmlFileName and outputDir:
-                add_to_list_button.config(state='normal')
-            else:
-                add_to_list_button.config(state='disabled')
+    def _group_chat_checkbox_changed_state(self):
+        if self._group_chat_checkbox.isChecked():
+            self._group_chat = True
+        else:
+            self._group_chat = False
 
-            if addToListFlag:
-                addToListFlag = False
-                inputFile = ''
-                group_chat_checkbox_var.set(0)  # Un-check group chat checkbox
+    def _add_to_list(self):
+        data = [self._selected_chat, self._group_chat, self._sender_name, self._chat_title, self._filename, self._selected_output]
+        self._all_chats_list.append(data)
 
-                enter_chat_title.delete(0, tk.END)
-                chatTitle = ''
+        # Clear everything
+        # This doesn't actually clear the selected chat but it clears the label, prompting the user to choose a new one
+        self._selected_chat_label.setText('Selected:\n')
+        self._group_chat_checkbox.setChecked(False)
+        self._sender_name_textbox.setText('')
+        self._chat_title_textbox.setText('')
+        self._filename_textbox.setText('')
+        # But don't clear the output directory, because the user will probably want to keep that the same
 
-                enter_html_file_name.delete(0, tk.END)
-                htmlFileName = ''
+    def _process_all_chats(self):
+        # Disable the exit button until the process_all function returns
+        self._exit_button.setEnabled(False)
+        self._processing_label.setText('Processing...')
 
-            if allChatsList:
-                process_all_button.config(state='normal')
-            else:
-                process_all_button.config(state='disabled')
+        # Assign all chats to temporary variable to allow the process_all button to be disabled
+        all_chats = self._all_chats_list.copy()
+        self._all_chats_list.clear()
+        functions.process_list(all_chats)
 
-            if startProcessingFlag:
-                startProcessingFlag = False
+        self._processing_label.setText('')
+        self._exit_button.setEnabled(True)
 
-                process_thread = threading.Thread(target=process_all_chats)
-                process_thread.start()
-                processing_string_var.set('Processing...')
+        # Remove temporary directory
+        if os.path.isdir('temp'):
+            rmtree('temp')
 
-                # Allow 'process all' button to be greyed out
-                allChatsList = []
+    def _process_all(self):
+        self._process_all_thread = threading.Thread(target=self._process_all_chats)
+        self._process_all_thread.start()
 
-                # Clear all variables
-                inputFile = ''
-                group_chat_checkbox_var.set(0)  # Un-check group chat checkbox
+    def _get_textbox_values(self):
+        self._sender_name = self._sender_name_textbox.text()
+        self._chat_title = self._chat_title_textbox.text()
+        self._filename = self._filename_textbox.text()
 
-                enter_sender_name.delete(0, tk.END)  # Clear entry box
-                senderName = ''
+    def _activate_add_to_list_button(self):
+        # If all text boxes have been filled in and the chat and output directory have been selected, activate the add to list button
+        if self._sender_name != '' and self._chat_title != '' and self._filename != '' and \
+                self._selected_chat != '' and self._selected_output != '':
+            self._add_to_list_button.setEnabled(True)
+        else:
+            self._add_to_list_button.setEnabled(False)
 
-                enter_chat_title.delete(0, tk.END)
-                chatTitle = ''
+    def _activate_process_all_button(self):
+        if len(self._all_chats_list) > 0:
+            self._process_all_button.setEnabled(True)
+        else:
+            self._process_all_button.setEnabled(False)
 
-                enter_html_file_name.delete(0, tk.END)
-                htmlFileName = ''
+    def _loop_check_everything(self):
+        while self._exists:
+            self._get_textbox_values()
+            self._activate_add_to_list_button()
+            self._activate_process_all_button()
 
-                outputDir = ''
+    def _close_properly(self):
+        self.close()
+        self._exists = False
 
-                select_zip_button.config(state='disabled')
-                enter_sender_name.config(state='disabled')
-                select_output_button.config(state='disabled')
-                exit_button.config(state='disabled')
 
-            if endProcessingFlag:
-                processing_string_var.set('')
-
-                select_zip_button.config(state='normal')
-                enter_sender_name.config(state='normal')
-                select_output_button.config(state='normal')
-                exit_button.config(state='normal')
-
-                endProcessingFlag = False
-
-            root.update()
-
-        except _tkinter.TclError:
-            return
+def show_window():
+    app = QApplication(sys.argv)
+    window = FormatterGUI()
+    window.show()
+    sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
-    update_loop()
+    show_window()
