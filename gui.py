@@ -81,7 +81,8 @@ class FormatterGUI(QMainWindow):
         self._exists = True
 
         self.setWindowTitle('WhatsApp Formatter')
-        self.setStyleSheet(open('gui_style.css').read())
+        with open('gui_style.css', 'r') as f:
+            self.setStyleSheet(f.read())
 
         self._instructions_text = """Steps:\n\n
 1. Select a single exported chat\n
