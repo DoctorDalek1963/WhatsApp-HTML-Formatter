@@ -159,6 +159,9 @@ the top of the page and in the tab title)\n
         self._process_all_button.setEnabled(False)
         self._process_all_button.clicked.connect(self._process_all)
 
+        self._processing_label = QtWidgets.QLabel(self)
+        self._processing_label.setText('')
+
         self._exit_button = QtWidgets.QPushButton(self)
         self._exit_button.setText('Exit')
         self._exit_button.clicked.connect(self._close_properly)
@@ -204,6 +207,7 @@ the top of the page and in the tab title)\n
         self._vbox.addWidget(self._selected_output_label)
         self._vbox.addWidget(self._add_to_list_button)
         self._vbox.addWidget(self._process_all_button)
+        self._vbox.addWidget(self._processing_label)
         self._vbox.addWidget(self._exit_button)
         self._hbox.setSpacing(20)
 
@@ -256,7 +260,9 @@ the top of the page and in the tab title)\n
     def _process_all_chats(self):
         # Disable the exit button until the process_all function returns
         self._exit_button.setEnabled(False)
+        self._processing_label.setText('Processing...')
         functions.process_list(self._all_chats_list)
+        self._processing_label.setText('')
         self._exit_button.setEnabled(True)
 
     def _process_all(self):
