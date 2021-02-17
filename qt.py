@@ -175,8 +175,8 @@ the top of the page and in the tab title)\n
 
         # ===== Create threads
 
-        self._get_textbox_values_thread = threading.Thread(target=self._loop_get_textbox_values)
-        self._get_textbox_values_thread.start()
+        self._check_everything_thread = threading.Thread(target=self._loop_check_everything)
+        self._check_everything_thread.start()
 
     def _arrange_widgets(self):
         self._hbox.addWidget(self._instructions_label)
@@ -244,9 +244,25 @@ the top of the page and in the tab title)\n
         self._chat_title = self._chat_title_textbox.text()
         self._filename = self._filename_textbox.text()
 
-    def _loop_get_textbox_values(self):
+    def _activate_add_to_list_button(self):
+        # If all text boxes have been filled in and the chat and output directory have been selected, activate the add to list button
+        if self._sender_name != '' and self._chat_title != '' and self._filename != '' and \
+                self._selected_chat != '' and self._selected_output != '':
+            self._add_to_list_button.setEnabled(True)
+        else:
+            self._add_to_list_button.setEnabled(False)
+
+    def _activate_process_all_button(self):
+        if len(self._all_chats_list) > 0:
+            self._process_all_button.setEnabled(True)
+        else:
+            self._process_all_button.setEnabled(False)
+
+    def _loop_check_everything(self):
         while self._exists:
             self._get_textbox_values()
+            self._activate_add_to_list_button()
+            self._activate_process_all_button()
 
     def _close_properly(self):
         self.close()
