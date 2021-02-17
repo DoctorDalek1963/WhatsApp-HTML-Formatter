@@ -81,6 +81,7 @@ class FormatterGUI(QMainWindow):
         self._exists = True
 
         self.setWindowTitle('WhatsApp Formatter')
+        self.setStyleSheet(open('gui_style.css').read())
 
         self._instructions_text = """Steps:\n\n
 1. Select a single exported chat\n
@@ -112,6 +113,7 @@ the top of the page and in the tab title)\n
         self._instructions_label = QtWidgets.QLabel(self)
         self._instructions_label.setText(self._instructions_text)
         self._instructions_label.setAlignment(QtCore.Qt.AlignCenter)
+        self._instructions_label.setProperty('class', 'instructions')
 
         self._select_chat_button = QtWidgets.QPushButton(self)
         self._select_chat_button.setText('Select an exported chat')
