@@ -331,7 +331,7 @@ the top of the page and in the tab title)\n
         self._chat_title = self._chat_title_textbox.text()
         self._filename = self._filename_textbox.text()
 
-    def _activate_add_to_list_button(self):
+    def _enable_add_to_list_button(self):
         """Set self._add_to_list_button to enabled if all the conditions have been met.
 
         There must be non-empty strings in all three text boxes and a chat and an output must be selected.
@@ -343,7 +343,7 @@ the top of the page and in the tab title)\n
         else:
             self._add_to_list_button.setEnabled(False)
 
-    def _activate_process_all_button(self):
+    def _enable_process_all_button(self):
         """Set self._process_all_button to enabled if there is data in self._all_chats_list."""
         if len(self._all_chats_list) > 0:
             self._process_all_button.setEnabled(True)
@@ -354,8 +354,8 @@ the top of the page and in the tab title)\n
         """Run the methods to check things and enable widgets while self._exists is True."""
         while self._exists:
             self._get_textbox_values()
-            self._activate_add_to_list_button()
-            self._activate_process_all_button()
+            self._enable_add_to_list_button()
+            self._enable_process_all_button()
 
     def _close_properly(self):
         """Set the self._exists boolean to false to end the threads and then close the window."""
