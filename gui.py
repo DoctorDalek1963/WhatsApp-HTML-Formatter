@@ -18,6 +18,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""This is the module that holds the GUI for the WhatsApp Formatter.
+
+Classes:
+    FormatterGUI:
+        The class for the GUI for the WhatsApp Formatter.
+
+        You have to create an instance (no arguments taken) and then call show() on it to show the window.
+
+Functions:
+    show_window():
+        Create an instance of the GUI window and show it. Takes no arguments.
+
+"""
+
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget, QShortcut
@@ -32,6 +46,10 @@ import os
 # It is a custom file selection dialog which also allows for the selection of directories
 def get_open_files_and_dirs(parent=None, caption='', directory='',
                             filter='', initial_filter='', options=None):
+    """Open a Qt dialog that can select files or directories.
+
+    I copied this function from [StackOverflow](https://stackoverflow.com/questions/64336575/select-a-file-or-a-folder-in-qfiledialog-pyqt5).
+    """
     def update_text():
         # update the contents of the line edit widget with the selected files
         selected = []
@@ -75,7 +93,14 @@ def get_open_files_and_dirs(parent=None, caption='', directory='',
 
 
 class FormatterGUI(QMainWindow):
+    """The class for the GUI for the WhatsApp Formatter.
+
+    Subclasses PyQt5.QtWidgets.QMainWindow. It has no public methods or attributes and only has __init__().
+    You have to create an instance (no arguments taken) and then call show() on it to show the window.
+    """
+
     def __init__(self):
+        """Create an instance of the WhatsApp Formatter GUI. Takes no arguments."""
         super(FormatterGUI, self).__init__()
 
         # A boolean to see if the window exists. Used to close properly
@@ -197,6 +222,7 @@ the top of the page and in the tab title)\n
         self._check_everything_thread.start()
 
     def _arrange_widgets(self):
+        """Arrange the attributes created by __init__() nicely."""
         self._hbox.addWidget(self._instructions_label)
         # The margins are around the edges of the window and the spacing is between widgets
         self.setContentsMargins(10, 10, 10, 10)
@@ -229,6 +255,7 @@ the top of the page and in the tab title)\n
         self._hbox.addLayout(self._vbox)
 
     def _select_chat_dialog(self):
+        """Open a dialog and allow the user to select a zip file, which then becomes self._selected_chat."""
         # This is a file select dialog to select a zip file
         self._selected_chat_raw = get_open_files_and_dirs(self, caption='Select an exported chat', filter='Zip files (*.zip)')
 
@@ -243,6 +270,7 @@ the top of the page and in the tab title)\n
         self._selected_chat_label.setText(f'Selected:\n{self._selected_chat_display}')
 
     def _select_output_dialog(self):
+        """Open a dialog and allow the user to select a directory, which then becomes self._selected_output."""
         self._selected_output_raw = get_open_files_and_dirs(self, caption='Select an output directory')
 
         try:
@@ -254,12 +282,14 @@ the top of the page and in the tab title)\n
         self._selected_output_label.setText(f'Selected:\n{self._selected_output}')
 
     def _group_chat_checkbox_changed_state(self):
+        """Check the state of self._group_chat_checkbox adn use it to determine the boolean value of self._group_chat."""
         if self._group_chat_checkbox.isChecked():
             self._group_chat = True
         else:
             self._group_chat = False
 
     def _add_to_list(self):
+        """Take the values given by the user and add them to the list of chat data."""
         data = [self._selected_chat, self._group_chat, self._sender_name, self._chat_title, self._filename, self._selected_output]
         self._all_chats_list.append(data)
 
@@ -273,6 +303,7 @@ the top of the page and in the tab title)\n
         # But don't clear the output directory, because the user will probably want to keep that the same
 
     def _process_all_chats(self):
+        """Process all the lists of chat data in self._all_chats_list with functions.process_list()."""
         # Disable the exit button until the process_all function returns
         self._exit_button.setEnabled(False)
         self._processing_label.setText('Processing...')
@@ -290,15 +321,21 @@ the top of the page and in the tab title)\n
             rmtree('temp')
 
     def _process_all(self):
+        """Run self._process_all_chats() in a thread."""
         self._process_all_thread = threading.Thread(target=self._process_all_chats)
         self._process_all_thread.start()
 
     def _get_textbox_values(self):
+        """Get the values from all the text boxes and assign them to their associated instance attributes."""
         self._sender_name = self._sender_name_textbox.text()
         self._chat_title = self._chat_title_textbox.text()
         self._filename = self._filename_textbox.text()
 
     def _activate_add_to_list_button(self):
+        """Set self._add_to_list_button to enabled if all the conditions have been met.
+
+        There must be non-empty strings in all three text boxes and a chat and an output must be selected.
+        """
         # If all text boxes have been filled in and the chat and output directory have been selected, activate the add to list button
         if self._sender_name != '' and self._chat_title != '' and self._filename != '' and \
                 self._selected_chat != '' and self._selected_output != '':
@@ -307,23 +344,27 @@ the top of the page and in the tab title)\n
             self._add_to_list_button.setEnabled(False)
 
     def _activate_process_all_button(self):
+        """Set self._process_all_button to enabled if there is data in self._all_chats_list."""
         if len(self._all_chats_list) > 0:
             self._process_all_button.setEnabled(True)
         else:
             self._process_all_button.setEnabled(False)
 
     def _loop_check_everything(self):
+        """Run the methods to check things and enable widgets while self._exists is True."""
         while self._exists:
             self._get_textbox_values()
             self._activate_add_to_list_button()
             self._activate_process_all_button()
 
     def _close_properly(self):
-        self.close()
+        """Set the self._exists boolean to false to end the threads and then close the window."""
         self._exists = False
+        self.close()
 
 
 def show_window():
+    """Create an instance of FormatterGUI and show it. Terminate the program when the user exits the window."""
     app = QApplication(sys.argv)
     window = FormatterGUI()
     window.show()
