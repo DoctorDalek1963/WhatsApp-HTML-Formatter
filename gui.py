@@ -241,7 +241,7 @@ the top of the page and in the tab title)\n
         self._selected_output_raw = get_open_files_and_dirs(self, caption='Select an output directory')
 
         try:
-            # We then need to trim the raw data down into just the name of the zip file
+            # We then need to trim the raw data down into just the name of the folder
             self._selected_output = self._selected_output_raw[0]
         except IndexError:
             self._selected_output = ''
