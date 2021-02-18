@@ -81,7 +81,7 @@ class FormatterGUI(QMainWindow):
         self._exists = True
 
         self.setWindowTitle('WhatsApp Formatter')
-        with open('gui_style.css', 'r') as f:
+        with open('style_gui.css', 'r') as f:
             self.setStyleSheet(f.read())
 
         self._instructions_text = """Steps:\n\n
