@@ -19,7 +19,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget, QShortcut
 import sys
 import threading
 import functions
@@ -174,6 +175,10 @@ the top of the page and in the tab title)\n
         self._exit_button = QtWidgets.QPushButton(self)
         self._exit_button.setText('Exit')
         self._exit_button.clicked.connect(self._close_properly)
+
+        # This is a shortcut for the exit button
+        self._exit_shortcut = QShortcut(QKeySequence("Ctrl+Q"), self)
+        self._exit_shortcut.activated.connect(self._close_properly)
 
         # ===== Arrange widgets properly
 
