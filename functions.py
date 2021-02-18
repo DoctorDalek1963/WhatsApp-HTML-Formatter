@@ -368,7 +368,7 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
     global senderName, htmlFileName, outputDir
 
     senderName = sender_name
-    htmlFileName = html_file_name
+    htmlFileName, _ = os.path.splitext(html_file_name)  # Remove possible '.html' from the end of the file name
     outputDir = output_dir
 
     if not os.path.isdir(f'{outputDir}/Library'):
