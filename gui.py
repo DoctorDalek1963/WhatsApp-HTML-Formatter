@@ -84,7 +84,7 @@ class FormatterGUI(QMainWindow):
         with open('style_gui.css', 'r') as f:
             self.setStyleSheet(f.read())
 
-        self._instructions_text = """Steps:\n\n
+        self._instructions_text = '''Steps:\n\n
 1. Select a single exported chat\n
 2. Tick the box if the chat is a group chat\n
 3. Enter the name of the sender (this is your WhatsApp alias)\n
@@ -97,7 +97,7 @@ the top of the page and in the tab title)\n
 9. Click the 'Process all' button\n
 10. Wait until the 'Processing...' text disappears
 (This may take quite a while if you've selected several large chats)\n
-11. Once the 'Exit' button is active, you can safely exit the program"""
+11. Once the 'Exit' button is active, you can safely exit the program'''
         self._all_chats_list = []
         self._group_chat = False
 
