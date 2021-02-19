@@ -1,6 +1,30 @@
 #!/usr/bin/env python
 
-"""Fully compile the GUI version of the formatter with pyinstaller."""
+# WhatsApp-Formatter is a program that takes exported WhatsApp chats and
+# formats them into more readable HTML files, with embedded attachments.
+#
+# Copyright (C) 2020 Doctor Dalek <https://github.com/DoctorDalek1963>.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+"""This module compiles the WhatsApp Formatter in GUI or CLI format. GUI by default.
+
+Functions:
+    compile_formatter(gui=True):
+        Compile the WhatsApp Formatter according to the truthiness of the gui keyword argument. It's true by default.
+
+"""
 
 import shutil
 import os
@@ -10,7 +34,10 @@ import subprocess
 def compile_formatter(gui=True):
     """Compile the WhatsApp Formatter using pyinstaller.
 
-This function takes one argument, gui, which is true by default. If it's true, this function will compile the GUI version of the formatter, if false, it will compile the command line version."""
+    Keyword arguments:
+        gui:
+            A boolean which is true if not specified. If true, the function will compile the GUI, if false, it will compile the CLI version.
+    """
     # Get filename from gui boolean
     filename = 'gui.py' if gui else 'cli.py'
 

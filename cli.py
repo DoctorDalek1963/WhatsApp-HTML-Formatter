@@ -18,6 +18,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""This module simply contains a function to run the CLI version of the WhatsApp Formatter.
+
+Functions:
+    run_cli:
+        Run the command line version of the WhatsApp Formatter.
+
+"""
+
 from functions import process_list
 import shutil
 import os

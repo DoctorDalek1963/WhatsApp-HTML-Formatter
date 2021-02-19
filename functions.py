@@ -16,6 +16,51 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""This module has the class and functions to format one WhatsApp chat in its entirety.
+
+Classes:
+    Message:
+        The class for each message in a chat. Every instance is a separate message.
+
+Functions:
+    clean_html(string: str) -> str:
+        Remove < and > to avoid rogue HTML tags.
+
+    simple_format_to_html(string: str) -> str:
+        Replace WhatsApp format characters with their HTML tags. Doesn't handle code blocks.
+
+    complete_format_to_html(string: str) -> str:
+        Replace WhatsApp format characters with their HTML tags. Handles code blocks.
+
+    format_links(string: str) -> str:
+        Find all the links in the string and put them in <a> tags.
+
+    fully_format_message_content(string: str) -> str:
+        Take message content and fully format it properly.
+
+    add_attachments(attachment: str) -> str:
+        Create HTML tags to embed attachments.
+
+    write_text(chat_title: str, group_chat: bool):
+        Format and write all text in _chat.txt to HTML file.
+
+    move_attachment_files():
+        Move all attachment files that don't need to be converted.
+
+    extract_zip(input_file: str) -> bool:
+        Extract the zip file given by file_dir into the temp directory. Return True if successfully extracted.
+
+    fully_format_chat(group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str):
+        Fully format an already exported chat.
+
+    process_single_chat(input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str):
+        Process a single chat completely. Extract and then fully format it.
+
+    process_list(chat_list: list):
+        Process a list of chats completely.
+
+"""
+
 from pydub import AudioSegment
 from datetime import datetime
 from zipfile import ZipFile
@@ -48,21 +93,35 @@ attachmentPattern = re.compile(r'<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}
 # Link pattern taken from urlregex.com
 linkPattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 
-encryptedMessagesNoticePattern = re.compile(r'\[(\d{2}/\d{2}/\d{4}, (\d{1,2}:\d{2}:\d{2} [ap]m|\d{2}:\d{2}:\d{2}))] '
-                                            r'([^:]+): Messages and calls are end-to-end encrypted. No one outside of'
-                                            r' this chat, not even WhatsApp, can read or listen to them.$')
+encryptedMessagesNoticePattern = re.compile(
+    r'\[(\d{2}/\d{2}/\d{4}, (\d{1,2}:\d{2}:\d{2} [ap]m|\d{2}:\d{2}:\d{2}))] ([^:]+): '
+    r'Messages and calls are end-to-end encrypted\. No one outside of this chat, not even WhatsApp, can read or listen to them\.$')
 
 
 class Message:
-    """A class to hold and format a single WhatsApp message.
+    """The class for each message in a chat. Every instance is a separate message.
 
-It should have an instance made for each message in a chat."""
-    def __init__(self, original_string: str, group_chat_flag: bool):
-        """Create a Message object.
+    Methods:
+        get_date():
+            Return the date of the message.
 
-It takes two arguments, a string representing the original message,
-and a boolean representing whether it's a message from a group chat."""
-        self._group_chat = group_chat_flag
+        create_html() -> str:
+            Return HTML representation of the Message object.
+
+    """
+
+    def __init__(self, original_string: str, group_chat: bool):
+        """Create a Message object and fully format its content according to the type of message it is.
+
+        Arguments:
+            original_string:
+                The complete original message including all prefix data.
+
+            group_chat:
+                A boolean to determine whether the message is from a group chat.
+
+        """
+        self._group_chat = group_chat
         original = original_string
 
         try:
@@ -75,7 +134,7 @@ and a boolean representing whether it's a message from a group chat."""
             if re.match(attachmentPattern, self._content):
                 self._content = add_attachments(self._content)
             else:
-                self._content = format_content(self._content)
+                self._content = fully_format_message_content(self._content)
 
             self._group_chat_meta = False
 
@@ -89,23 +148,15 @@ and a boolean representing whether it's a message from a group chat."""
             self._group_chat_meta = True
 
         date_raw = prefix_match.group(1)
-
-        # Check if the chat is 12 hour or 24 hour
         time = prefix_match.group(2)
-        if ' am' in time or ' pm' in time:
-            twelve_hour = True
-        else:
-            twelve_hour = False
 
-        # Reformat date and time to be more readable
-        if twelve_hour:
-            date_obj = datetime.strptime(date_raw, '%d/%m/%Y, %I:%M:%S %p')
-        else:
-            date_obj = datetime.strptime(date_raw, '%d/%m/%Y, %H:%M:%S')
+        # Use a ternary operator to get datetime object whether the message is in 12 hour or 24 hour format
+        date_obj = datetime.strptime(date_raw, '%d/%m/%Y, %I:%M:%S %p') if ' am' in time or ' pm' in time \
+            else datetime.strptime(date_raw, '%d/%m/%Y, %H:%M:%S')
 
         day = datetime.strftime(date_obj, '%d')
         if day.startswith('0'):
-            day = day.replace('0', '', 1)  # Remove a leading 0
+            day = day.replace('0', '', 1)  # Remove a single leading 0
 
         self._date = datetime.strftime(date_obj, f'%a {day} %B %Y')
         self._time = datetime.strftime(date_obj, '%I:%M:%S %p')
@@ -114,6 +165,7 @@ and a boolean representing whether it's a message from a group chat."""
             self._time = self._time.replace('0', '', 1)
 
     def __repr__(self):
+        """Return a repr of the Message object including the name, date, name, and whether it's from a group chat. Also includes the memory location in hex."""
         # Use hex here at end to give memory location of Message object
         if not self._group_chat_meta:
             return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self._name}", ' \
@@ -124,10 +176,11 @@ and a boolean representing whether it's a message from a group chat."""
                    f'{hex(id(self))}>'
 
     def get_date(self):
+        """Return the date of the message."""
         return self._date
 
     def create_html(self) -> str:
-        """Create HTML from Message object."""
+        """Return HTML representation of the Message object."""
         if not self._group_chat_meta:
             if self._name == senderName:
                 sender_type = 'sender'
@@ -151,14 +204,14 @@ and a boolean representing whether it's a message from a group chat."""
 
 
 def clean_html(string: str) -> str:
-    """Remove <> to avoid rogue HTML tags."""
+    """Remove < and > to avoid rogue HTML tags."""
     string = string.replace('<', '&lt;').replace('>', '&gt;')
     string = string.replace('\"', '&quot;').replace('\'', '&apos;')
     return string
 
 
-def format_to_html(string: str) -> str:
-    """Replace format characters with their HTML tags."""
+def simple_format_to_html(string: str) -> str:
+    """Replace WhatsApp format characters with their HTML tags. Doesn't handle code blocks."""
     first_tag = True
     list_string = list(string)
 
@@ -176,8 +229,8 @@ def format_to_html(string: str) -> str:
     return ''.join(list_string)
 
 
-def replace_tags(string: str) -> str:
-    """Replace format characters with HTML tags in string."""
+def complete_format_to_html(string: str) -> str:
+    """Replace WhatsApp format characters with their HTML tags. Handles code blocks."""
     first_tag = True
     if '```' in string:
         string = string.replace('```', '<code>')
@@ -192,13 +245,13 @@ def replace_tags(string: str) -> str:
 
         string = ''.join(list_string)
     else:
-        string = format_to_html(string)
+        string = simple_format_to_html(string)
 
     return string
 
 
 def format_links(string: str) -> str:
-    """Find links in message and put them in <a> tags."""
+    """Find all the links in the string and put them in <a> tags."""
     # Get links and concat the RegEx groups into a list of links
     link_match_list = re.findall(linkPattern, string)
     link_matches = [''.join(match) for match in link_match_list]
@@ -219,21 +272,33 @@ def format_links(string: str) -> str:
     return string
 
 
-def format_content(string: str) -> str:
-    """Take message content and formats it properly.
+def fully_format_message_content(string: str) -> str:
+    """Take message content and fully format it properly.
 
-It cleans the HTML, adds HTML formatting tags for italics etc, creates
-<a> tags for links, and adds <br> tags."""
+    Clean the HTML of rogue tags, add HTML formatting tags for italics etc, create <a> tags for links, and add <br> tags.
+    """
     string = clean_html(string)
-    string = replace_tags(string)
+    string = complete_format_to_html(string)
     string = format_links(string)
     string = string.replace('\n', '<br>\n\t\t')
     return string
 
 
-def add_attachments(message_content: str) -> str:
-    """Embed images, videos, GIFs, and audios, converting audio files when necessary."""
-    attachment_match = re.match(attachmentPattern, message_content)
+def add_attachments(attachment: str) -> str:
+    """Create HTML tags to embed attachments.
+
+    It creates tags for images, videos, GIFs, and audio.
+    This function automatically converts audio files when necessary, typically when they are .opus encoded voice messages.
+    
+    Arguments:
+        attachment:
+            The original, isolated attachment marker. Only the stuff between angled brackets.
+
+    Returns:
+        The HTML tag for the embedded attachment.
+
+    """
+    attachment_match = re.match(attachmentPattern, attachment)
     filename_no_extension = attachment_match.group(1)
     file_type = attachment_match.group(2)
     extension = attachment_match.group(3)
@@ -243,7 +308,7 @@ def add_attachments(message_content: str) -> str:
     if file_type == 'AUDIO':
         for ext, html_format in htmlAudioFormats.items():
             if extension == ext:
-                message_content = f'<audio controls>\n\t\t\t<source src="Attachments/{htmlFileName}/{filename}" ' \
+                attachment = f'<audio controls>\n\t\t\t<source src="Attachments/{htmlFileName}/{filename}" ' \
                                   f'type="audio/{html_format}">\n\t\t</audio>'
                 break
 
@@ -252,29 +317,43 @@ def add_attachments(message_content: str) -> str:
                 f'temp/{filename_no_extension}.mp3', format='mp3')
             os.remove(f'temp/{filename}')
             filename = filename_no_extension + '.mp3'
-            message_content = f'<audio controls>\n\t\t\t' \
-                              f'<source src="Attachments/{htmlFileName}/{filename}" type="audio/mpeg">\n\t\t</audio>'
+            attachment = f'<audio controls>\n\t\t\t' \
+                         f'<source src="Attachments/{htmlFileName}/{filename}" type="audio/mpeg">\n\t\t</audio>'
             os.rename(f'{cwd}/temp/{filename}', f'{outputDir}/Attachments/{htmlFileName}/{filename}')
 
     elif file_type == 'VIDEO':
-        message_content = f'<video controls>\n\t\t\t<source src="Attachments/{htmlFileName}/{filename}">\n\t\t</video>'
+        attachment = f'<video controls>\n\t\t\t<source src="Attachments/{htmlFileName}/{filename}">\n\t\t</video>'
 
     elif (file_type == 'PHOTO') or (file_type == 'GIF' and extension == '.gif') or (file_type == 'STICKER'):
-        message_content = f'<img class="small" src="Attachments/{htmlFileName}/{filename}" alt="IMAGE ATTACHMENT" ' \
-                           'style="max-height: 400px; max-width: 800px; display: inline-block;">'
+        attachment = f'<img class="small" src="Attachments/{htmlFileName}/{filename}" alt="IMAGE ATTACHMENT" ' \
+                          'style="max-height: 400px; max-width: 800px; display: inline-block;">'
 
     elif file_type == 'GIF' and extension != '.gif':  # Add gif as video that autoplays and loops like a proper gif
-        message_content = f'<video autoplay loop muted playsinline>\n\t\t\t<source src="Attachments/{htmlFileName}/' \
+        attachment = f'<video autoplay loop muted playsinline>\n\t\t\t<source src="Attachments/{htmlFileName}/' \
                           f'{filename}">\n\t\t</video>'
 
     else:
-        message_content = f'UNKNOWN ATTACHMENT "{filename}"'
+        attachment = f'UNKNOWN ATTACHMENT "{filename}"'
 
-    return message_content
+    return attachment
 
 
 def write_text(chat_title: str, group_chat: bool):
-    """Write all text in _chat.txt to HTML file."""
+    """Format and write all text in _chat.txt to HTML file.
+
+    This function creates a new HTML file with the global htmlFileName.
+    If that filename already exist, it will be given a number in brackets at the end of the name.
+    It only writes the text of _chat.txt to the HTML file.
+    It should be in a thread running parallel with a thread running move_attachment_files().
+
+    Arguments:
+        chat_title:
+            A string which becomes the title of the chat. Not the filename, but the title.
+
+        group_chat:
+            A boolean to determine whether the chat is a group chat.
+
+    """
     date_separator = ''
 
     with open('temp/_chat.txt', encoding='utf-8') as f:
@@ -334,7 +413,11 @@ def write_text(chat_title: str, group_chat: bool):
 
 def move_attachment_files():
     """Move all attachment files that don't need to be converted.
-This allows for multithreading."""
+
+    This function moves all attachment files that don't need to be converted to the global outputDir.
+    It only moves the attachment files.
+    It should be in a thread running parallel with a thread running write_text().
+    """
     files = glob('temp/*')
 
     if files:
@@ -347,24 +430,55 @@ This allows for multithreading."""
                 os.rename(f'{cwd}/temp/{filename}', f'{outputDir}/Attachments/{htmlFileName}/{filename}')
 
 
-def extract_zip(file_dir: str):
-    """MUST BE RUN BEFORE write_to_file().
+def extract_zip(input_file: str) -> bool:
+    """Extract the zip file given by file_dir into the temp directory. Return True if successfully extracted.
 
-Extract the given zip file into the temp directory."""
+    If input_file is not a valid zip file, it is skipped and the function returns False.
+
+    This function must be called before fully_format_chat() to ensure correct operation.
+
+    Arguments:
+        input_file:
+            The name of the original input zip file. It must end in '.zip'.
+
+    Returns:
+        True if the file is successfully extracted, but False if it isn't.
+
+    """
     try:
-        zip_file_object = ZipFile(file_dir)
+        zip_file_object = ZipFile(input_file)
         zip_file_object.extractall('temp')
         zip_file_object.close()
         return True
     except OSError:
-        print(f'ERROR: {file_dir} was not found. Skipping.')
+        print(f'ERROR: {input_file} was not found. Skipping.')
         return False
 
 
-def write_to_file(group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str):
-    """MUST RUN extract_zip() FIRST.
+def fully_format_chat(group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str):
+    """Fully format an already extracted chat.
 
-Go through _chat.txt, format every message, and write them all to output_dir/name.html."""
+    This function will format every message in _chat.txt and write it to output_dir/name.html.
+    It will also move every attachment file to output_dir/Attachments/sender_name.
+
+    extract_zip() must be called before this function to ensure correct operation.
+
+    Arguments:
+        group_chat:
+            A boolean to determine whether the chat is a group chat.
+
+        sender_name:
+            The name of the sender in the chat. Typically the user's WhatsApp alias.
+
+        chat_title:
+            The title of the chat. This appears in the top bar and in the browser tab. It is not the file name.
+
+        html_file_name:
+            The intended name of the final HTML file.
+
+        output_dir:
+            The intended directory for the output. The HTML file, Attachments folder, and Library folder will go here.
+    """
     global senderName, htmlFileName, outputDir
 
     senderName = sender_name
@@ -388,37 +502,50 @@ Go through _chat.txt, format every message, and write them all to output_dir/nam
     file_move_thread.join()
 
 
-def process_single_chat(input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str,
-                        output_dir: str):
-    """Process a single chat completely.
+def process_single_chat(input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str):
+    """Process a single chat completely. Extract it and then fully format it.
 
-This function takes six arguments. All except group_chat, which is a boolean, are strings.
+    Arguments:
+        input_file:
+            The original zip file of the exported chat. It must have '.zip' on the end.
 
-- input_file is the original zip file of the exported chat ('.zip' is necessary)
-- group_chat is True if the chat is a group chat and False if it's not
-- sender_name is the name of the sender (your WhatsApp alias)
-- chat_title is the title of the chat. This will be at the top of the page and in the title of the tab
-- html_file_name is the name of the HTML file to be produced ('.html' should not be part of this)
-- output_dir is the directory where the HTML file, Library directory, and Attachments directory should be generated"""
+        group_chat:
+            A boolean to determine whether the chat is a group chat.
 
+        sender_name:
+            The name of the sender in the chat. Typically the user's WhatsApp alias.
+
+        chat_title:
+            The title of the chat. This appears in the top bar and in the browser tab. It is not the file name.
+
+        html_file_name:
+            The intended name of the final HTML file.
+
+        output_dir:
+            The intended directory for the output. The HTML file, Attachments folder, and Library folder will go here.
+
+    Raises:
+        OSError:
+            If the zip file is not found.
+
+    """
     if extract_zip(input_file):
-        write_to_file(group_chat, sender_name, chat_title, html_file_name, output_dir)
+        fully_format_chat(group_chat, sender_name, chat_title, html_file_name, output_dir)
     else:
         raise OSError(f'Zip file "{input_file}" not found')
 
 
 def process_list(chat_list: list):
-    """RUN TO PROCESS MULTIPLE CHATS. PASSED AS A LIST OF LISTS.
+    """Process a list of chats completely.
 
-chat_list is a list of lists.
-Each list contains the input file, a group chat boolean, the sender name, the title of the chat,
-the file name, and the output directory.
+    Arguments:
+        chat_list:
+            A list of lists. Each sublist must have 6 elements. These elements are the arguments to be passed to process_single_chat().
+            chat_list should look like this:
+                [[input_file, group_hat, sender_name, chat_title, html_file_name, output_dir],
+                [input_file, group_hat, sender_name, chat_title, html_file_name, output_dir], ...]
 
-It should look like this:
-[[inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir],
-[inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir],
-[inputFile, groupChat, senderName, chatTitle, htmlFileName, outputDir], ...]"""
-
+    """
     for chat_data in chat_list:
         # Check if chat_data is the right length and then unpack its values to pass to process_single_chat()
         if len(chat_data) == 6:
