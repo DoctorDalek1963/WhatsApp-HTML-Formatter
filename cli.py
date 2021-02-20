@@ -26,7 +26,7 @@ Functions:
 
 """
 
-from functions import process_list
+from library import process_list
 import shutil
 import os
 import re
