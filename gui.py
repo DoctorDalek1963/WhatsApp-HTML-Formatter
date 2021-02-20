@@ -95,7 +95,7 @@ class FormatterGUI(QMainWindow):
     """The class for the GUI for the WhatsApp Formatter.
 
     Subclasses PyQt5.QtWidgets.QMainWindow. It has no public methods or attributes and only has __init__().
-    You have to create an instance (no arguments taken) and then call show() on it to show the window.
+    You have to create an instance (no arguments taken) and then call show() to show the window.
     """
 
     def __init__(self):
