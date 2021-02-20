@@ -44,8 +44,7 @@ import os
 
 # This is a function I copied from [StackOverflow](https://stackoverflow.com/questions/64336575/select-a-file-or-a-folder-in-qfiledialog-pyqt5)
 # It is a custom file selection dialog which also allows for the selection of directories
-def get_open_files_and_dirs(parent=None, caption='', directory='',
-                            filter='', initial_filter='', options=None):
+def get_open_files_and_dirs(parent=None, caption='', directory='', filter='', initial_filter='', options=None):
     """Open a Qt dialog that can select files or directories.
 
     I copied this function from [StackOverflow](https://stackoverflow.com/questions/64336575/select-a-file-or-a-folder-in-qfiledialog-pyqt5).
