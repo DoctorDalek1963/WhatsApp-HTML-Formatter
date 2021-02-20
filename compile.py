@@ -18,11 +18,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""This module compiles the WhatsApp Formatter in GUI or CLI format. GUI by default.
+"""This module compiles the WhatsApp Formatter with pyinstaller in GUI or CLI format. GUI by default.
 
 Functions:
     compile_formatter(gui=True):
-        Compile the WhatsApp Formatter according to the truthiness of the gui keyword argument. It's true by default.
+        Compile the WhatsApp Formatter with pyinstaller according to the truthiness of the gui keyword argument. It's true by default.
 
 """
 
