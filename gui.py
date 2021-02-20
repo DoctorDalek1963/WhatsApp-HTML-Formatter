@@ -99,7 +99,9 @@ class FormatterGUI(QMainWindow):
     """
 
     def __init__(self):
-        """Create an instance of the WhatsApp Formatter GUI. Takes no arguments."""
+        """Create an instance of the WhatsApp Formatter GUI.
+
+        This method takes no arguments and you must call show() on it after initialising an instance of it."""
         super(FormatterGUI, self).__init__()
 
         # A boolean to see if the window exists. Used to close properly
