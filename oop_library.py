@@ -26,7 +26,7 @@ Classes:
         The class for each chat to be formatted. Every instance is a separate chat.
 
 Functions:
-    process_chat(input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str):
+    process_chat(input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str) -> None:
         Process one chat completely.
 
     process_list_of_chats(list_of_chats: list) -> list:
@@ -70,11 +70,12 @@ class Message:
 
 
 class Chat:
-    """The class for each chat to be formatted. Every instance is a separate chat."""
+    """The class for each chat to be formatted. Every instance is a separate chat.
 
-    sender_name = ''
-    html_file_name = ''
-    output_dir = ''
+    Methods:
+        format():
+            Fully extract the zip file and format the chat.
+    """
 
     def __init__(self, input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str):
         """Create a Chat object with instance attributes equal to the arguments passed.
@@ -127,12 +128,12 @@ class Chat:
         self._move_attachment_files_thread.start()
 
     def format(self):
-        """Fully format the chat."""
+        """Fully extract the zip file and format the chat."""
         self._extract_zip()
         self._start_formatting_threads()
 
 
-def process_chat(input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str):
+def process_chat(input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str) -> None:
     """Process one chat completely.
 
     This function also checks that all arguments are of the right type before using them. If they're not, raise TypeError.
