@@ -38,6 +38,7 @@ Functions:
 
 import re
 import threading
+from datetime import datetime
 
 
 class Message:
@@ -67,6 +68,58 @@ class Message:
     encrypted_messages_notice_pattern = re.compile(
         r'\[(\d{2}/\d{2}/\d{4}, (\d{1,2}:\d{2}:\d{2} [ap]m|\d{2}:\d{2}:\d{2}))] ([^:]+): '
         r'Messages and calls are end-to-end encrypted\. No one outside of this chat, not even WhatsApp, can read or listen to them\.$')
+
+    def __init__(self, original_string: str, group_chat: bool):
+        """Create a Message object."""
+        self._group_chat = group_chat
+
+        # Remove LRM, LRE, and PDF Unicode characters from original_string
+        original = original_string.replace('\u200e', '').replace('\u202a', '').replace('\u202c', '')
+
+        prefix_match = re.match(Message.full_prefix_pattern, original)
+
+        if prefix_match:  # If it's a normal message
+            self._name = prefix_match.group(3)
+            self._message_content = prefix_match.group(4)
+
+            if re.match(Message.attachment_pattern, self._message_content):
+                pass  # TODO: Format self._message_content as an attachment
+            else:
+                pass  # TODO: Format self._message_content as a normal message
+
+            self._group_chat_meta = False
+        else:  # If it's a group chat meta message
+            prefix_match = re.match(Message.group_meta_prefix_pattern, original)
+
+            self._name = ''
+            self._message_content = prefix_match.group(3)
+            self._clean_message_content()
+
+            self._group_chat_meta = True
+
+        # Whichever pattern was matched, the prefix is group 1
+        self._prefix = prefix_match.group(1)
+
+        date_raw = prefix_match.group(1)
+        time = prefix_match.group(2)
+
+        # Use a ternary operator to get datetime object whether the message is in 12 hour or 24 hour format
+        date_obj = datetime.strptime(date_raw, '%d/%m/%Y, %I:%M:%S %p') if ' am' in time or ' pm' in time \
+            else datetime.strptime(date_raw, '%d/%m/%Y, %H:%M:%S')
+
+        day = datetime.strftime(date_obj, '%d')
+        if day.startswith('0'):
+            day = day.replace('0', '', 1)  # Remove a single leading 0
+
+        self._date = datetime.strftime(date_obj, f'%a {day} %B %Y')
+        self._time = datetime.strftime(date_obj, '%I:%M:%S %p')
+
+        if self._time.startswith('0'):
+            self._time = self._time.replace('0', '', 1)
+
+    def _clean_message_content(self):
+        """Replace < and > in self._message_content to avoid rogue HTML tags."""
+        self._message_content = self._message_content.replace('<', '&lt;').replace('>', '&gt;')
 
 
 class Chat:
