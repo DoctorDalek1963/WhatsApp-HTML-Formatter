@@ -29,6 +29,11 @@ Functions:
     process_chat(input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str):
         Process one chat completely.
 
+    process_list_of_chats(list_of_chats: list) -> list:
+        Fully format a list of lists, where each sub-list is a set of arguments to be passed to process_chat().
+
+        Returns a list of all the sub-lists that couldn't be processed properly.
+
 """
 
 import re
@@ -146,4 +151,24 @@ def process_chat(input_file: str, group_chat: bool, sender_name: str, chat_title
         # I'm actually very proud of this code. If the arguments aren't all of the correct type, this TypeError gets raised
         # It gets just the string of the actual type for the type of every item in both lists and prints them nicely
         raise TypeError(f'Expected arg types of [{", ".join([str(x)[8:-2] for x in required_types])}]. '
-                        f'Got [{", ".join([str(type(x))[8:-2] for x in args])}] instead.')
+                        f'Got [{", ".join([str(x)[8:-2] for x in arg_types])}] instead.')
+
+
+def process_list_of_chats(list_of_chats: list) -> list:
+    """Fully format a list of lists, where each sub-list is a set of arguments to be passed to process_chat().
+
+    Returns:
+        rejected_chats:
+            A list of all the sub-lists that couldn't be processed properly. It is an empty list if no sub-lists failed.
+
+    """
+    rejected_chats = []
+
+    for chat_data in list_of_chats:
+        try:
+            process_chat(*chat_data)
+        except TypeError:
+            # If the types in the sub-list are incorrect, add the sub-list to rejected_chats
+            rejected_chats.append(chat_data)
+
+    return rejected_chats
