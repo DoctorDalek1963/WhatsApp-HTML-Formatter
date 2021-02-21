@@ -162,15 +162,15 @@ class Chat:
 
     def _extract_zip(self):
         """Extract the zip file into the temp directory."""
-        pass
+        pass  # TODO: Implement _extract_zip
 
     def _write_text(self):
         """Write the contents of temp/_chat.txt to the output directory."""
-        pass
+        pass  # TODO: Implement _write_text
 
     def _move_attachment_files(self):
         """Move the attachment files in temp to the output directory."""
-        pass
+        pass  # TODO: Implement _move_attachment_files
 
     def _start_formatting_threads(self):
         """Start two threads to fully format the chat after it's been extracted."""
