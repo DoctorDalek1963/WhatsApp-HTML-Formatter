@@ -115,7 +115,7 @@ class Message:
             self._time = self._time.replace('0', '', 1)
 
     def __repr__(self):
-        """Return a __repr__ of the Message object including the name, date, name, and whether it's from a group chat. Also includes the memory location in hex."""
+        """Return a __repr__ of the Message instance including the name, date, name, and whether it's from a group chat. Also includes the memory location in hex."""
         # Use hex here at end to give memory location of Message object
         if self._group_chat_meta:
             return f'<{self.__class__.__module__}.{self.__class__.__name__} object with date="{self._date}", ' \
