@@ -97,9 +97,6 @@ class Message:
 
             self._group_chat_meta = True
 
-        # Whichever pattern was matched, the prefix is group 1
-        self._prefix = prefix_match.group(1)
-
         date_raw = prefix_match.group(1)
         time = prefix_match.group(2)
 
