@@ -114,6 +114,17 @@ class Message:
         if self._time.startswith('0'):
             self._time = self._time.replace('0', '', 1)
 
+    def __repr__(self):
+        """Return a __repr__ of the Message object including the name, date, name, and whether it's from a group chat. Also includes the memory location in hex."""
+        # Use hex here at end to give memory location of Message object
+        if self._group_chat_meta:
+            return f'<{self.__class__.__module__}.{self.__class__.__name__} object with date="{self._date}", ' \
+                   f'time="{self._time}", and group_chat={self._group_chat}, which is a meta message at ' \
+                   f'{hex(id(self))}>'
+        else:
+            return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self._name}", ' \
+                   f'date="{self._date}", time="{self._time}", and group_chat={self._group_chat} at {hex(id(self))}>'
+
     def _clean_message_content(self):
         """Replace < and > in self._message_content to avoid rogue HTML tags."""
         self._message_content = self._message_content.replace('<', '&lt;').replace('>', '&gt;')
