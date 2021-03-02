@@ -136,6 +136,7 @@ class Chat:
     Methods:
         format():
             Fully extract the zip file and format the chat.
+
     """
 
     def __init__(self, input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str):
