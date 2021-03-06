@@ -101,15 +101,25 @@ class Message:
         time = prefix_match.group(2)
 
         # Use a ternary operator to get datetime object whether the message is in 12 hour or 24 hour format
-        date_obj = datetime.strptime(date_raw, '%d/%m/%Y, %I:%M:%S %p') if ' am' in time or ' pm' in time \
+        self._datetime_obj = datetime.strptime(date_raw, '%d/%m/%Y, %I:%M:%S %p') if ' am' in time or ' pm' in time \
             else datetime.strptime(date_raw, '%d/%m/%Y, %H:%M:%S')
 
-        day = datetime.strftime(date_obj, '%d')
-        if day.startswith('0'):
-            day = day.replace('0', '', 1)  # Remove a single leading 0
+        day = str(self._datetime_obj.day)
 
-        self._date = datetime.strftime(date_obj, f'%a {day} %B %Y')
-        self._time = datetime.strftime(date_obj, '%I:%M:%S %p')
+        # Get day of the month extension
+        if day.endswith('1') and day != '11':
+            extension = 'st'
+        elif day.endswith('2') and day != '12':
+            extension = 'nd'
+        elif day.endswith('3') and day != '13':
+            extension = 'rd'
+        else:
+            extension = 'th'
+
+        self._day = day + extension
+
+        self._date = datetime.strftime(self._datetime_obj, f'%a {self._day} %B %Y')
+        self._time = datetime.strftime(self._datetime_obj, '%I:%M:%S %p')
 
         if self._time.startswith('0'):
             self._time = self._time.replace('0', '', 1)
