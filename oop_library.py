@@ -139,6 +139,39 @@ class Message:
         """Replace < and > in self._message_content to avoid rogue HTML tags."""
         self._message_content = self._message_content.replace('<', '&lt;').replace('>', '&gt;')
 
+    def get_date(self) -> str:
+        """Return the formatted date of the message."""
+        return self._date
+
+    def create_html(self, sender_name: str) -> str:
+        """Return HTML representation of the Message object.
+
+        Arguments:
+            sender_name: str:
+                The sender in the chat that this message is from.
+
+        """
+        if not self._group_chat_meta:
+            if self._name == sender_name:
+                sender_type = 'sender'
+            else:
+                sender_type = 'recipient'
+
+            # If this is a group chat and this isn't the sender, add the recipient's name
+            if self._group_chat and self._name != sender_name:
+                css_formatted_name = self._name.replace('\u00a0', '-')  # Replace no-break space with dash
+                recipient_name = f'<span class="recipient-name {css_formatted_name}">{self._name}</span>'
+            else:
+                recipient_name = ''
+
+            return f'<div class="message {sender_type}">\n\t{recipient_name}\n\t<span class="message-info date">' \
+                   f'{self._date}</span>\n\t\t<p>{self._message_content}</p>\n\t<span class="message-info time">' \
+                   f'{self._time}</span>\n</div>\n\n'
+
+        else:  # If a meta message in a group chat
+            return f'<div class="group-chat-meta">\n\t<span class="message-info date">{self._date}</span>\n\t\t' \
+                   f'<p>{self._message_content}</p>\n\t<span class="message-info time">{self._time}</span>\n</div>\n\n'
+
 
 class Chat:
     """The class for each chat to be formatted. Every instance is a separate chat.
