@@ -187,22 +187,22 @@ class Chat:
 
         Arguments:
             input_file:
-            The original zip file of the exported chat. It must have '.zip' on the end.
+                The original zip file of the exported chat. It must have '.zip' on the end.
 
-        group_chat:
-            A boolean to determine whether the chat is a group chat.
+            group_chat:
+                A boolean to determine whether the chat is a group chat.
 
-        sender_name:
-            The name of the sender in the chat. Typically the user's WhatsApp alias.
+            sender_name:
+                The name of the sender in the chat. Typically the user's WhatsApp alias.
 
-        chat_title:
-            The title of the chat. This appears in the top bar and in the browser tab. It is not the file name.
+            chat_title:
+                The title of the chat. This appears in the top bar and in the browser tab. It is not the file name.
 
-        html_file_name:
-            The intended name of the final HTML file.
+            html_file_name:
+                The intended name of the final HTML file.
 
-        output_dir:
-            The intended directory for the output. The HTML file, Attachments folder, and Library folder will go here.
+            output_dir:
+                The intended directory for the output. The HTML file, Attachments folder, and Library folder will go here.
 
         """
         self._input_file = input_file
