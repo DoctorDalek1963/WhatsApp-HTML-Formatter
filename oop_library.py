@@ -42,7 +42,16 @@ from datetime import datetime
 
 
 class Message:
-    """The class for each message in a chat. Every instance is a separate message."""
+    """The class for each message in a chat. Every instance is a separate message.
+
+    Methods:
+        get_date():
+            Return the date of the message.
+
+        create_html(sender_name: str) -> str:
+            Return HTML representation of the Message object.
+
+    """
 
     html_audio_formats = {'.mp3': 'mpeg', '.ogg': 'ogg', '.wav': 'wav'}  # Dict of HTML accepted audio formats
     format_dict = {'_': 'em', '*': 'strong', '~': 'del'}  # Dict of format chars with their HTML tags
@@ -70,7 +79,16 @@ class Message:
         r'Messages and calls are end-to-end encrypted\. No one outside of this chat, not even WhatsApp, can read or listen to them\.$')
 
     def __init__(self, original_string: str, group_chat: bool):
-        """Create a Message object."""
+        """Create a Message object.
+
+        Arguments:
+            original_string: str:
+                The original full content of the message, including all the prefix data in square brackets.
+
+            group_chat: bool:
+                A boolean representing whether the message came from a group chat.
+
+        """
         self._group_chat = group_chat
 
         # Remove LRM, LRE, and PDF Unicode characters from original_string
