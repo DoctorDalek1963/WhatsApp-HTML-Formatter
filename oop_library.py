@@ -35,10 +35,11 @@ Functions:
         Returns a list of all the sub-lists that couldn't be processed properly.
 
 """
+from datetime import datetime
 import os
 import re
 import threading
-from datetime import datetime
+import zipfile
 
 
 class Message:
@@ -235,9 +236,24 @@ class Chat:
         self._temp_directory = f'temp_{os.path.splitext(self._input_file)[0]}_{self._chat_title}_' \
                                f'{os.path.splitext(self._html_file_name)[0]}'
 
-    def _extract_zip(self):
-        """Extract the zip file into the temp directory."""
-        pass  # TODO: Implement _extract_zip
+    def _extract_zip(self) -> bool:
+        """Extract the zip file into a temporary directory.
+
+        Extract the object's input_file into a unique temporary directory. If the extraction fails, the method returns False and skips the file.
+
+        Returns:
+            True if the zip file was successfully extracted, False if not.
+
+        """
+        try:
+            with zipfile.ZipFile(self._input_file) as zip_file:
+                zip_file.extractall(self._temp_directory)
+
+            return True
+
+        except OSError:  # If the zip file failed to extract
+            print(f'ERROR: Failed to extract {self._input_file}. It likely does not exist. This chat will be skipped.')
+            return False
 
     def _write_text(self):
         """Write the contents of temp/_chat.txt to the output directory."""
