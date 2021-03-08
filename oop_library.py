@@ -35,7 +35,7 @@ Functions:
         Returns a list of all the sub-lists that couldn't be processed properly.
 
 """
-
+import os
 import re
 import threading
 from datetime import datetime
@@ -230,6 +230,11 @@ class Chat:
         self._html_file_name = html_file_name
         self._output_dir = output_dir
 
+        # TODO: Use this unique temp directory name to allow for chat processing to be multithreaded
+        # os.path.splitext()[0] is used to remove extensions
+        self._temp_directory = f'temp_{os.path.splitext(self._input_file)[0]}_{self._chat_title}_' \
+                               f'{os.path.splitext(self._html_file_name)[0]}'
+
     def _extract_zip(self):
         """Extract the zip file into the temp directory."""
         pass  # TODO: Implement _extract_zip
@@ -254,6 +259,12 @@ class Chat:
         """Fully extract the zip file and format the chat."""
         self._extract_zip()
         self._start_formatting_threads()
+
+        # Wait until directory is empty, then rmdir it
+        while len(os.listdir(self._temp_directory)) > 0:
+            pass
+
+        os.rmdir(self._temp_directory)
 
 
 def process_chat(input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str) -> None:
