@@ -206,7 +206,7 @@ class Chat:
 
         Arguments:
             input_file:
-                The original zip file of the exported chat. It must have '.zip' on the end.
+                The original zip file of the exported chat. It must have the '.zip' extension.
 
             group_chat:
                 A boolean to determine whether the chat is a group chat.
