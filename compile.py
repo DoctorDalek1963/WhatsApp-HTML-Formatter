@@ -42,7 +42,7 @@ def compile_formatter(gui=True):
     filename = 'gui.py' if gui else 'cli.py'
 
     if os.path.isfile('WhatsApp_Formatter.zip'):
-        os.remove('WhatsApp_Formatter.py')
+        os.remove('WhatsApp_Formatter.zip')
 
     # Create temporary directory to hold everything
     os.mkdir('compile_temp')
