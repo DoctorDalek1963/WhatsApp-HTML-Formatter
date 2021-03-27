@@ -40,6 +40,7 @@ import os
 from pydub import AudioSegment
 import re
 import threading
+import shutil
 import zipfile
 
 
@@ -235,6 +236,13 @@ class Chat:
         # os.path.splitext()[0] is used to remove extensions
         self._temp_directory = f'temp_{os.path.splitext(self._input_file)[0]}_{self._chat_title}_' \
                                f'{os.path.splitext(self._html_file_name)[0]}'
+
+        # Make directories if they don't exist
+        if not os.path.isdir(library_path := os.path.join(self._output_dir, 'Library')):
+            shutil.copytree('Library', library_path)
+
+        if not os.path.isdir(attachments_path := os.path.join(self._output_dir, 'Attachments', self._html_file_name)):
+            os.makedirs(attachments_path)
 
     def _extract_zip(self) -> bool:
         """Extract the zip file into a temporary directory.
