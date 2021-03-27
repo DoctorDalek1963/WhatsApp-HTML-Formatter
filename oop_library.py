@@ -37,6 +37,7 @@ Functions:
 """
 from datetime import datetime
 import os
+from pydub import AudioSegment
 import re
 import threading
 import zipfile
@@ -69,7 +70,7 @@ class Message:
     group_meta_prefix_pattern = re.compile(r'\[(\d{2}/\d{2}/\d{4}, (\d{1,2}:\d{2}:\d{2} [ap]m|\d{2}:\d{2}:\d{2}))] (.+)')
     # Groups: full prefix is 1, time is 2, content is 3
 
-    attachment_pattern = re.compile(r'<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$')
+    attachment_file_pattern = re.compile(r'<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$')
     # Groups: filename without extension is 1, file type is 2, extension is 3
 
     # Link pattern taken from urlregex.com
@@ -101,7 +102,7 @@ class Message:
             self._name = prefix_match.group(3)
             self._message_content = prefix_match.group(4)
 
-            if re.match(Message.attachment_pattern, self._message_content):
+            if re.match(Message.attachment_file_pattern, self._message_content):
                 pass  # TODO: Format self._message_content as an attachment
             else:
                 pass  # TODO: Format self._message_content as a normal message
@@ -201,6 +202,9 @@ class Chat:
 
     """
 
+    attachment_file_pattern = re.compile(r'(\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)$')
+    # Groups: filename without extension is 1, file type is 2, extension is 3
+
     def __init__(self, input_file: str, group_chat: bool, sender_name: str, chat_title: str, html_file_name: str, output_dir: str):
         """Create a Chat object with instance attributes equal to the arguments passed.
 
@@ -261,7 +265,29 @@ class Chat:
 
     def _move_attachment_files(self):
         """Move the attachment files in temp to the output directory."""
-        pass  # TODO: Implement _move_attachment_files
+        files = os.listdir(self._temp_directory)
+        for f in files:
+            try:
+                # Get the file type and the name without an extension
+                file_type = re.match(Chat.attachment_file_pattern, f).group(2)
+                f_no_ext = os.path.splitext(f)[0]
+
+                if file_type == 'AUDIO':
+                    # Convert audio files that can't be played in browsers with simple HTML audio tags
+                    # This is necessary because all voice messages are .opus, which must be converted
+                    if file_type not in Message.html_audio_formats.keys():
+                        # Convert old audio file into .mp3 in same directory
+                        AudioSegment.from_file(os.path.join(self._temp_directory, f)).export(
+                            os.path.join(self._temp_directory, f_no_ext) + '.mp3', format='mp3')
+
+                        # Remove old audio file
+                        os.remove(os.path.join(self._temp_directory, f))
+                        # Set f to new file to make moving the new file easier
+                        f = f_no_ext + '.mp3'
+            except AttributeError:  # File is named weird and doesn't match the RegEx
+                pass
+
+            os.rename(f, os.path.join(self._output_dir, 'Attachments', f))
 
     def _start_formatting_threads(self):
         """Start two threads to fully format the chat after it's been extracted."""
