@@ -138,7 +138,7 @@ class Message:
 
         self._day = day + extension
 
-        self._date = datetime.strftime(self._datetime_obj, f'%a {self._day} %B %Y')
+        self.date = datetime.strftime(self._datetime_obj, f'%a {self._day} %B %Y')
         self._time = datetime.strftime(self._datetime_obj, '%I:%M:%S %p')
 
         if self._time.startswith('0'):
@@ -148,20 +148,16 @@ class Message:
         """Return a __repr__ of the Message instance including the name, date, name, and whether it's from a group chat. Also includes the memory location in hex."""
         # Use hex here at end to give memory location of Message object
         if self._group_chat_meta:
-            return f'<{self.__class__.__module__}.{self.__class__.__name__} object with date="{self._date}", ' \
+            return f'<{self.__class__.__module__}.{self.__class__.__name__} object with date="{self.date}", ' \
                    f'time="{self._time}", and group_chat={self._group_chat}, which is a meta message at ' \
                    f'{hex(id(self))}>'
         else:
             return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self._name}", ' \
-                   f'date="{self._date}", time="{self._time}", and group_chat={self._group_chat} at {hex(id(self))}>'
+                   f'date="{self.date}", time="{self._time}", and group_chat={self._group_chat} at {hex(id(self))}>'
 
     def _clean_message_content(self):
         """Replace < and > in self._message_content to avoid rogue HTML tags."""
         self._message_content = self._message_content.replace('<', '&lt;').replace('>', '&gt;')
-
-    def get_date(self) -> str:
-        """Return the formatted date of the message."""
-        return self._date
 
     def create_html(self, sender_name: str) -> str:
         """Return HTML representation of the Message object.
@@ -185,11 +181,11 @@ class Message:
                 recipient_name = ''
 
             return f'<div class="message {sender_type}">\n\t{recipient_name}\n\t<span class="message-info date">' \
-                   f'{self._date}</span>\n\t\t<p>{self._message_content}</p>\n\t<span class="message-info time">' \
+                   f'{self.date}</span>\n\t\t<p>{self._message_content}</p>\n\t<span class="message-info time">' \
                    f'{self._time}</span>\n</div>\n\n'
 
         else:  # If a meta message in a group chat
-            return f'<div class="group-chat-meta">\n\t<span class="message-info date">{self._date}</span>\n\t\t' \
+            return f'<div class="group-chat-meta">\n\t<span class="message-info date">{self.date}</span>\n\t\t' \
                    f'<p>{self._message_content}</p>\n\t<span class="message-info time">{self._time}</span>\n</div>\n\n'
 
 
@@ -261,7 +257,60 @@ class Chat:
 
     def _write_text(self):
         """Write the contents of temp/_chat.txt to the output directory."""
-        pass  # TODO: Implement _write_text
+        with open(os.path.join(self._temp_directory, '_chat.txt'), 'r', encoding='utf-8') as f:
+            # Read file and remove LRM, LRE, and PDF Unicode characters
+            chat_txt = f.read().replace('\u200e', '').replace('\u202a', '').replace('\u202c', '')
+
+        # Add number to the end of the filename if the file already exists
+        html_filename_with_directory_no_ext = os.path.join(self._output_dir, self._html_file_name)
+        if not os.path.isfile(html_filename_with_directory_no_ext + '.html'):
+            html_file = open(html_filename_with_directory_no_ext + '.html', 'w+', encoding='utf-8')
+        else:
+            same_name_number = 1
+
+            while os.path.isfile(html_filename_with_directory_no_ext + f' ({same_name_number}).html'):
+                same_name_number += 1
+
+            html_file = open(html_filename_with_directory_no_ext + f' ({same_name_number}).html', 'w+', encoding='utf-8')
+
+        start_template = open('start_template.txt', 'r', encoding='utf-8').readlines()  # .readlines() preserves \n characters
+
+        # Replace chat title in start template
+        for line in start_template:
+            if '%chat_title%' in line:
+                line = line.replace('%chat_title%', self._chat_title)
+
+            html_file.write(line)
+
+        # Use a re.sub to place LRMs between each message and then create a list by splitting by LRM
+        chat_txt = re.sub(r'\n\[(?=\d{2}/\d{2}/\d{4}, (\d{1,2}:\d{2}:\d{2} [ap]m|\d{2}:\d{2}:\d{2})])', '\u200e[', chat_txt)
+        chat_txt_list = chat_txt.split('\u200e')
+
+        date_separator = ''
+
+        # === Write every message
+
+        for raw_message in chat_txt_list:
+            # If it's the notice that messages are encrypted, skip it
+            if re.match(Message.encrypted_messages_notice_pattern, raw_message):
+                continue
+
+            msg = Message(raw_message, self._group_chat)
+
+            if msg.date != date_separator:
+                date_separator = msg.date
+                html_file.write(f'<div class="date-separator">{date_separator}</div>\n\n')
+
+            html_file.write(msg.create_html(self._sender_name))
+
+        end_template = open('end_template.txt', 'r', encoding='utf-8')
+
+        for line in end_template:
+            html_file.write(line)
+
+        html_file.close()
+
+        os.remove(os.path.join(self._temp_directory, '_chat.txt'))
 
     def _move_attachment_files(self):
         """Move the attachment files in temp to the output directory."""
