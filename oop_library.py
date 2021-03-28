@@ -113,7 +113,11 @@ class Message:
             if re.match(Message.attachment_file_pattern, self._message_content):
                 pass  # TODO: Format self._message_content as an attachment
             else:
-                pass  # TODO: Format self._message_content as a normal message
+                self._clean_message_content()
+                self._format_with_html_tags()
+                self._format_links()
+
+                self._message_content = self._message_content.replace('\n', '<br>\n\t\t')
 
             self._group_chat_meta = False
         else:  # If it's a group chat meta message
