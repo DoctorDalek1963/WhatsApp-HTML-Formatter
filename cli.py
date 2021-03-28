@@ -27,9 +27,9 @@ Functions:
 """
 
 from library import process_list_of_chats
-import shutil
 import os
 import re
+import shutil
 
 
 def run_cli():

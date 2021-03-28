@@ -32,14 +32,14 @@ Functions:
 
 """
 
-from PyQt5 import QtWidgets, QtCore
+from library import process_list_of_chats
+import os
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget, QShortcut
+from shutil import rmtree
 import sys
 import threading
-from library import process_list_of_chats
-from shutil import rmtree
-import os
 
 
 # This is a function I copied from [StackOverflow](https://stackoverflow.com/questions/64336575/select-a-file-or-a-folder-in-qfiledialog-pyqt5)
