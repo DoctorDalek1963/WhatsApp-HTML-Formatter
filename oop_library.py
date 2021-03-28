@@ -61,10 +61,10 @@ class Message:
     html_audio_formats = {'.mp3': 'mpeg', '.ogg': 'ogg', '.wav': 'wav'}  # Dict of HTML accepted audio formats
 
     # This is a dictionary of patterns and replacement patterns for converting WhatsApp formatting to HTML tags
-    format_dict = {re.compile(r'_([^_]+)_'): r'<em>\1</em>',
-                   re.compile(r'\*([^*]+)\*'): r'<strong>\1</strong>',
-                   re.compile(r'~([^~]+)~'): r'<del>\1</del>',
-                   re.compile(r'```([^`]+)```'): r'<code>\1</code>'}
+    format_dict = {re.compile(r'\b_([^_]+)_\b'): r'<em>\1</em>',
+                   re.compile(r'\*\b([^*]+)\b\*'): r'<strong>\1</strong>',
+                   re.compile(r'~\b([^~]+)\b~'): r'<del>\1</del>',
+                   re.compile(r'```\b([^`]+)\b```'): r'<code>\1</code>'}
 
     # Tuple of extensions that can be moved without being converted
     non_conversion_extensions = ('jpg', 'png', 'webp', 'gif', 'mp4', 'mp3', 'ogg', 'wav')
