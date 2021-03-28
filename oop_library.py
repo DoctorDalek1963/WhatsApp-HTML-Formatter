@@ -35,6 +35,7 @@ Functions:
         Returns a list of all the sub-lists that couldn't be processed properly.
 
 """
+
 import concurrent.futures
 from datetime import datetime
 import os
@@ -413,7 +414,7 @@ def process_chat(input_file: str, group_chat: bool, sender_name: str, chat_title
 
 
 def process_list_of_chats(list_of_chats: list) -> list:
-    """Fully format a list of lists, where each sub-list is a set of arguments to be passed to process_chat().
+    """Fully format a list of lists, where each sub-list is a list of arguments to be passed to process_chat().
 
     Returns:
         rejected_chats:
