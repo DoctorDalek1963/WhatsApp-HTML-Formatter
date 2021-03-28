@@ -303,7 +303,9 @@ class Chat:
         self._html_file_name = html_file_name
         self._output_dir = output_dir
 
+        # This is a unique temporary directory for this chat, to allow for multithreading multiple chats
         # os.path.splitext()[0] is used to remove extensions
+        # os.path.split()[1] is used to just get the name of the zip file, not the absolute path
         self._temp_directory = f'temp_{os.path.splitext(os.path.split(self._input_file)[1])[0]}_{self._chat_title}_' \
                                f'{os.path.splitext(self._html_file_name)[0]}'
 
