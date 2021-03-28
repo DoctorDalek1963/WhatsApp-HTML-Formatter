@@ -394,27 +394,28 @@ class Chat:
         """Move the attachment files in temp to the output directory."""
         files = os.listdir(self._temp_directory)
         for f in files:
-            try:
-                # Get the file type and the name without an extension
-                file_type = re.match(Chat.attachment_file_pattern, f).group(2)
-                f_no_ext = os.path.splitext(f)[0]
+            if f != '_chat.txt':
+                try:
+                    # Get the file type and the name without an extension
+                    file_type = re.match(Chat.attachment_file_pattern, f).group(2)
+                    f_no_ext = os.path.splitext(f)[0]
 
-                if file_type == 'AUDIO':
-                    # Convert audio files that can't be played in browsers with simple HTML audio tags
-                    # This is necessary because all voice messages are .opus, which must be converted
-                    if file_type not in Message.html_audio_formats.keys():
-                        # Convert old audio file into .mp3 in same directory
-                        AudioSegment.from_file(os.path.join(self._temp_directory, f)).export(
-                            os.path.join(self._temp_directory, f_no_ext) + '.mp3', format='mp3')
+                    if file_type == 'AUDIO':
+                        # Convert audio files that can't be played in browsers with simple HTML audio tags
+                        # This is necessary because all voice messages are .opus, which must be converted
+                        if file_type not in Message.html_audio_formats.keys():
+                            # Convert old audio file into .mp3 in same directory
+                            AudioSegment.from_file(os.path.join(self._temp_directory, f)).export(
+                                os.path.join(self._temp_directory, f_no_ext) + '.mp3', format='mp3')
 
-                        # Remove old audio file
-                        os.remove(os.path.join(self._temp_directory, f))
-                        # Set f to new file to make moving the new file easier
-                        f = f_no_ext + '.mp3'
-            except AttributeError:  # File is named weird and doesn't match the RegEx
-                pass
+                            # Remove old audio file
+                            os.remove(os.path.join(self._temp_directory, f))
+                            # Set f to new file to make moving the new file easier
+                            f = f_no_ext + '.mp3'
+                except AttributeError:  # File is named weird and doesn't match the RegEx
+                    pass
 
-            os.rename(os.path.join(self._temp_directory, f), os.path.join(self._output_dir, 'Attachments', self._html_file_name, f))
+                os.rename(os.path.join(self._temp_directory, f), os.path.join(self._output_dir, 'Attachments', self._html_file_name, f))
 
     def _start_formatting_threads(self):
         """Start two threads to fully format the chat after it's been extracted."""
