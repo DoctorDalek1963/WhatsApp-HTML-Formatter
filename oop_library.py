@@ -303,9 +303,8 @@ class Chat:
         self._html_file_name = html_file_name
         self._output_dir = output_dir
 
-        # TODO: Use this unique temp directory name to allow for chat processing to be multithreaded
         # os.path.splitext()[0] is used to remove extensions
-        self._temp_directory = f'temp_{os.path.splitext(self._input_file)[0]}_{self._chat_title}_' \
+        self._temp_directory = f'temp_{os.path.splitext(os.path.split(self._input_file)[1])[0]}_{self._chat_title}_' \
                                f'{os.path.splitext(self._html_file_name)[0]}'
 
         # Make directories if they don't exist
