@@ -35,6 +35,7 @@ Functions:
         Returns a list of all the sub-lists that couldn't be processed properly.
 
 """
+import concurrent.futures
 from datetime import datetime
 import os
 from pydub import AudioSegment
@@ -420,11 +421,17 @@ def process_list_of_chats(list_of_chats: list) -> list:
     """
     rejected_chats = []
 
-    for chat_data in list_of_chats:
-        try:
-            process_chat(*chat_data)
-        except TypeError:
-            # If the types in the sub-list are incorrect, add the sub-list to rejected_chats
-            rejected_chats.append(chat_data)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        # Create a dictionary with the Future object of the method call as the key and the list of args as the value
+        # This allows us to return the args of the rejected chats
+        futures = {executor.submit(process_chat, *chat_data): chat_data for chat_data in list_of_chats}
+
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                future.result()
+            except TypeError:
+                # Get the value from the dictionary using the Future object as the key
+                # This is the arguments passed
+                rejected_chats.append(futures[future])
 
     return rejected_chats
