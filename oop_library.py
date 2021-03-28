@@ -115,7 +115,7 @@ class Message:
             self._message_content = prefix_match.group(4)
 
             if re.match(Message.attachment_message_pattern, self._message_content):
-                pass  # TODO: Format self._message_content as an attachment
+                self._format_attachment_message()
             else:
                 self._clean_message_content()
                 self._format_with_html_tags()
@@ -191,6 +191,45 @@ class Message:
 
             formatted_link = f'<a href="{link}" target="_blank">{link}</a>'
             self._message_content = self._message_content.replace(link, formatted_link)
+
+    def _format_attachment_message(self):
+        """Format an attachment message to properly link to the attachment with HTML tags."""
+        match = re.match(Message.attachment_message_pattern, self._message_content)
+        filename_no_ext = match.group(1)
+        file_type = match.group(2)
+        extension = match.group(3)
+
+        filename = filename_no_ext + extension
+
+        if file_type == 'AUDIO':
+            for ext, given_format in Message.html_audio_formats.items():
+                # If it's a standard, accepted extension, use that format
+                if extension == ext:
+                    html_format = given_format
+                    break
+
+            else:  # If none of the standard HTML audio formats broke out of the for loop, it will be converted to an mp3 file, so use that format
+                html_format = 'mpeg'
+                filename = filename_no_ext + '.mp3'
+
+            self._message_content = f'<audio controls>\n\t\t\t<source ' \
+                                    f'src="{os.path.join("Attachments", self._html_file_name, filename)}" ' \
+                                    f'type="audio/{html_format}">\n\t\t</audio>'
+
+        elif file_type == 'VIDEO':
+            self._message_content = f'<video controls>\n\t\t\t<source ' \
+                                    f'src="{os.path.join("Attachments", self._html_file_name, filename)}">\n\t\t</video>'
+
+        elif (file_type == 'PHOTO') or (file_type == 'GIF' and extension == '.gif') or (file_type == 'STICKER'):
+            self._message_content = f'<img class="small" src="{os.path.join("Attachments", self._html_file_name, filename)}" ' \
+                                    f'alt="IMAGE ATTACHMENT" style="max-height: 400px; max-width: 800px; display: inline-block;">'
+
+        elif file_type == 'GIF' and extension != '.gif':  # Add gif as video that autoplays and loops like a proper gif
+            self._message_content = f'<video autoplay loop muted playsinline>\n\t\t\t<source ' \
+                                    f'src="Attachments/{os.path.join("Attachments", self._html_file_name, filename)}">\n\t\t</video>'
+
+        else:
+            self._message_content = f'UNKNOWN ATTACHMENT "{filename}"'
 
     def create_html(self, sender_name: str) -> str:
         """Return HTML representation of the Message object.
