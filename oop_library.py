@@ -59,7 +59,12 @@ class Message:
     """
 
     html_audio_formats = {'.mp3': 'mpeg', '.ogg': 'ogg', '.wav': 'wav'}  # Dict of HTML accepted audio formats
-    format_dict = {'_': 'em', '*': 'strong', '~': 'del'}  # Dict of format chars with their HTML tags
+
+    # This is a dictionary of patterns and replacement patterns for converting WhatsApp formatting to HTML tags
+    format_dict = {re.compile(r'_([^_]+)_'): r'<em>\1</em>',
+                   re.compile(r'\*([^*]+)\*'): r'<strong>\1</strong>',
+                   re.compile(r'~([^~]+)~'): r'<del>\1</del>',
+                   re.compile(r'```([^`]+)```'): r'<code>\1</code>'}
 
     # Tuple of extensions that can be moved without being converted
     non_conversion_extensions = ('jpg', 'png', 'webp', 'gif', 'mp4', 'mp3', 'ogg', 'wav')
@@ -161,6 +166,11 @@ class Message:
     def _clean_message_content(self):
         """Replace < and > in self._message_content to avoid rogue HTML tags."""
         self._message_content = self._message_content.replace('<', '&lt;').replace('>', '&gt;')
+
+    def _format_with_html_tags(self):
+        """Replace WhatsApp format characters with their HTML tag equivalents in self._message_content."""
+        for pattern, replacement in Message.format_dict.items():
+            self._message_content = re.sub(pattern, replacement, self._message_content)
 
     def _format_links(self):
         """Find all the links in self._message_content and wrap them in <a> tags."""
