@@ -213,20 +213,20 @@ class Message:
                 filename = filename_no_ext + '.mp3'
 
             self._message_content = f'<audio controls>\n\t\t\t<source ' \
-                                    f'src="{os.path.join("Attachments", self._html_file_name, filename)}" ' \
+                                    f'src="Attachments/{self._html_file_name}/{filename}" ' \
                                     f'type="audio/{html_format}">\n\t\t</audio>'
 
         elif file_type == 'VIDEO':
             self._message_content = f'<video controls>\n\t\t\t<source ' \
-                                    f'src="{os.path.join("Attachments", self._html_file_name, filename)}">\n\t\t</video>'
+                                    f'src="Attachments/{self._html_file_name}/{filename}">\n\t\t</video>'
 
         elif (file_type == 'PHOTO') or (file_type == 'GIF' and extension == '.gif') or (file_type == 'STICKER'):
-            self._message_content = f'<img class="small" src="{os.path.join("Attachments", self._html_file_name, filename)}" ' \
+            self._message_content = f'<img class="small" src="Attachments/{self._html_file_name}/{filename}" ' \
                                     f'alt="IMAGE ATTACHMENT" style="max-height: 400px; max-width: 800px; display: inline-block;">'
 
         elif file_type == 'GIF' and extension != '.gif':  # Add gif as video that autoplays and loops like a proper gif
             self._message_content = f'<video autoplay loop muted playsinline>\n\t\t\t<source ' \
-                                    f'src="Attachments/{os.path.join("Attachments", self._html_file_name, filename)}">\n\t\t</video>'
+                                    f'src="Attachments/{self._html_file_name}/{filename}">\n\t\t</video>'
 
         else:
             self._message_content = f'UNKNOWN ATTACHMENT "{filename}"'
