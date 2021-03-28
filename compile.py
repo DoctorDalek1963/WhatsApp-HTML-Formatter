@@ -52,6 +52,7 @@ def compile_formatter(gui=True):
     shutil.copy('end_template.txt', 'compile_temp/')
     shutil.copytree('Library', 'compile_temp/Library')
     shutil.copy('release_readme.md', 'compile_temp/README.md')
+    shutil.copy('style_gui.css', 'compile_temp/')
 
     # Remove jsconfig file, which only exists on my machine
     if os.path.isfile('compile_temp/Library/jsconfig.json'):
