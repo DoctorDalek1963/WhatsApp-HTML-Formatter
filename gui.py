@@ -37,7 +37,7 @@ from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget, QShortcut
 import sys
 import threading
-import library
+from library import process_list_of_chats
 from shutil import rmtree
 import os
 
@@ -313,7 +313,7 @@ the top of the page and in the tab title)\n
         # Assign all chats to temporary variable to allow the process_all button to be disabled
         all_chats = self._all_chats_list.copy()
         self._all_chats_list.clear()
-        library.process_list_of_chats(all_chats)
+        process_list_of_chats(all_chats)
 
         self._processing_label.setText('')
         self._exit_button.setEnabled(True)
