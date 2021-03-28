@@ -162,6 +162,18 @@ class Message:
         """Replace < and > in self._message_content to avoid rogue HTML tags."""
         self._message_content = self._message_content.replace('<', '&lt;').replace('>', '&gt;')
 
+    def _format_links(self):
+        """Find all the links in self._message_content and wrap them in <a> tags."""
+        links = re.findall(Message.link_pattern, self._message_content)
+
+        for link in links:
+            # Get rid of punctuation or spaces at the end of the link
+            while re.search(r'[\s.,!?]$', link):
+                link = link[:-1]
+
+            formatted_link = f'<a href="{link}" target="_blank">{link}</a>'
+            self._message_content = self._message_content.replace(link, formatted_link)
+
     def create_html(self, sender_name: str) -> str:
         """Return HTML representation of the Message object.
 
