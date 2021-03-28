@@ -373,7 +373,7 @@ class Chat:
             if re.match(Message.encrypted_messages_notice_pattern, raw_message):
                 continue
 
-            msg = Message(raw_message, self._group_chat)
+            msg = Message(raw_message, self._group_chat, self._html_file_name)
 
             if msg.date != date_separator:
                 date_separator = msg.date
