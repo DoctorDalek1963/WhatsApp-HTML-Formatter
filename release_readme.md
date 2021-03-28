@@ -20,7 +20,7 @@ These are only necessary if you aren't on Windows and can't run `WhatsApp_Format
 ## Steps:
 
 1. Export the desired chat on your phone
-2. Run gui.py or `WhatsApp_Formatter.exe` if you're on Windows
+2. Run `WhatsApp_Formatter.exe` (this only works on Windows; if you're on a different OS, you'll need to download the source and run `compile.py` yourself. (Requires pyinstaller))
 3. Select the first zip file with the `Select an exported chat` button
 4. Tick the box if it's a group chat
 5. Enter the name of the sender (your WhatsApp alias)
