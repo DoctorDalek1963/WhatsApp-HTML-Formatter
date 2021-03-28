@@ -50,9 +50,6 @@ class Message:
     """The class for each message in a chat. Every instance is a separate message.
 
     Methods:
-        get_date():
-            Return the date of the message.
-
         create_html(sender_name: str) -> str:
             Return HTML representation of the Message object.
 
