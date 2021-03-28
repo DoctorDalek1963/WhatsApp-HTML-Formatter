@@ -42,7 +42,7 @@ def compile_formatter(gui=True):
     filename = 'gui.py' if gui else 'cli.py'
 
     if os.path.isfile('WhatsApp_Formatter.zip'):
-        os.remove('WhatsApp_Formatter.py')
+        os.remove('WhatsApp_Formatter.zip')
 
     # Create temporary directory to hold everything
     os.mkdir('compile_temp')
@@ -51,6 +51,7 @@ def compile_formatter(gui=True):
     shutil.copy('start_template.txt', 'compile_temp/')
     shutil.copy('end_template.txt', 'compile_temp/')
     shutil.copytree('Library', 'compile_temp/Library')
+    shutil.copy('release_readme.md', 'compile_temp/README.md')
 
     # Remove jsconfig file, which only exists on my machine
     if os.path.isfile('compile_temp/Library/jsconfig.json'):

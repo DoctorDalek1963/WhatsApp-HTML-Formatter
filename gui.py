@@ -313,7 +313,7 @@ the top of the page and in the tab title)\n
         # Assign all chats to temporary variable to allow the process_all button to be disabled
         all_chats = self._all_chats_list.copy()
         self._all_chats_list.clear()
-        library.process_list(all_chats)
+        library.process_list_of_chats(all_chats)
 
         self._processing_label.setText('')
         self._exit_button.setEnabled(True)

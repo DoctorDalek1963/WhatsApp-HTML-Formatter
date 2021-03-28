@@ -12,11 +12,15 @@ A program to convert WhatsApp chats exported as zip files into formatted HTML fi
 ---
 
 ## Notices:
+- **THIS ONLY WORKS FOR CHATS EXPORTED ON iOS**. As far as I'm aware, chats exported on Android use a completely different format. I've only tested this on LineageOS, though, so it might be fine if you exported the chat from a stock Android ROM.
+
 - Feel free to change `Library/background-image.jpg` to whatever background image you'd like, just make sure it has the same name
 - If you're formatting a group chat, please add the participants' names to `Library/group_chat_names.css` with colours, following the examples given at the top of the file
 
 ## Dependencies:
-- [pydub](http://pydub.com/)
+Install these with `pip install -r requirements.txt`.
+- [pydub](https://pypi.org/project/pydub/)
+- [PyQt5](https://pypi.org/project/PyQt5/)
 
 ---
 
@@ -24,7 +28,7 @@ A program to convert WhatsApp chats exported as zip files into formatted HTML fi
 
 ### Command Line:
 1. Export the desired chat on your phone
-2. Run formatter_cli.py
+2. Run cli.py
 3. Enter the name of the first zip file
 4. If it's a group chat, type anything beginning with a `y` or `Y`
 5. Enter the name of the sender (your WhatsApp alias)
@@ -38,7 +42,7 @@ A program to convert WhatsApp chats exported as zip files into formatted HTML fi
 
 ### GUI:
 1. Export the desired chat on your phone
-2. Run formatter_gui.py or formatter.exe
+2. Run gui.py or `WhatsApp_Formatter.exe` if you're on Windows and downloaded the release
 3. Select the first zip file with the `Select an exported chat` button
 4. Tick the box if it's a group chat
 5. Enter the name of the sender (your WhatsApp alias)
