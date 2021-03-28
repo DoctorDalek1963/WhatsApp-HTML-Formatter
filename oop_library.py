@@ -78,7 +78,7 @@ class Message:
     group_meta_prefix_pattern = re.compile(r'\[(\d{2}/\d{2}/\d{4}, (\d{1,2}:\d{2}:\d{2} [ap]m|\d{2}:\d{2}:\d{2}))] (.+)')
     # Groups: full prefix is 1, time is 2, content is 3
 
-    attachment_file_pattern = re.compile(r'<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$')
+    attachment_message_pattern = re.compile(r'<attached: (\d{8}-(\w+)-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})(\.\w+)>$')
     # Groups: filename without extension is 1, file type is 2, extension is 3
 
     # Link pattern taken from urlregex.com
@@ -110,7 +110,7 @@ class Message:
             self._name = prefix_match.group(3)
             self._message_content = prefix_match.group(4)
 
-            if re.match(Message.attachment_file_pattern, self._message_content):
+            if re.match(Message.attachment_message_pattern, self._message_content):
                 pass  # TODO: Format self._message_content as an attachment
             else:
                 self._clean_message_content()
