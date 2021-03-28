@@ -26,7 +26,7 @@ Functions:
 
 """
 
-from library import process_list
+from library import process_list_of_chats
 import shutil
 import os
 import re
@@ -83,7 +83,7 @@ def run_cli():
     # Process list of chats
     print()
     print('Processing all...')
-    process_list(all_chats)
+    process_list_of_chats(all_chats)
     shutil.rmtree('temp')
     print('Processing complete!')
 
