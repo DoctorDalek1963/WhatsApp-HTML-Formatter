@@ -88,7 +88,7 @@ class Message:
         r'\[(\d{2}/\d{2}/\d{4}, (\d{1,2}:\d{2}:\d{2} [ap]m|\d{2}:\d{2}:\d{2}))] ([^:]+): '
         r'Messages and calls are end-to-end encrypted\. No one outside of this chat, not even WhatsApp, can read or listen to them\.$')
 
-    def __init__(self, original_string: str, group_chat: bool):
+    def __init__(self, original_string: str, group_chat: bool, html_file_name: str):
         """Create a Message object.
 
         Arguments:
@@ -98,8 +98,12 @@ class Message:
             group_chat: bool:
                 A boolean representing whether the message came from a group chat.
 
+            html_file_name: str:
+                The name of the final HTML file.
+
         """
         self._group_chat = group_chat
+        self._html_file_name = html_file_name
 
         # Remove LRM, LRE, and PDF Unicode characters from original_string
         original = original_string.replace('\u200e', '').replace('\u202a', '').replace('\u202c', '')
