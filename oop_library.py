@@ -397,18 +397,19 @@ def process_chat(input_file: str, group_chat: bool, sender_name: str, chat_title
 
     """
     args = [input_file, group_chat, sender_name, chat_title, html_file_name, output_dir]
+
     arg_types = [type(x) for x in args]
+    printable_arg_types = '[' + ', '.join([str(x)[8:-2] for x in arg_types]) + ']'
+
     required_types = [str, bool, str, str, str, str]
+    printable_required_types = '[' + ', '.join([str(x)[8:-2] for x in required_types]) + ']'
 
     # If all the arguments are of the correct type, format the chat
     if arg_types == required_types:
         chat = Chat(*args)
         chat.format()
     else:
-        # I'm actually very proud of this code. If the arguments aren't all of the correct type, this TypeError gets raised
-        # It gets just the string of the actual type for the type of every item in both lists and prints them nicely
-        raise TypeError(f'Expected arg types of [{", ".join([str(x)[8:-2] for x in required_types])}]. '
-                        f'Got [{", ".join([str(x)[8:-2] for x in arg_types])}] instead.')
+        raise TypeError(f'Expected arg types of {printable_required_types}. Got {printable_arg_types} instead.')
 
 
 def process_list_of_chats(list_of_chats: list) -> list:
