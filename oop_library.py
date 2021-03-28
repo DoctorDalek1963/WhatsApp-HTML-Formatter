@@ -415,7 +415,7 @@ class Chat:
             except AttributeError:  # File is named weird and doesn't match the RegEx
                 pass
 
-            os.rename(os.path.join(self._temp_directory, f), os.path.join(self._output_dir, 'Attachments', f))
+            os.rename(os.path.join(self._temp_directory, f), os.path.join(self._output_dir, 'Attachments', self._html_file_name, f))
 
     def _start_formatting_threads(self):
         """Start two threads to fully format the chat after it's been extracted."""
