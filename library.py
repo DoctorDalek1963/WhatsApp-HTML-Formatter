@@ -300,6 +300,10 @@ class Chat:
         self._html_file_name = html_file_name
         self._output_dir = output_dir
 
+        # Threads to be used later
+        self._write_text_thread = threading.Thread(target=self._write_text)
+        self._move_attachment_files_thread = threading.Thread(target=self._move_attachment_files)
+
         # This is a unique temporary directory for this chat, to allow for multithreading multiple chats
         # os.path.splitext()[0] is used to remove extensions
         # os.path.split()[1] is used to just get the name of the zip file, not the absolute path
@@ -418,9 +422,6 @@ class Chat:
 
     def _start_formatting_threads(self):
         """Start two threads to fully format the chat after it's been extracted."""
-        self._write_text_thread = threading.Thread(target=self._write_text)
-        self._move_attachment_files_thread = threading.Thread(target=self._move_attachment_files)
-
         self._write_text_thread.start()
         self._move_attachment_files_thread.start()
 
