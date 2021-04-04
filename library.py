@@ -37,13 +37,14 @@ Functions:
 """
 
 import concurrent.futures
-from datetime import datetime
 import os
-from pydub import AudioSegment
 import re
 import threading
 import shutil
 import zipfile
+
+from datetime import datetime
+from pydub import AudioSegment
 
 
 class Message:

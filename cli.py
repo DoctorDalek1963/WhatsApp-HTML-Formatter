@@ -26,10 +26,11 @@ Functions:
 
 """
 
-from library import process_list_of_chats
 import os
 import re
 import shutil
+
+from library import process_list_of_chats
 
 
 def run_cli():
