@@ -47,6 +47,10 @@ from datetime import datetime
 from pydub import AudioSegment
 
 
+class BadFormatError(Exception):
+    """A simple exception to be thrown if the format is incorrect."""
+
+
 class Message:
     """The class for each message in a chat. Every instance is a separate message.
 
@@ -124,6 +128,9 @@ class Message:
             self._group_chat_meta = False
         else:  # If it's a group chat meta message
             prefix_match = re.match(Message.group_meta_prefix_pattern, original)
+
+            if prefix_match is None:
+                raise BadFormatError('Failed to match normal message or group chat meta message.')
 
             self._name = ''
             self._message_content = prefix_match.group(3)
