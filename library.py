@@ -484,7 +484,7 @@ def process_chat(input_file: str, group_chat: bool, sender_name: str, chat_title
 
     # If all the arguments are of the correct type, format the chat
     if arg_types == required_types:
-        chat = Chat(*args)
+        chat = Chat(input_file, group_chat, sender_name, chat_title, html_file_name, output_dir)
         chat.format()
     else:
         raise TypeError(f'Expected arg types of {printable_required_types}. Got {printable_arg_types} instead.')
