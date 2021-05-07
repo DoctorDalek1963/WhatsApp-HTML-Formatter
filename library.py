@@ -19,6 +19,9 @@
 """This module has the class and functions to format one WhatsApp chat in its entirety.
 
 Classes:
+    BadFormatError:
+        A simple exception to be thrown if the format is incorrect.
+
     Message:
         The class for each message in a chat. Every instance is a separate message.
 
@@ -44,7 +47,9 @@ import shutil
 import zipfile
 
 from datetime import datetime
+from typing import Tuple, List
 from pydub import AudioSegment
+
 
 
 class BadFormatError(Exception):
@@ -165,27 +170,28 @@ class Message:
         if self._time.startswith('0'):
             self._time = self._time.replace('0', '', 1)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a __repr__ of the Message instance including the name, date, name, and whether it's from a group chat. Also includes the memory location in hex."""
         # Use hex here at end to give memory location of Message object
         if self._group_chat_meta:
             return f'<{self.__class__.__module__}.{self.__class__.__name__} object with date="{self.date}", ' \
                    f'time="{self._time}", and group_chat={self._group_chat}, which is a meta message at ' \
                    f'{hex(id(self))}>'
-        else:
-            return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self._name}", ' \
-                   f'date="{self.date}", time="{self._time}", and group_chat={self._group_chat} at {hex(id(self))}>'
 
-    def _clean_message_content(self):
+        # Else
+        return f'<{self.__class__.__module__}.{self.__class__.__name__} object with name="{self._name}", ' \
+               f'date="{self.date}", time="{self._time}", and group_chat={self._group_chat} at {hex(id(self))}>'
+
+    def _clean_message_content(self) -> None:
         """Replace < and > in self._message_content to avoid rogue HTML tags."""
         self._message_content = self._message_content.replace('<', '&lt;').replace('>', '&gt;')
 
-    def _format_with_html_tags(self):
+    def _format_with_html_tags(self) -> None:
         """Replace WhatsApp format characters with their HTML tag equivalents in self._message_content."""
         for pattern, replacement in Message.format_dict.items():
             self._message_content = re.sub(pattern, replacement, self._message_content)
 
-    def _format_links(self):
+    def _format_links(self) -> None:
         """Find all the links in self._message_content and wrap them in <a> tags."""
         links = re.findall(Message.link_pattern, self._message_content)
 
@@ -197,9 +203,12 @@ class Message:
             formatted_link = f'<a href="{link}" target="_blank">{link}</a>'
             self._message_content = self._message_content.replace(link, formatted_link)
 
-    def _format_attachment_message(self):
+    def _format_attachment_message(self) -> None:
         """Format an attachment message to properly link to the attachment with HTML tags."""
         match = re.match(Message.attachment_message_pattern, self._message_content)
+        if match is None:
+            raise BadFormatError('Failed to match attachment message.')
+
         filename_no_ext = match.group(1)
         file_type = match.group(2)
         extension = match.group(3)
@@ -261,9 +270,10 @@ class Message:
                    f'{self.date}</span>\n\t\t<p>{self._message_content}</p>\n\t<span class="message-info time">' \
                    f'{self._time}</span>\n</div>\n\n'
 
-        else:  # If a meta message in a group chat
-            return f'<div class="group-chat-meta">\n\t<span class="message-info date">{self.date}</span>\n\t\t' \
-                   f'<p>{self._message_content}</p>\n\t<span class="message-info time">{self._time}</span>\n</div>\n\n'
+        # Else
+        # If it's a meta message in a group chat
+        return f'<div class="group-chat-meta">\n\t<span class="message-info date">{self.date}</span>\n\t\t' \
+               f'<p>{self._message_content}</p>\n\t<span class="message-info time">{self._time}</span>\n</div>\n\n'
 
 
 class Chat:
@@ -344,7 +354,7 @@ class Chat:
             print(f'ERROR: Failed to extract {self._input_file}. It likely does not exist. This chat will be skipped.')
             return False
 
-    def _write_text(self):
+    def _write_text(self) -> None:
         """Write the contents of temp/_chat.txt to the output directory."""
         with open(os.path.join(self._temp_directory, '_chat.txt'), 'r', encoding='utf-8') as f:
             # Read file and remove LRM, LRE, and PDF Unicode characters
@@ -401,14 +411,19 @@ class Chat:
 
         os.remove(os.path.join(self._temp_directory, '_chat.txt'))
 
-    def _move_attachment_files(self):
+    def _move_attachment_files(self) -> None:
         """Move the attachment files in temp to the output directory."""
         files = os.listdir(self._temp_directory)
         for f in files:
             if f != '_chat.txt':
                 try:
                     # Get the file type and the name without an extension
-                    file_type = re.match(Chat.attachment_file_pattern, f).group(2)
+                    file_match = re.match(Chat.attachment_file_pattern, f)
+                    if file_match is None:
+                        raise BadFormatError('Failed to match format of attachment file.')
+
+                    file_type = file_match.group(2)
+
                     f_no_ext = os.path.splitext(f)[0]
 
                     if file_type == 'AUDIO':
@@ -428,12 +443,12 @@ class Chat:
 
                 os.rename(os.path.join(self._temp_directory, f), os.path.join(self._output_dir, 'Attachments', self._html_file_name, f))
 
-    def _start_formatting_threads(self):
+    def _start_formatting_threads(self) -> None:
         """Start two threads to fully format the chat after it's been extracted."""
         self._write_text_thread.start()
         self._move_attachment_files_thread.start()
 
-    def format(self):
+    def format(self) -> None:
         """Fully extract the zip file and format the chat."""
         self._extract_zip()
         self._start_formatting_threads()
@@ -490,12 +505,12 @@ def process_chat(input_file: str, group_chat: bool, sender_name: str, chat_title
         raise TypeError(f'Expected arg types of {printable_required_types}. Got {printable_arg_types} instead.')
 
 
-def process_list_of_chats(list_of_chats: list) -> list:
-    """Fully format a list of lists, where each sub-list is a list of arguments to be passed to process_chat().
+def process_list_of_chats(list_of_chats: List[Tuple[str, bool, str, str, str, str]]) -> List[Tuple[str, bool, str, str, str, str]]:
+    """Fully format a list of tuples, where each tuple is a list of arguments to be passed to process_chat().
 
     Returns:
         rejected_chats:
-            A list of all the sub-lists that couldn't be processed properly. It is an empty list if no sub-lists failed.
+            A list of all the argument tuples that couldn't be processed properly. It is an empty list if no tuples failed.
 
     """
     rejected_chats = []

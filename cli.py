@@ -33,7 +33,7 @@ import shutil
 from library import process_list_of_chats
 
 
-def run_cli():
+def run_cli() -> None:
     """Run the command line version of the WhatsApp Formatter."""
     cwd = os.getcwd()
     process_flag = False
@@ -53,10 +53,7 @@ def run_cli():
         print()
 
         group_chat_raw_input = input('Is this a group chat? (Y/n) ')
-        if re.match(r'[yY]', group_chat_raw_input):
-            group_chat = True
-        else:
-            group_chat = False
+        group_chat = bool(re.match(r'[yY]', group_chat_raw_input))
         print()
 
         sender_name = input('Please enter the name of the sender (your WhatsApp alias): ')
@@ -72,7 +69,7 @@ def run_cli():
         print()
 
         # Add selected chat with data to all_chats
-        all_chats.append([input_file, group_chat, sender_name, chat_title, html_file_name, output_dir])
+        all_chats.append((input_file, group_chat, sender_name, chat_title, html_file_name, output_dir))
 
         # Ask for another input
         process_input = input('Would you like to add another file (Y/n)? ')

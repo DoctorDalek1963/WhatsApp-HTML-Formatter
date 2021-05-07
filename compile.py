@@ -31,7 +31,7 @@ import os
 import subprocess
 
 
-def compile_formatter(gui=True):
+def compile_formatter(gui=True) -> None:
     """Compile the WhatsApp Formatter using pyinstaller.
 
     Keyword arguments:

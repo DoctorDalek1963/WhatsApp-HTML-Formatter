@@ -4,6 +4,8 @@
 # Python byte code
 __pycache__/
 
+.mypy_cache/
+
 # Temporary directory to extract zip files to
 temp/
 

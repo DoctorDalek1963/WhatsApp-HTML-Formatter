@@ -226,7 +226,9 @@ the top of the page and in the tab title)\n
         self._check_everything_thread = threading.Thread(target=self._loop_check_everything)
         self._check_everything_thread.start()
 
-    def _arrange_widgets(self):
+        self._process_all_thread: threading.Thread
+
+    def _arrange_widgets(self) -> None:
         """Arrange the attributes created by __init__() nicely."""
         self._hbox.addWidget(self._instructions_label)
         # The margins are around the edges of the window and the spacing is between widgets
@@ -259,14 +261,14 @@ the top of the page and in the tab title)\n
 
         self._hbox.addLayout(self._vbox)
 
-    def _select_chat_dialog(self):
+    def _select_chat_dialog(self) -> None:
         """Open a dialog and allow the user to select a zip file, which then becomes self._selected_chat."""
         # This is a file select dialog to select a zip file
-        self._selected_chat_raw = get_open_files_and_dirs(self, caption='Select an exported chat', filter='Zip files (*.zip)')
+        selected_chat_raw = get_open_files_and_dirs(self, caption='Select an exported chat', filter='Zip files (*.zip)')
 
         try:
             # We then need to trim the raw data down into just the name of the zip file
-            self._selected_chat = self._selected_chat_raw[0]
+            self._selected_chat = selected_chat_raw[0]
             self._selected_chat_display = self._selected_chat.split('/')[-1]
         except IndexError:
             self._selected_chat = ''
@@ -274,28 +276,28 @@ the top of the page and in the tab title)\n
 
         self._selected_chat_label.setText(f'Selected:\n{self._selected_chat_display}')
 
-    def _select_output_dialog(self):
+    def _select_output_dialog(self) -> None:
         """Open a dialog and allow the user to select a directory, which then becomes self._selected_output."""
-        self._selected_output_raw = get_open_files_and_dirs(self, caption='Select an output directory')
+        selected_output_raw = get_open_files_and_dirs(self, caption='Select an output directory')
 
         try:
             # We then need to trim the raw data down into just the name of the folder
-            self._selected_output = self._selected_output_raw[0]
+            self._selected_output = selected_output_raw[0]
         except IndexError:
             self._selected_output = ''
 
         self._selected_output_label.setText(f'Selected:\n{self._selected_output}')
 
-    def _group_chat_checkbox_changed_state(self):
+    def _group_chat_checkbox_changed_state(self) -> None:
         """Check the state of self._group_chat_checkbox adn use it to determine the boolean value of self._group_chat."""
         if self._group_chat_checkbox.isChecked():
             self._group_chat = True
         else:
             self._group_chat = False
 
-    def _add_to_list(self):
+    def _add_to_list(self) -> None:
         """Take the values given by the user and add them to the list of chat data."""
-        data = [self._selected_chat, self._group_chat, self._sender_name, self._chat_title, self._filename, self._selected_output]
+        data = (self._selected_chat, self._group_chat, self._sender_name, self._chat_title, self._filename, self._selected_output)
         self._all_chats_list.append(data)
 
         # Clear everything
@@ -307,7 +309,7 @@ the top of the page and in the tab title)\n
         self._filename_textbox.setText('')
         # But don't clear the output directory, because the user will probably want to keep that the same
 
-    def _process_all_chats(self):
+    def _process_all_chats(self) -> None:
         """Process all the lists of chat data in self._all_chats_list with functions.process_list()."""
         # Disable the exit button until the process_all function returns
         self._exit_button.setEnabled(False)
@@ -325,18 +327,18 @@ the top of the page and in the tab title)\n
         if os.path.isdir('temp'):
             rmtree('temp')
 
-    def _process_all(self):
+    def _process_all(self) -> None:
         """Run self._process_all_chats() in a thread."""
         self._process_all_thread = threading.Thread(target=self._process_all_chats)
         self._process_all_thread.start()
 
-    def _get_textbox_values(self):
+    def _get_textbox_values(self) -> None:
         """Get the values from all the text boxes and assign them to their associated instance attributes."""
         self._sender_name = self._sender_name_textbox.text()
         self._chat_title = self._chat_title_textbox.text()
         self._filename = self._filename_textbox.text()
 
-    def _enable_add_to_list_button(self):
+    def _enable_add_to_list_button(self) -> None:
         """Set self._add_to_list_button to enabled if all the conditions have been met.
 
         There must be non-empty strings in all three text boxes and a chat and an output must be selected.
@@ -348,27 +350,27 @@ the top of the page and in the tab title)\n
         else:
             self._add_to_list_button.setEnabled(False)
 
-    def _enable_process_all_button(self):
+    def _enable_process_all_button(self) -> None:
         """Set self._process_all_button to enabled if there is data in self._all_chats_list."""
         if len(self._all_chats_list) > 0:
             self._process_all_button.setEnabled(True)
         else:
             self._process_all_button.setEnabled(False)
 
-    def _loop_check_everything(self):
+    def _loop_check_everything(self) -> None:
         """Run the methods to check things and enable widgets while self._exists is True."""
         while self._exists:
             self._get_textbox_values()
             self._enable_add_to_list_button()
             self._enable_process_all_button()
 
-    def _close_properly(self):
+    def _close_properly(self) -> None:
         """Set the self._exists boolean to false to end the threads and then close the window."""
         self._exists = False
         self.close()
 
 
-def show_window():
+def show_window() -> None:
     """Create an instance of FormatterGUI and show it. Terminate the program when the user exits the window."""
     app = QApplication(sys.argv)
     window = FormatterGUI()
