@@ -106,7 +106,7 @@ class FormatterGUI(QMainWindow):
 
         This method takes no arguments and you must call show() on it after initialising an instance of it.
         """
-        super(FormatterGUI, self).__init__()
+        super().__init__()
 
         # A boolean to see if the window exists. Used to close properly
         self._exists = True
