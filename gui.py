@@ -164,18 +164,21 @@ the top of the page and in the tab title)\n
         self._sender_name_label.setAlignment(QtCore.Qt.AlignCenter)
 
         self._sender_name_textbox = QtWidgets.QLineEdit(self)
+        self._sender_name_textbox.textChanged.connect(self._set_sender_name)
 
         self._chat_title_label = QtWidgets.QLabel(self)
         self._chat_title_label.setText('Enter the desired title of the chat:')
         self._chat_title_label.setAlignment(QtCore.Qt.AlignCenter)
 
         self._chat_title_textbox = QtWidgets.QLineEdit(self)
+        self._chat_title_textbox.textChanged.connect(self._set_chat_title)
 
         self._filename_label = QtWidgets.QLabel(self)
         self._filename_label.setText('Enter the desired name of the HTML file:')
         self._filename_label.setAlignment(QtCore.Qt.AlignCenter)
 
         self._filename_textbox = QtWidgets.QLineEdit(self)
+        self._filename_textbox.textChanged.connect(self._set_filename)
 
         self._select_output_button = QtWidgets.QPushButton(self)
         self._select_output_button.setText('Select an output directory')
@@ -223,10 +226,29 @@ the top of the page and in the tab title)\n
 
         # ===== Create threads
 
-        self._check_everything_thread = threading.Thread(target=self._loop_check_everything)
-        self._check_everything_thread.start()
-
         self._process_all_thread: threading.Thread
+
+    def _set_sender_name(self) -> None:
+        """Set self._sender_name to value."""
+        self._sender_name = self._sender_name_textbox.text()
+        self._enable_add_to_list_button()
+
+    def _set_chat_title(self) -> None:
+        """Set self._chat_title to value."""
+        self._chat_title = self._chat_title_textbox.text()
+        self._enable_add_to_list_button()
+
+    def _set_filename(self) -> None:
+        """Set self._filename to value."""
+        self._filename = self._filename_textbox.text()
+        self._enable_add_to_list_button()
+
+    def _enable_add_to_list_button(self) -> None:
+        """Enable self._add_to_list_button if all the conditions are met."""
+        self._add_to_list_button.setEnabled(bool(
+            self._sender_name != '' and self._chat_title != '' and self._filename != '' and
+            self._selected_chat != '' and self._selected_output != ''
+        ))
 
     def _arrange_widgets(self) -> None:
         """Arrange the attributes created by __init__() nicely."""
@@ -276,6 +298,8 @@ the top of the page and in the tab title)\n
 
         self._selected_chat_label.setText(f'Selected:\n{self._selected_chat_display}')
 
+        self._enable_add_to_list_button()
+
     def _select_output_dialog(self) -> None:
         """Open a dialog and allow the user to select a directory, which then becomes self._selected_output."""
         selected_output_raw = get_open_files_and_dirs(self, caption='Select an output directory')
@@ -287,6 +311,8 @@ the top of the page and in the tab title)\n
             self._selected_output = ''
 
         self._selected_output_label.setText(f'Selected:\n{self._selected_output}')
+
+        self._enable_add_to_list_button()
 
     def _group_chat_checkbox_changed_state(self) -> None:
         """Check the state of self._group_chat_checkbox adn use it to determine the boolean value of self._group_chat."""
@@ -309,6 +335,8 @@ the top of the page and in the tab title)\n
         self._filename_textbox.setText('')
         # But don't clear the output directory, because the user will probably want to keep that the same
 
+        self._process_all_button.setEnabled(True)
+
     def _process_all_chats(self) -> None:
         """Process all the lists of chat data in self._all_chats_list with functions.process_list()."""
         # Disable the exit button until the process_all function returns
@@ -329,40 +357,9 @@ the top of the page and in the tab title)\n
 
     def _process_all(self) -> None:
         """Run self._process_all_chats() in a thread."""
+        self._process_all_button.setEnabled(False)
         self._process_all_thread = threading.Thread(target=self._process_all_chats)
         self._process_all_thread.start()
-
-    def _get_textbox_values(self) -> None:
-        """Get the values from all the text boxes and assign them to their associated instance attributes."""
-        self._sender_name = self._sender_name_textbox.text()
-        self._chat_title = self._chat_title_textbox.text()
-        self._filename = self._filename_textbox.text()
-
-    def _enable_add_to_list_button(self) -> None:
-        """Set self._add_to_list_button to enabled if all the conditions have been met.
-
-        There must be non-empty strings in all three text boxes and a chat and an output must be selected.
-        """
-        # If all text boxes have been filled in and the chat and output directory have been selected, activate the add to list button
-        if self._sender_name != '' and self._chat_title != '' and self._filename != '' and \
-                self._selected_chat != '' and self._selected_output != '':
-            self._add_to_list_button.setEnabled(True)
-        else:
-            self._add_to_list_button.setEnabled(False)
-
-    def _enable_process_all_button(self) -> None:
-        """Set self._process_all_button to enabled if there is data in self._all_chats_list."""
-        if len(self._all_chats_list) > 0:
-            self._process_all_button.setEnabled(True)
-        else:
-            self._process_all_button.setEnabled(False)
-
-    def _loop_check_everything(self) -> None:
-        """Run the methods to check things and enable widgets while self._exists is True."""
-        while self._exists:
-            self._get_textbox_values()
-            self._enable_add_to_list_button()
-            self._enable_process_all_button()
 
     def _close_properly(self) -> None:
         """Set the self._exists boolean to false to end the threads and then close the window."""
