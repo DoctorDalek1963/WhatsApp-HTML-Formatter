@@ -29,7 +29,6 @@ Classes:
 Functions:
     show_window():
         Create an instance of the GUI window and show it. Takes no arguments.
-
 """
 
 import os
